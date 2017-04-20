@@ -5,7 +5,7 @@
   <link href="/MLBlog/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-04-19T17:21:17.000Z</updated>
+  <updated>2017-04-20T02:02:14.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,11 +16,192 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>“绪论”小结</title>
+    <link href="http://yoursite.com/posts/c939f06b/"/>
+    <id>http://yoursite.com/posts/c939f06b/</id>
+    <published>2017-04-20T01:48:45.000Z</published>
+    <updated>2017-04-20T02:02:14.000Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>与传统的计算机程序不同，机器学习是面向数据的算法、能够从数据中获得信息。它符合新时代脑力劳动代替体力劳动的趋势，是富有生命力的领域</li>
+<li>Python 是一门优异的语言，代码清晰可读、功能广泛强大。其最大弱点——速度问题也可以通过很多不太困难的方法弥补</li>
+<li>虽说机器学习算法很多，但通常而言、进行机器学习的过程会包含以下三步：<ul>
+<li>获取与处理数据</li>
+<li>选择与训练模型</li>
+<li>评估与可视化结果</li>
+</ul>
+</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;与传统的计算机程序不同，机器学习是面向数据的算法、能够从数据中获得信息。它符合新时代脑力劳动代替体力劳动的趋势，是富有生命力的领域&lt;/li&gt;
+&lt;li&gt;Python 是一门优异的语言，代码清晰可读、功能广泛强大。其最大弱点——速度问题也可以通过很多不太困难的方法弥
+    
+    </summary>
+    
+      <category term="绪论" scheme="http://yoursite.com/categories/%E7%BB%AA%E8%AE%BA/"/>
+    
+    
+      <category term="小结" scheme="http://yoursite.com/tags/%E5%B0%8F%E7%BB%93/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>第一个机器学习样例</title>
+    <link href="http://yoursite.com/posts/372587d5/"/>
+    <id>http://yoursite.com/posts/372587d5/</id>
+    <published>2017-04-20T01:03:45.000Z</published>
+    <updated>2017-04-20T02:02:28.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/a_FirstExample/Regression.py" target="_blank" rel="external">这里</a>）</p>
+<p>作为“绪论”的总结，我们来运用 Python 解决一个实际问题以对机器学习有具体的感受吧。由于该样例只是为了提供直观，我们就拿比较有名的一个小问题来进行阐述。俗话云：“麻雀虽小，五脏俱全”，我们完全可以通过这个样例来对机器学习的一般性步骤进行一个大致的认知</p>
+<p>该问题来自 Coursera 上斯坦福大学机器学习课程（which is 我的入坑课程），其叙述如下：现有包含 47 个房子的面积和价格，需要建立一个模型对新的房价进行预测。稍微翻译一下问题，可以得知：</p>
+<ul>
+<li>输入数据只有一维、亦即房子的面积</li>
+<li>目标数据也只有一维、亦即房子的价格</li>
+<li>我们需要做的、就是根据已知的房子的面积和价格的关系进行机器学习</li>
+</ul>
+<p>下面我们就来一步步地进行操作</p>
+<a id="more"></a>
+<h1 id="获取与处理数据"><a href="#获取与处理数据" class="headerlink" title="获取与处理数据"></a>获取与处理数据</h1><p>原始数据集的前 10 个样本如下表所示，这里房子面积和房子价格的单位可以随意定夺、因为它们不会对结果造成影响：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>房子面积</th>
+<th>房子价格</th>
+<th>房子面积</th>
+<th>房子价格</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2104</td>
+<td>399900</td>
+<td>1600</td>
+<td>329900</td>
+</tr>
+<tr>
+<td>2400</td>
+<td>369000</td>
+<td>1416</td>
+<td>232000</td>
+</tr>
+<tr>
+<td>3000</td>
+<td>539900</td>
+<td>1985</td>
+<td>299900</td>
+</tr>
+<tr>
+<td>1534</td>
+<td>314900</td>
+<td>1427</td>
+<td>198999</td>
+</tr>
+<tr>
+<td>1380</td>
+<td>212000</td>
+<td>1494</td>
+<td>242500</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>完整的数据集可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/prices.txt" target="_blank" rel="external">这里</a>。虽然该数据集比较简单，但可以看到其中的数字都相当大。保留它原始形式确实有可能是有必要的，但一般而言、我们应该对它做简单的处理以期望能够降低问题的复杂度。在这个例子里，我们采取常用的、将输入数据标准化的做法，其数学公式为：</p>
+<script type="math/tex; mode=display">
+X = \frac{X - \bar X}{std(X)}</script><p>其中<script type="math/tex">\bar X</script>表示<script type="math/tex">X</script>（房子面积）的均值、<script type="math/tex">std(X)</script>表示<script type="math/tex">X</script>的标准差（Standard Deviation）。代码实现则如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入需要用到的库</span></div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line"></div><div class="line"><span class="comment"># 定义存储输入数据（x）和目标数据（y）的数组</span></div><div class="line">x, y = [], []</div><div class="line"><span class="comment"># 遍历数据集，变量 sample 对应的正是一个个样本</span></div><div class="line"><span class="keyword">for</span> sample <span class="keyword">in</span> open(<span class="string">"../_Data/prices.txt"</span>, <span class="string">"r"</span>):</div><div class="line">    <span class="comment"># 由于数据是用逗号隔开的，所以调用 Python 中的 split 方法并将逗号作为参数传入</span></div><div class="line">    _x, _y = sample.split(<span class="string">","</span>)</div><div class="line">    <span class="comment"># 将字符串数据转化为浮点数</span></div><div class="line">    x.append(float(_x))</div><div class="line">    y.append(float(_y))</div><div class="line"><span class="comment"># 读取完数据后，将它们转化为 Numpy 数组以方便进一步的处理</span></div><div class="line">x, y = np.array(x), np.array(y)</div><div class="line"><span class="comment"># 标准化</span></div><div class="line">x = (x - x.mean()) / x.std()</div><div class="line"><span class="comment"># 将原始数据以散点图的形式画出</span></div><div class="line">plt.figure()</div><div class="line">plt.scatter(x, y, c=<span class="string">"g"</span>, s=<span class="number">20</span>)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
+<p>上面这段代码的运行结果如下图所示：</p>
+<img src="/MLBlog/posts/372587d5/p1.png" alt="预处理后的数据散点图" title="预处理后的数据散点图">
+<p>这里横轴是标准化后的房子面积，纵轴是房子价格。以上我们已经比较好地完成了机器学习任务的第一步：数据预处理</p>
+<h1 id="选择与训练模型"><a href="#选择与训练模型" class="headerlink" title="选择与训练模型"></a>选择与训练模型</h1><p>在弄好数据之后、下一步就要开始选择相应的学习方法和模型了。幸运的是，通过可视化原始数据，我们可以非常直观地感受到：我们很有可能通过线性回归（Linear Regression）中的多项式拟合来得到一个不错的结果。其模型的数学表达式如下：</p>
+<p><strong><em>注意：用多项式拟合散点只是线性回归的很小的一部分、但是它的直观意义比较明显。考虑到问题比较简单、我们才选用了多项式拟合。线性回归的详细讨论超出了本书的范围，这里不做赘述</em></strong></p>
+<script type="math/tex; mode=display">
+f(x|p;n)=p_0x^n+p_1x^{n-1}+...+p_{n-1}x+p_n
+
+L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/tex">f(x|p;n)</script>就是我们的模型，<code>p</code>、<code>n</code>都是模型的参数，其中<code>p</code>是多项式<code>f</code>的各个系数、<code>n</code>是多项式的次数。<script type="math/tex">L(p;n)</script>则是模型的损失函数，这里我们采用了常见的平方损失函数、也就是所谓的欧氏距离（或说向量的二范数）。<code>x</code>、<code>y</code>则分别是输入向量和目标向量；在我们这个样例中，<code>x</code>、<code>y</code>这两个向量都是 47 维的向量，分别由 47 个不同的房子面积、房子价格所构成</p>
+<p>在确定好模型后，我们就可以开始编写代码来进行训练了。对于大多数机器学习算法，所谓的训练正是最小化某个损失函数的过程，我们这个多项式拟合的模型也不例外：我们的目的就是让上面定义的<script type="math/tex">L(p;n)</script>最小。在数理统计领域里面有专门的理论研究这种回归问题，其中比较有名的正规方程更是直接给出了一个简单的解的通式。不过由于有 Numpy 的存在，这个训练过程甚至变得还要更加简单一些：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 在(-2,4)这个区间上取 100 个点作为画图的基础</span></div><div class="line">x0 = np.linspace(<span class="number">-2</span>, <span class="number">4</span>, <span class="number">100</span>)</div><div class="line"></div><div class="line"><span class="comment"># 利用 Numpy 的函数定义训练并返回多项式回归模型的函数</span></div><div class="line"><span class="comment"># deg 参数代表着模型参数中的 n、亦即模型中多项式的次数</span></div><div class="line"><span class="comment"># 返回的模型能够根据输入的 x（默认是 x0）、返回相对应的预测的 y</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_model</span><span class="params">(deg)</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">lambda</span> input_x=x0: np.polyval(np.polyfit(x, y, deg), input_x)</div></pre></td></tr></table></figure>
+<p>这里需要解释 Numpy 里面带的两个函数：<code>polyfit</code>和<code>polyval</code>的用法：</p>
+<ul>
+<li><code>polyfit(x, y, deg)</code>：该函数会返回使得上述（注：该公式中的<code>x</code>和<code>y</code>就是输入的<code>x</code>和<code>y</code>）<script type="math/tex">L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script>最小的参数<code>p</code>、亦即多项式的各项系数。换句话说，该函数就是模型的训练函数</li>
+<li><code>polyval(p, x)</code>：根据多项式的各项系数<code>p</code>和多项式中<code>x</code>的值、返回多项式的值<code>y</code></li>
+</ul>
+<h1 id="评估与可视化结果"><a href="#评估与可视化结果" class="headerlink" title="评估与可视化结果"></a>评估与可视化结果</h1><p>模型做好后、我们就要尝试判断各种参数下模型的好坏了。为简洁，我们采用<script type="math/tex">n=1,4,10</script>这三组参数进行评估。由于我们训练的目的是最小化损失函数，所以用损失函数来衡量模型的好坏似乎是一个合理的做法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 根据参数 n、输入的 x、y 返回相对应的损失</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_cost</span><span class="params">(deg, input_x, input_y)</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="number">0.5</span> * ((get_model(deg)(input_x) - input_y) ** <span class="number">2</span>).sum()</div><div class="line"></div><div class="line"><span class="comment"># 定义测试参数集并根据它进行各种实验</span></div><div class="line">test_set = (<span class="number">1</span>, <span class="number">4</span>, <span class="number">10</span>)</div><div class="line"><span class="keyword">for</span> d <span class="keyword">in</span> test_set:</div><div class="line">    <span class="comment"># 输出相应的损失</span></div><div class="line">    print(get_cost(d, x, y))</div></pre></td></tr></table></figure>
+<p>所得的结果是：当<script type="math/tex">n=1,4,10</script>时，损失的头两个数字分别为 96、94 和 75。这么看来似乎是<script type="math/tex">n=10</script>优于<script type="math/tex">n=4</script>而<script type="math/tex">n=1</script>最差；但从上面那张图可以看出，似乎直接选择<script type="math/tex">n=1</script>作为模型的参数才是最好的选择。这里的矛盾的来源正是前文所提到过的过拟合情况</p>
+<p>那么怎么最直观地了解是否出现过拟合了呢？当然还是画图了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"># 画出相应的图像</div><div class="line">plt.scatter(x, y, c=&quot;g&quot;, s=20)</div><div class="line">for d in test_set:</div><div class="line">    plt.plot(x0, get_model(d)(), label=&quot;degree = &#123;&#125;&quot;.format(d))</div><div class="line">plt.xlim(-2, 4)</div><div class="line"># 将横轴、纵轴的范围分别限制在(-2,4)、(10^5,8 * 10^5)</div><div class="line">plt.ylim(1e5, 8e5)</div><div class="line"># 调用 legend 方法使曲线对应的 label 正确显示</div><div class="line">plt.legend()</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
+<p>上面这段代码的运行结果如下图所示：</p>
+<img src="/MLBlog/posts/372587d5/p2.png" alt="线性回归的可视化" title="线性回归的可视化">
+<p>其中，蓝线、绿线、红线分别代表<script type="math/tex">n=1</script>、<script type="math/tex">n=4</script>、<script type="math/tex">n=10</script>的情况（上图的右上角亦有说明）。可以看出，从<script type="math/tex">n=4</script>开始模型就已经开始出现过拟合现象了，到<script type="math/tex">n=10</script>时模型已经变得非常不合理</p>
+<p>至此，可以说这个问题就已经基本解决了。在这个样例里面，除了交叉验证、我们涵盖了机器学习中的大部分主要步骤（之所以没有进行交叉验证是因为数据太少了……）。代码部分加起来总共 40~50 行，应该算是一个比较合适的长度。希望大家能够通过这个样例对机器学习有个大概的理解、也希望它能引起大家对机器学习的兴趣</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/a_FirstExample/Regression.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
+&lt;p&gt;作为“绪论”的总结，我们来运用 Python 解决一个实际问题以对机器学习有具体的感受吧。由于该样例只是为了提供直观，我们就拿比较有名的一个小问题来进行阐述。俗话云：“麻雀虽小，五脏俱全”，我们完全可以通过这个样例来对机器学习的一般性步骤进行一个大致的认知&lt;/p&gt;
+&lt;p&gt;该问题来自 Coursera 上斯坦福大学机器学习课程（which is 我的入坑课程），其叙述如下：现有包含 47 个房子的面积和价格，需要建立一个模型对新的房价进行预测。稍微翻译一下问题，可以得知：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;输入数据只有一维、亦即房子的面积&lt;/li&gt;
+&lt;li&gt;目标数据也只有一维、亦即房子的价格&lt;/li&gt;
+&lt;li&gt;我们需要做的、就是根据已知的房子的面积和价格的关系进行机器学习&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;下面我们就来一步步地进行操作&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="绪论" scheme="http://yoursite.com/categories/%E7%BB%AA%E8%AE%BA/"/>
+    
+    
+      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>人生苦短，我用 Python</title>
+    <link href="http://yoursite.com/posts/698a0893/"/>
+    <id>http://yoursite.com/posts/698a0893/</id>
+    <published>2017-04-20T00:51:16.000Z</published>
+    <updated>2017-04-20T02:03:18.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>上一篇文章大概地介绍了一下机器学习的各种概念，这一篇文章我们则会主要讲讲脚本语言 Python 相关的一些东西。本文题目是在 Python 界流传甚广的“谚语”，它讲述了 Python 强大的功能与易于上手的特性</p>
+<a id="more"></a>
+<h1 id="为何选择-Python"><a href="#为何选择-Python" class="headerlink" title="为何选择 Python"></a>为何选择 Python</h1><p>援引开源运动的领袖人物 Eric Raymond 的说法：“Python 语言非常干净，设计优雅，具有出色的模块化特性。其最出色的地方在于，它鼓励清晰易读的代码，特别适合以渐进开发的方式构造项目”。Python 的可读性使得即使是刚学不久的人也看懂大部分的代码，Python 庞大的社区和大量的开发文档更是使得初学者能够快速地实现许许多多令人惊叹的功能。对于 Python 的程序，人们甚至有时会戏称其为“可执行的伪代码（executable pseudo-code）”以突显它的清晰性和可读性</p>
+<p>Python 的强大是毋庸置疑的，上文提到的 Eric Raymond 甚至称其“过于强大了”。与之相对应的、就是 Python 的速度比较慢。然而比起 Python 开发环境提供的海量高级数据结构（如列表、元组、字典、集合等）和数之不尽的第三方库、再加上高速的 CPU 和近代发展起来的 GPU 编程，速度的问题就显得没那么尖锐。况且 Python 还能通过各种途径来使用 C / C++ 代码来编写核心代码，其强大的“胶水”功能使其速度（在程序员能力允许的情况下）和纯粹的 C / C++ 相比已经相去不远。一个典型的例子、也是我们会在本书常常运用到的、就是 Python 中 Numpy 这个第三方库。编写它的语言正是底层语言（C 和 Fortran），其支持向量、矩阵操作的特性和优异的速度使得 Python 在科学计算这一领域大放异彩</p>
+<p><strong><em>注意：Python 及本博客会用到的两个非常优异的第三方库——Numpy 和 Tensorflow 的用法摘要我们会开单独的章节进行说明</em></strong></p>
+<h1 id="Python-在机器学习领域的优势"><a href="#Python-在机器学习领域的优势" class="headerlink" title="Python 在机器学习领域的优势"></a>Python 在机器学习领域的优势</h1><p>虽然在上一小节叙述了 Python 的种种好处，但不可否认的是，确实存在诸如 MATLAB 和 Mathematica 这样的高级程序语言、它们对机器学习的支持也不错，MATLAB 甚至还自带许多机器学习的应用。但是作为一个问心无愧的程序员，我们还是需要提倡支持正版、而 MATLAB 的正版软件需要数千美金。与之相对，由于 Python 是开源项目，几乎所有必要的组件都是完全免费的</p>
+<p>之前也提到过 Python 的速度问题，但是更快更底层的语言、比如 C 和 C++，若使用它们来学习机器学习的话、会不可避免地引发这么一个问题：即使是实现一个非常简单的功能、也需要进行大量的编写和 debug 的过程；在这期间，程序员很有可能忘掉学习机器学习的初衷而迷失在代码的海洋中。笔者曾经尝试过将 Python 上的神经网络框架移植到 C++ 上，这之间的折腾至今难忘</p>
+<p>此外，笔者认为、使用 Python 来学习机器学习是和“不要过早优化”这句编程界金句有着异曲同工之妙的。Python（几乎）唯一的缺陷——速度，在初期进行快速检验算法、思想正误及开发工作时，其实基本不是重要问题。这之中的道理是平凡的：如果解决问题的思想存在问题，那么即使拼命去提高程序的运行效率、也只能使问题越来越大而已。这种时候，先使用 Python 进行快速实现、有必要时再用底层代码重写核心代码，从各方面来说都是一个更好的选择</p>
+<p><del>（有没有觉得这个人真能扯）</del></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;上一篇文章大概地介绍了一下机器学习的各种概念，这一篇文章我们则会主要讲讲脚本语言 Python 相关的一些东西。本文题目是在 Python 界流传甚广的“谚语”，它讲述了 Python 强大的功能与易于上手的特性&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="绪论" scheme="http://yoursite.com/categories/%E7%BB%AA%E8%AE%BA/"/>
+    
+    
+      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+    
+      <category term="综述" scheme="http://yoursite.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+    
+  </entry>
+  
+  <entry>
     <title>机器学习简介</title>
     <link href="http://yoursite.com/posts/a0837b26/"/>
     <id>http://yoursite.com/posts/a0837b26/</id>
     <published>2017-04-19T15:28:56.000Z</published>
-    <updated>2017-04-19T17:21:17.000Z</updated>
+    <updated>2017-04-20T02:03:24.000Z</updated>
     
     <content type="html"><![CDATA[<p>“机器学习”在最近虽可能不至于到人尽皆知的程度、却也是非常火热的词汇。机器学习是英文单词“Machine Learning”（简称ML）的直译，从字面上便说明了这门技术是让机器进行“学习”的技术。然而我们知道机器终究是死的，所谓的“学习”归根结底亦只是人类“赋予”机器的一系列运算。这个“赋予”的过程可以有很多种实现，而 Python 正是其中相对容易上手、同时性能又相当不错的一门语言。作为综述，我们只打算谈谈机器学习相关的一些比较宽泛的知识，介绍与说明为何要使用 Python 来作为机器学习的工具的工作则交给下一篇文章来做。而在最后，我们会提供一个简短易懂的、具有实际意义的例子来给大家提供一个直观的感受</p>
 <p>由于所涉及到的东西都比较基础，有相应知识背景的观众老爷大可不必看“绪论”这一分类下的文章 ( σ’ω’)σ</p>
@@ -63,7 +244,8 @@
 <ul>
 <li>泛化能力针对的其实是学习方法，它用于衡量该学习方法学习到的模型在整个样本空间上的表现</li>
 </ul>
-<p>这一点当然是十分重要的，因为我们拿来训练我们模型的数据终究只是样本空间的一个很小的采样，如果只是过分专注于它们的话、就会出现所谓的“过拟合”（Over Fitting）的情况。当然，如果过分罔顾训练数据，又会出现“欠拟合”（Under Fitting）。我们可以用一张图来直观感受过拟合和欠拟合（如下图所示，左为欠拟合、右为过拟合）：<br><img src="/MLBlog/posts/a0837b26/p1.png" alt="欠拟合与过拟合" title="欠拟合与过拟合"></p>
+<p>这一点当然是十分重要的，因为我们拿来训练我们模型的数据终究只是样本空间的一个很小的采样，如果只是过分专注于它们的话、就会出现所谓的“过拟合”（Over Fitting）的情况。当然，如果过分罔顾训练数据，又会出现“欠拟合”（Under Fitting）。我们可以用一张图来直观感受过拟合和欠拟合（如下图所示，左为欠拟合、右为过拟合）：</p>
+<img src="/MLBlog/posts/a0837b26/p1.png" alt="欠拟合与过拟合" title="欠拟合与过拟合">
 <p>所以我们需要“张弛有度”、找到最好的那个平衡点。统计学习中的结构风险最小化（Structural Risk Minimization、简称 SRM）就是研究这个的，它和传统的经验风险最小化（Empirical Risk Minimization、简称 ERM）相比，注重于对风险上界的最小化、而不是单纯使经验风险最小化。它有一个原则：在使得风险上界最小的函数子集中、挑选出使得经验风险最小的函数。而这个函数子集，正是我们之前提到过的假设空间</p>
 <p><strong><em>注意：所谓经验风险，可以理解为训练数据集上的风险。相对应的，ERM 则可以理解为只注重训练数据集的学习方法，它的理论基础是经验风险在某种足够合理的数学意义上一致收敛于期望风险、亦即所谓的“真正的”风险</em></strong></p>
 <p>关于 SRM 和 ERM 的详细讨论会涉及到诸如 VC 维和正则化的概念，这里不进行详细展开、但我们需要有这么一个直观：为了使我们学习方法训练出的模型泛化能力足够好，我们需要对我们的模型做出一定的“限制”、而这个“限制”就表现在假设空间的选取上。一个非常普遍的做法是对模型的复杂度做出一定的惩罚、从而使模型趋于精简。这与所谓的“奥卡姆剃刀原理”<del>（奥卡姆：我的剃刀还能再战 500 年）</del>不谋而合：“如无必要，勿增实体”“切勿浪费较多的东西去做，用较少的东西、同样可以做好事情”</p>
@@ -108,7 +290,7 @@
     <link href="http://yoursite.com/posts/4f2fecf/"/>
     <id>http://yoursite.com/posts/4f2fecf/</id>
     <published>2017-04-19T12:13:19.000Z</published>
-    <updated>2017-04-19T17:20:39.000Z</updated>
+    <updated>2017-04-20T01:17:33.000Z</updated>
     
     <content type="html"><![CDATA[<p>其实要说搭博客的想法的话，在相当久之前就已经有了。然而由于种种原因<del>（懒）</del>，导致一直搁置至今</p>
 <p>不过搭一个相对好看的博客比我想象的要难不少，我在经历了打算从头搭建<script type="math/tex">\rightarrow</script>打算使用 WordPress<script type="math/tex">\rightarrow</script>打算使用 Jekyll 这三个阶段后，最终还是选择了 Hexo + Next 主题这一个组合</p>
@@ -125,7 +307,7 @@
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/g_CNN" target="_blank" rel="external">卷积神经网络（Convolutional Neural Network）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/_Dist" target="_blank" rel="external">具体的应用实例（Applications）</a></li>
 </ul>
-<p>（对于有相应博客的内容，链接会导向相应的综述，否则会导向相应的源代码）</p>
+<p>对于有相应博客的内容，链接会导向相应的综述，否则会导向相应的源代码</p>
 ]]></content>
     
     <summary type="html">
@@ -136,9 +318,9 @@
     </summary>
     
     
-      <category term="综述" scheme="http://yoursite.com/tags/%E7%BB%BC%E8%BF%B0/"/>
-    
       <category term="目录" scheme="http://yoursite.com/tags/%E7%9B%AE%E5%BD%95/"/>
+    
+      <category term="综述" scheme="http://yoursite.com/tags/%E7%BB%BC%E8%BF%B0/"/>
     
   </entry>
   
