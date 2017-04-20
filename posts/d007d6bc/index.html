@@ -74,7 +74,7 @@
 <link href="/MLBlog/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Machine Learning, Python, Numpy" />
+  <meta name="keywords" content="数学," />
 
 
 
@@ -92,15 +92,17 @@
 
 
 
-<meta name="description" content="一个啥都想学的浮莲子">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Python 与机器学习">
-<meta property="og:url" content="http://yoursite.com/categories/绪论/index.html">
+<meta name="description" content="无论是贝叶斯学派还是频率学派，一个无法避开的问题就是如何从已有的样本中获取信息并据此估计目标模型的参数。比较有名的“频率近似概率”其实就是（基于大数定律的）相当合理的估计之一，本章所叙述的两种参数估计方法在最后也通常会归结于它">
+<meta name="keywords" content="数学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="参数估计">
+<meta property="og:url" content="http://yoursite.com/posts/d007d6bc/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
-<meta property="og:description" content="一个啥都想学的浮莲子">
+<meta property="og:description" content="无论是贝叶斯学派还是频率学派，一个无法避开的问题就是如何从已有的样本中获取信息并据此估计目标模型的参数。比较有名的“频率近似概率”其实就是（基于大数定律的）相当合理的估计之一，本章所叙述的两种参数估计方法在最后也通常会归结于它">
+<meta property="og:updated_time" content="2017-04-20T13:22:34.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Python 与机器学习">
-<meta name="twitter:description" content="一个啥都想学的浮莲子">
+<meta name="twitter:title" content="参数估计">
+<meta name="twitter:description" content="无论是贝叶斯学派还是频率学派，一个无法避开的问题就是如何从已有的样本中获取信息并据此估计目标模型的参数。比较有名的“频率近似概率”其实就是（基于大数定律的）相当合理的估计之一，本章所叙述的两种参数估计方法在最后也通常会归结于它">
 
 
 
@@ -128,13 +130,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/categories/绪论/"/>
+  <link rel="canonical" href="http://yoursite.com/posts/d007d6bc/"/>
 
 
 
 
 
-  <title> 分类: 绪论 | Python 与机器学习 </title>
+  <title> 参数估计 | Python 与机器学习 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -169,7 +171,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -297,131 +299,233 @@
           <div id="content" class="content">
             
 
-  <section id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        绪论
-        <small>分类</small>
-      </h2>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/MLBlog/posts/c939f06b/" itemprop="url">
-              
-                <span itemprop="name">“绪论”小结</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-04-20T09:48:45+08:00"
-              content="2017-04-20" >
-          04-20
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/MLBlog/posts/372587d5/" itemprop="url">
-              
-                <span itemprop="name">第一个机器学习样例</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-04-20T09:03:45+08:00"
-              content="2017-04-20" >
-          04-20
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/MLBlog/posts/698a0893/" itemprop="url">
-              
-                <span itemprop="name">人生苦短，我用 Python</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-04-20T08:51:16+08:00"
-              content="2017-04-20" >
-          04-20
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/MLBlog/posts/a0837b26/" itemprop="url">
-              
-                <span itemprop="name">机器学习综述</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-04-19T23:28:56+08:00"
-              content="2017-04-19" >
-          04-19
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </section>
 
   
 
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/MLBlog/posts/d007d6bc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/MLBlog/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                参数估计
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-20T11:52:09+08:00">
+                2017-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/MLBlog/categories/朴素贝叶斯/" itemprop="url" rel="index">
+                    <span itemprop="name">朴素贝叶斯</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>无论是贝叶斯学派还是频率学派，一个无法避开的问题就是如何从已有的样本中获取信息并据此估计目标模型的参数。比较有名的“频率近似概率”其实就是（基于大数定律的）相当合理的估计之一，本章所叙述的两种参数估计方法在最后也通常会归结于它</p>
+<a id="more"></a>
+<h1 id="极大似然估计（ML-估计）"><a href="#极大似然估计（ML-估计）" class="headerlink" title="极大似然估计（ML 估计）"></a>极大似然估计（ML 估计）</h1><p>如果把模型描述成一个概率模型的话，一个自然的想法是希望得到的模型参数<script type="math/tex">\theta</script>能够使得在训练集<script type="math/tex">\tilde{X}</script>作为输入时、模型输出的概率达到极大。这里就有一个似然函数的概念，它能够输出<script type="math/tex">\tilde{X} = \left( x_{1},\ldots,x_{N} \right)^{T}</script>在模型参数为<script type="math/tex">\theta</script>下的概率：</p>
+<script type="math/tex; mode=display">
+p\left( \tilde{X} \middle| \theta \right) = \prod_{i = 1}^{N}{p(x_{i}|\theta)}</script><p>我们希望找到的<script type="math/tex">\hat{\theta}</script>就是使得似然函数在<script type="math/tex">\tilde{X}</script>作为输入时达到极大的参数：</p>
+<script type="math/tex; mode=display">
+\hat{\theta} = \arg{\max_\theta{p\left( \tilde{X} \middle| \theta \right) = \arg{\max_\theta{\prod_{i = 1}^{N}{p(x_{i}|\theta)}}}}}</script><p>举个栗子：假设一个暗箱中有白球、黑球共两个，虽然不知道具体的颜色分布情况、但是知道这两个球是完全一样的。现在有放回地从箱子里抽了 2 个球，发现两次抽出来的结果是 1 黑 1 白，那么该如何估计箱子里面球的颜色？从直观上来说似乎箱子中也是 1 黑 1 白会比较合理，下面我们就来说明“1 黑 1 白”这个估计就是极大似然估计。</p>
+<p>在这个问题中，模型的参数<script type="math/tex">\theta</script>可以设为从暗箱中抽出黑球的概率，样本<script type="math/tex">x_{i}</script>可以描述为第i次取出的球是否是黑球；如果是就取 1、否则取 0。这样的话，似然函数就可以描述为：</p>
+<script type="math/tex; mode=display">
+p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \theta \right)^{2 - x_{1} - x_{2}}</script><p>直接对它求极大值（虽然可行但是）不太方便，通常的做法是将似然函数取对数之后再进行极大值的求解：</p>
+<script type="math/tex; mode=display">
+\ln{p\left( \tilde{X} \middle| \theta \right) = \left( x_{1} + x_{2} \right)\ln{\theta + \left( 2 - x_{1} - x_{2} \right)\ln{(1 - \theta)}}} \Rightarrow \frac{\partial\ln p}{\partial\theta} = \frac{x_{1} + x_{2}}{\theta} - \frac{2 - x_{1} - x_{2}}{1 - \theta}</script><p>从而可知：</p>
+<script type="math/tex; mode=display">
+\frac{\partial\ln p}{\partial\theta} = 0 \Rightarrow \theta = \frac{x_{1} + x_{2}}{2}</script><p>由于<script type="math/tex">x_{1} + x_{2} = 1</script>，所以得<script type="math/tex">\hat{\theta} = 0.5</script>、亦即应该估计从暗箱中抽出黑球的概率是 50%；进一步地、既然暗箱中的两个球完全一样，我们应该估计暗箱中的颜色分布为 1 黑 1 白。</p>
+<p>从以上的讨论可以看出，极大似然估计视待估参数为一个未知但固定的量、不考虑“观察者”的影响（亦即不考虑先验知识的影响），是传统的频率学派的做法</p>
+<h1 id="极大后验概率估计（MAP估计）"><a href="#极大后验概率估计（MAP估计）" class="headerlink" title="极大后验概率估计（MAP估计）"></a>极大后验概率估计（MAP估计）</h1><p>相比起极大似然估计，极大后验概率估计是更贴合贝叶斯学派思想的做法；事实上、甚至也有不少人直接称其为“贝叶斯估计”（注：贝叶斯估计的定义有许多，本人接触到的就有 3、4 种；囿于实力，本人无法辨析哪种才是真正的贝叶斯估计、所以我们不会进行相关的讨论）</p>
+<p>在讨论 MAP 估计之前，我们有必要先知道何为后验概率<script type="math/tex">p(\theta|\tilde{X})</script>：它可以理解为参数<script type="math/tex">\theta</script>在训练集<script type="math/tex">\tilde{X}</script>下所谓的“真实的出现概率”，能够利用参数的先验概率<script type="math/tex">p\left( \theta \right)</script>、样本的先验概率<script type="math/tex">p(\tilde{X})</script>和条件概率<script type="math/tex">p\left( \tilde{X}|\theta \right) = \prod_{i = 1}^{N}{p\left( x_{i}|\theta \right)}</script>通过贝叶斯公式导出（详见<a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>）</p>
+<p>而 MAP 估计的核心思想、就是将待估参数<script type="math/tex">\theta</script>看成是一个随机变量、从而引入了极大似然估计里面没有引入的、参数<script type="math/tex">\theta</script>的先验分布。MAP 估计<script type="math/tex">{\hat{\theta}}_{\text{MAP}}</script>的定义为：</p>
+<script type="math/tex; mode=display">
+{\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{p(\theta|\tilde{X}) = \arg{\max_\theta{p(\theta)\prod_{i = 1}^{N}{p(x_{i}|\theta)}}}}}</script><p>同样的，为了计算简洁，我们通常对上式取对数：</p>
+<script type="math/tex; mode=display">
+{\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{\ln{p(\theta|\tilde{X})} = \arg{\max_\theta\left\lbrack \ln{p\left( \theta \right)} + \sum_{i = 1}^{N}{\ln{p\left( x_{i} \middle| \theta \right)}} \right\rbrack}}}</script><p>可以看到，从形式上、极大后验概率估计只比极大似然估计多了<script type="math/tex">\ln{p(\theta)}</script>这一项，不过它们背后的思想却相当不同。不过有意思的是，在下一节具体讨论朴素贝叶斯算法时我们会看到、朴素贝叶斯在估计参数时选用了极大似然估计法、但是在做决策时则选用了 MAP 估计</p>
+<p>和极大似然估计相比，MAP 估计的一个显著优势在于它可以引入所谓的“先验知识”，这正是贝叶斯学派的精髓。当然这个优势同时也伴随着劣势：它我们对模型参数有相对较好的认知、否则会相当大地影响到结果的合理性</p>
+<p>既然先验分布如此重要，那么是否有比较合理的、先验分布的选取方法呢？事实上，如何确定先验分布这个问题，正是贝叶斯统计中最困难、最具有争议性却又必须解决的问题。虽然这个问题确实有许多现代的研究成果，但遗憾的是，尚未能有一个圆满的理论和普适的方法。这里拟介绍“协调性假说”这个相对而言拥有比较好的直观的理论：</p>
+<ul>
+<li>我们选择的参数<script type="math/tex">\theta</script>的先验分布、应该与由它和训练集确定的后验分布属同一类型</li>
+</ul>
+<p>此时先验分布又叫共轭先验分布。这里面所谓的“同一类型”其实又是难有恰当定义的概念，但是我们可以直观地理解为：概率性质相似的所有分布归为“同一类型”。比如，所有的正态分布都是“同一类型”的</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/MLBlog/tags/数学/" rel="tag"># 数学</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/MLBlog/posts/a0e8b2e/" rel="prev" title="贝叶斯决策论">
+                <i class="fa fa-chevron-left"></i> 贝叶斯决策论
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/MLBlog/posts/ea9b7d09/" rel="next" title="朴素贝叶斯算法">
+                朴素贝叶斯算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -429,6 +533,12 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
 
         </div>
         
@@ -448,8 +558,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/MLBlog/images/avatar.jpg"
@@ -538,6 +657,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#极大似然估计（ML-估计）"><span class="nav-number">1.</span> <span class="nav-text">极大似然估计（ML 估计）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#极大后验概率估计（MAP估计）"><span class="nav-number">2.</span> <span class="nav-text">极大后验概率估计（MAP估计）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -651,6 +786,10 @@
   
 
   
+  <script type="text/javascript" src="/MLBlog/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/MLBlog/js/src/post-details.js?v=5.1.0"></script>
+
+
 
   
 
@@ -685,6 +824,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 

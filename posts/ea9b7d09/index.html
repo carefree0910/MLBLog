@@ -1,0 +1,1290 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/MLBlog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/MLBlog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/MLBlog/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数学,算法," />
+
+
+
+
+
+  <link rel="alternate" href="/MLBlog/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/MLBlog/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="首先要叙述朴素贝叶斯算法的基本假设：  独立性假设：假设单一样本X_i的 n 个维度X_i^{(1)},...,X_i^{(n)}彼此之间在各种意义上相互独立  这当然是很强的假设，在现实任务中也大多无法满足该假设。由此会衍生出所谓的半朴素贝叶斯和贝叶斯网，这里先按下不表 然后就是算法。我们打算先只叙述它的基本思想和各个公式，相关的定义和证明会放在后面的文章中。不过其实仅对着接下来的公式敲代码的话">
+<meta name="keywords" content="数学,算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="朴素贝叶斯算法">
+<meta property="og:url" content="http://yoursite.com/posts/ea9b7d09/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="首先要叙述朴素贝叶斯算法的基本假设：  独立性假设：假设单一样本X_i的 n 个维度X_i^{(1)},...,X_i^{(n)}彼此之间在各种意义上相互独立  这当然是很强的假设，在现实任务中也大多无法满足该假设。由此会衍生出所谓的半朴素贝叶斯和贝叶斯网，这里先按下不表 然后就是算法。我们打算先只叙述它的基本思想和各个公式，相关的定义和证明会放在后面的文章中。不过其实仅对着接下来的公式敲代码的话">
+<meta property="og:updated_time" content="2017-04-20T13:53:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="朴素贝叶斯算法">
+<meta name="twitter:description" content="首先要叙述朴素贝叶斯算法的基本假设：  独立性假设：假设单一样本X_i的 n 个维度X_i^{(1)},...,X_i^{(n)}彼此之间在各种意义上相互独立  这当然是很强的假设，在现实任务中也大多无法满足该假设。由此会衍生出所谓的半朴素贝叶斯和贝叶斯网，这里先按下不表 然后就是算法。我们打算先只叙述它的基本思想和各个公式，相关的定义和证明会放在后面的文章中。不过其实仅对着接下来的公式敲代码的话">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/MLBlog/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/ea9b7d09/"/>
+
+
+
+
+
+  <title> 朴素贝叶斯算法 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?d302af09d0ab8c3ceeebb942fca035be";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/MLBlog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/MLBlog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/MLBlog/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/MLBlog/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/MLBlog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/MLBlog/posts/ea9b7d09/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/MLBlog/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                朴素贝叶斯算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-20T12:15:21+08:00">
+                2017-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/MLBlog/categories/朴素贝叶斯/" itemprop="url" rel="index">
+                    <span itemprop="name">朴素贝叶斯</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>首先要叙述朴素贝叶斯算法的基本假设：</p>
+<ul>
+<li><strong>独立性假设</strong>：假设单一样本<script type="math/tex">X_i</script>的 n 个维度<script type="math/tex">X_i^{(1)},...,X_i^{(n)}</script>彼此之间在各种意义上相互独立</li>
+</ul>
+<p>这当然是很强的假设，在现实任务中也大多无法满足该假设。由此会衍生出所谓的半朴素贝叶斯和贝叶斯网，这里先按下不表</p>
+<p>然后就是算法。我们打算先只叙述它的基本思想和各个公式，相关的定义和证明会放在后面的文章中。不过其实仅对着接下来的公式敲代码的话、就已经可以实现一个朴素贝叶斯模型了：</p>
+<ul>
+<li>基本思想：<strong>后验概率最大化</strong>、然后通过贝叶斯公式转换成先验概率乘条件概率最大化</li>
+<li>各个公式（假设输入有 N 个、单个样本是 n 维的、一共有 K 类：<script type="math/tex">c_1,...,c_K</script>）<ul>
+<li>计算先验概率的极大似然估计：  <script type="math/tex; mode=display">
+\hat p(y=c_k)=\frac{\sum_{i=1}^NI(y_i=c_k)}{N},k=1,2,...,K</script></li>
+<li>计算条件概率的极大似然估计：  <script type="math/tex; mode=display">
+\hat p(x^{(j)}=a_{jl}|y=c_k)=\frac{\sum_{i=1}^NI(x_i^{(j)}=a_{jl},y_i=c_k)}{\sum_{i=1}^NI(y_i=c_k)}</script>其中样本<script type="math/tex">x_i</script>第 j 维<script type="math/tex">x_i^{(j)}</script>的取值集合为<script type="math/tex">\{a_{j1},...,a_{jS_j}\}</script></li>
+</ul>
+</li>
+<li>得到最终的分类器：  <script type="math/tex; mode=display">
+y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)</script></li>
+</ul>
+<p>在朴素贝叶斯算法思想下、一般来说会衍生出以下三种不同的模型：</p>
+<ul>
+<li>离散型朴素贝叶斯（MultinomialNB）：所有维度的特征都是离散型随机变量</li>
+<li>连续型朴素贝叶斯（GaussianNB）：所有维度的特征都是连续型随机变量</li>
+<li>混合型朴素贝叶斯（MergedNB）：各个维度的特征有离散型也有连续型</li>
+</ul>
+<p>接下来就简单<del>（并不简单啊喂）</del>讲讲朴素贝叶斯的数学背景。由浅入深，我们会用离散型朴素贝叶斯来说明一些普适性的概念，连续型和混合型的相关定义是类似的</p>
+<a id="more"></a>
+<h1 id="朴素贝叶斯与贝叶斯决策论的联系"><a href="#朴素贝叶斯与贝叶斯决策论的联系" class="headerlink" title="朴素贝叶斯与贝叶斯决策论的联系"></a>朴素贝叶斯与贝叶斯决策论的联系</h1><p>朴素贝叶斯的模型参数即是类别的选择空间：</p>
+<script type="math/tex; mode=display">
+\Theta = \left\{ y = c_{1},{y = c}_{2},\ldots,{y = c}_{K} \right\}</script><p>朴素贝叶斯总的参数空间<script type="math/tex">\tilde{\Theta}</script>本应包括模型参数的先验概率<script type="math/tex">p\left( \theta_{k} \right) = p(y = c_{k})</script>、样本空间在模型参数下的条件概率<script type="math/tex">p\left( X \middle| \theta_{k} \right) = p(X|y = c_{k})</script>和样本空间本身的概率<script type="math/tex">p(X)</script>；但由于我们采取样本空间的子集<script type="math/tex">\tilde{X}</script>作为训练集，所以在给定的<script type="math/tex">\tilde{X}</script>下、<script type="math/tex">p\left( X \right) = p(\tilde{X})</script>是常数，因此可以把它从参数空间中删去。换句话说，我们关心的东西只有模型参数的先验概率和样本空间在模型参数下的条件概率</p>
+<script type="math/tex; mode=display">
+\tilde{\Theta} = \left\{ p\left( \theta \right),p\left( X \middle| \theta \right):\theta \in \Theta \right\}</script><p>行动空间<script type="math/tex">A</script>就是朴素贝叶斯总的参数空间<script type="math/tex">\tilde{\Theta}</script></p>
+<p>决策就是后验概率最大化（在<a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>里，我们会证明该决策为贝叶斯决策）</p>
+<script type="math/tex; mode=display">
+\delta\left( \tilde{X} \right) = \hat{\theta} = \arg{\max_{\tilde\theta\in\tilde\Theta}{p\left( \tilde{\theta} \middle| \tilde{X} \right)}}</script><p>在<script type="math/tex">\hat{\theta}</script>确定后，模型的决策就可以具体写成（这一步用到了独立性假设）</p>
+<script type="math/tex; mode=display">
+\begin{align}
+  f\left( x^{*} \right) &= \arg{\max_{c_k}{\hat{p}\left( c_{k} \middle| X = x^{*} \right)}} \\
+  &= \arg{\max_{c_k}{\hat{p}\left( y = c_{k} \right)\prod_{j = 1}^{n}{\hat{p}\left( X^{\left( j \right)} = {x^{*}}^{\left( j \right)} \middle| y = c_{k} \right)}}}
+\end{align}</script><p>损失函数会随模型的不同而不同。在离散型朴素贝叶斯中，损失函数就是比较简单的 0-1 损失函数</p>
+<script type="math/tex; mode=display">
+L\left( \theta,\delta\left( \tilde{X} \right) \right) = \sum_{i = 1}^{N}{\tilde{L}\left( y_{i},f\left( x_{i} \right) \right) =}\sum_{i = 1}^{N}{I(}y_{i} \neq f\left( x_{i} \right))</script><p>这里的<script type="math/tex">I</script>是示性函数，它满足：</p>
+<script type="math/tex; mode=display">
+I\left( y_{i} \neq f\left( x_{i} \right) \right) = \left\{ \begin{matrix}
+1,\ if\ y_{i} \neq f\left( x_{i} \right) \\
+0,if\ y_{i} \neq f\left( x_{i} \right) \\
+\end{matrix} \right.\</script><p>从上述定义出发、可以利用<a href="/MLBlog/posts/d007d6bc/" title="上一篇文章">上一篇文章</a>中讲解的两种参数估计方法导出离散型朴素贝叶斯的算法（详见<a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>）：</p>
+<ul>
+<li>输入：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
+<li>过程（利用 ML 估计导出模型的具体参数）：<ul>
+<li>计算先验概率<script type="math/tex">p(y = c_{k})</script>的极大似然估计：  <script type="math/tex; mode=display">
+\hat{p}\left( y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}{N},\ k = 1,2,\ldots,K</script></li>
+<li>计算条件概率<script type="math/tex">p(X^{\left( j \right)} = a_{jl}|y = c_{k})</script>的极大似然估计（设每一个单独输入的 n 维向量<script type="math/tex">x_{i}</script>的第 j 维特征<script type="math/tex">x^{\left( j \right)}</script>可能的取值集合为<script type="math/tex">\{ a_{j1},\ldots,a_{jS_{j}}\}</script>）：  <script type="math/tex; mode=display">
+\hat{p}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I(x_{i}^{\left( j \right)} = a_{jl},y_{i} = c_{k})}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}</script></li>
+</ul>
+</li>
+<li>输出（利用 MAP 估计进行决策）：朴素贝叶斯模型，能够估计数据<script type="math/tex">x^{*} = \left( {x^{*}}^{\left( 1 \right)},\ldots,{x^{*}}^{\left( n \right)} \right)^{T}</script>的类别：  <script type="math/tex; mode=display">
+y = f(x^{*}) = \arg{\max_{c_k}{\hat{p}\left( y = c_{k} \right)\prod_{j = 1}^{n}{\hat{p}(X^{\left( j \right)} = {x^{*}}^{\left( j \right)}|y = c_{k})}}}</script></li>
+</ul>
+<p>由上述算法可以清晰地梳理出朴素贝叶斯算法背后的数学思想：</p>
+<ul>
+<li>使用极大似然估计导出模型的具体参数（先验概率、条件概率）</li>
+<li>使用极大后验概率估计作为模型的决策（输出使得数据后验概率最大化的类别）</li>
+</ul>
+<h1 id="离散型朴素贝叶斯实例"><a href="#离散型朴素贝叶斯实例" class="headerlink" title="离散型朴素贝叶斯实例"></a>离散型朴素贝叶斯实例</h1><p>接下来我们在一个简单、虚拟的数据集上应用离散型朴素贝叶斯算法以加深对算法的理解，该数据集（不妨称之为气球数据集 1.0）如下表所示（参考了 UCI 上相应的数据集）：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>大小</th>
+<th>测试人员</th>
+<th>测试动作</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>成人</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>大</td>
+<td>成人</td>
+<td>用手打</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>大</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>大</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>大</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小</td>
+<td>成人</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>大</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>大</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>该数据集的电子版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/balloon1.0.txt" target="_blank" rel="external">这里</a>。我们想预测的是样本：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>大小</th>
+<th>测试人员</th>
+<th>测试动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  紫色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用脚踩</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>所导致的结果。容易观察到的是、气球的颜色对结果不起丝毫影响，所以在算法中该项特征可以直接去掉。因此从直观上来说，该样本所导致的结果应该是“不爆炸”，我们用离散型朴素贝叶斯算法来看看是否确实如此。首先我们需要计算类别的先验概率，易得：</p>
+<script type="math/tex; mode=display">
+p\left( 不爆炸\right) = p\left( 爆炸\right) = 0.5</script><p>亦即类别的先验概率也对决策不起作用。继而我们需要依次求出第2、3、4个特征（大小、测试人员、测试动作）的条件概率，它们才是决定新样本所属类别的关键。易得：</p>
+<script type="math/tex; mode=display">p\left( 小气球\middle| 不爆炸\right) = \frac{5}{6},\ \ p\left( 大气球\middle| 不爆炸\right) = \frac{1}{6}</script><script type="math/tex; mode=display">p\left( 小气球\middle| 爆炸\right) = \frac{1}{6},\ \ p\left( 大气球\middle| 爆炸\right) = \frac{5}{6}</script><script type="math/tex; mode=display">p\left( 成人\middle| 不爆炸\right) = \frac{1}{3},\ \ p\left( 小孩\middle| 不爆炸\right) = \frac{2}{3}</script><script type="math/tex; mode=display">p\left( 成人\middle| 爆炸\right) = \frac{2}{3},\ \ p\left( 小孩\middle| 爆炸\right) = \frac{1}{3}</script><script type="math/tex; mode=display">p\left( 用手打\middle| 不爆炸\right) = \frac{5}{6},\ \ p\left( 用脚踩\middle| 不爆炸\right) = \frac{1}{6}</script><script type="math/tex; mode=display">p\left( 用手打\middle| 爆炸\right) = \frac{1}{6},\ \ p\left( 用脚踩\middle| 爆炸\right) = \frac{5}{6}</script><p>那么在条件“紫色小气球、小孩用脚踩”下，知（注意我们可以忽略颜色和先验概率）：</p>
+<script type="math/tex; mode=display">\hat{p}\left( 不爆炸\right) = p\left( 小气球\middle| 不爆炸\right) \times p\left( 小孩\middle| 不爆炸\right) \times p\left( 用脚踩\middle| 不爆炸\right) = \frac{5}{54}</script><script type="math/tex; mode=display">\hat{p}\left( 爆炸\right) = p\left( 小气球\middle| 爆炸\right) \times p\left( 小孩\middle| 爆炸\right) \times p\left( 用脚踩\middle| 爆炸\right) = \frac{5}{108}</script><p>所以我们确实应该认为给定样本所导致的结果是“不爆炸”。</p>
+<h1 id="不足与改进"><a href="#不足与改进" class="headerlink" title="不足与改进"></a>不足与改进</h1><p>需要指出的是，目前为止的算法存在一个问题：如果训练集中某个类别<script type="math/tex">c_{k}</script>的数据没有涵盖第 j 维特征的第 l 个取值的话、相应估计的条件概率<script type="math/tex">\hat{p}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right)</script>就是 0、从而导致模型可能会在测试集上的分类产生误差。解决这个问题的办法是在各个估计中加入平滑项（也有这种做法就叫贝叶斯估计的说法）：</p>
+<ul>
+<li>过程：<ul>
+<li>计算先验概率<script type="math/tex">p_{\lambda}(y = c_{k})</script>：  <script type="math/tex; mode=display">
+p_{\lambda}\left( y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I\left( y_{i} = c_{k} \right) + \lambda}}{N + K\lambda},\ k = 1,2,\ldots,K</script></li>
+<li>计算条件概率<script type="math/tex">p_{\lambda}(X^{\left( j \right)} = a_{jl}|y = c_{k})</script>：  <script type="math/tex; mode=display">
+p_{\lambda}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I\left( x_{i}^{\left( j \right)} = a_{jl},y_{i} = c_{k} \right) + \lambda}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})} + S_{j}\lambda}</script></li>
+</ul>
+</li>
+</ul>
+<p>可见当<script type="math/tex">\lambda = 0</script>时就是极大似然估计，而当<script type="math/tex">\lambda = 1</script>时、一般可以称之为拉普拉斯平滑（Laplace Smoothing）。拉普拉斯平滑是常见的做法、我们的实现中也会默认使用它。可以将气球数据集 1.0 稍作变动以彰显加入平滑项的重要性（新数据集如下表所示，不妨称之为气球数据集 1.5）：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>大小</th>
+<th>测试人员</th>
+<th>测试动作</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>成人</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>大</td>
+<td>成人</td>
+<td>用手打</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>大</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>大</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小</td>
+<td>成人</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>大</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>该数据集的电子版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/balloon1.5.txt" target="_blank" rel="external">这里</a>。可以看到这个数据集是“不太均衡”的：它对样本“黄色小气球，小孩用脚踩”重复进行了三次实验、而对所有紫色气球样本实验的结果都是“不爆炸”。如果我们此时想预测“紫色小气球，小孩用脚踩”的结果，虽然从直观上来说应该是“爆炸”，但我们会发现、此时由于</p>
+<script type="math/tex; mode=display">
+p\left( 用脚踩| 不爆炸\right) = p\left( 紫色| 爆炸\right) = 0</script><p>所以会直接导致</p>
+<script type="math/tex; mode=display">
+\hat{p}\left( 不爆炸\right) = \hat{p}\left( 爆炸\right) = 0</script><p>从而我们只能随机进行决策，这不是一个令人满意的结果。此时加入平滑项就显得比较重要了，我们以拉普拉斯平滑为例、知（注意类别的先验概率仍然不造成影响）：</p>
+<script type="math/tex; mode=display">p\left( 黄色\middle| 不爆炸\right) = \frac{3 + 1}{6 + 2},\ \ p\left( 紫色\middle| 不爆炸\right) = \frac{3 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 黄色\middle| 爆炸\right) = \frac{6 + 1}{6 + 2},\ \ p\left( 紫色\middle| 爆炸\right) = \frac{0 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 小气球\middle| 不爆炸\right) = \frac{4 + 1}{6 + 2},\ \ p\left( 大气球\middle| 不爆炸不爆炸\right) = \frac{2 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 小气球\middle| 爆炸\right) = \frac{4 + 1}{6 + 2},\ \ p\left( 大气球\middle| 爆炸\right) = \frac{2 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 成人\middle| 不爆炸\right) = \frac{2 + 1}{6 + 2},\ \ p\left( 小孩\middle| 不爆炸\right) = \frac{4 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 成人\middle| 爆炸\right) = \frac{3 + 1}{6 + 2},\ \ p\left( 小孩\middle| 爆炸\right) = \frac{3 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 用手打\middle| 不爆炸\right) = \frac{6 + 1}{6 + 2},\ \ p\left( 用脚踩\middle| 不爆炸\right) = \frac{0 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 用手打\middle| 爆炸\right) = \frac{1 + 1}{6 + 2},\ \ p\left( 用脚踩\middle| 爆炸\right) = \frac{5 + 1}{6 + 2}</script><p>从而可算得：</p>
+<script type="math/tex; mode=display">\hat{p}\left( 不爆炸\right) = \frac{25}{1024},\ \ \hat{p}\left( 爆炸\right) = \frac{15}{512}</script><p>因此我们确实应该认为给定样本所导致的结果是“爆炸”</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/MLBlog/tags/数学/" rel="tag"># 数学</a>
+          
+            <a href="/MLBlog/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/MLBlog/posts/d007d6bc/" rel="prev" title="参数估计">
+                <i class="fa fa-chevron-left"></i> 参数估计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/MLBlog/posts/fa51e28/" rel="next" title="框架的实现">
+                框架的实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/MLBlog/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/MLBlog/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/MLBlog/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/MLBlog/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/MLBlog/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#朴素贝叶斯与贝叶斯决策论的联系"><span class="nav-number">1.</span> <span class="nav-text">朴素贝叶斯与贝叶斯决策论的联系</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#离散型朴素贝叶斯实例"><span class="nav-number">2.</span> <span class="nav-text">离散型朴素贝叶斯实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#不足与改进"><span class="nav-number">3.</span> <span class="nav-text">不足与改进</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/MLBlog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/MLBlog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/MLBlog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/MLBlog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/MLBlog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/MLBlog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/MLBlog/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/MLBlog/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/MLBlog/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/MLBlog/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/MLBlog/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/MLBlog/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

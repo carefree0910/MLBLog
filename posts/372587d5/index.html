@@ -101,7 +101,7 @@
 <meta property="og:description" content="（本文会用到的所有代码都在这里） 作为“绪论”的总结，我们来运用 Python 解决一个实际问题以对机器学习有具体的感受吧。由于该样例只是为了提供直观，我们就拿比较有名的一个小问题来进行阐述。俗话云：“麻雀虽小，五脏俱全”，我们完全可以通过这个样例来对机器学习的一般性步骤进行一个大致的认知 该问题来自 Coursera 上斯坦福大学机器学习课程（which is 我的入坑课程），其叙述如下：现有包">
 <meta property="og:image" content="http://yoursite.com/MLBlog/posts/372587d5/p1.png">
 <meta property="og:image" content="http://yoursite.com/MLBlog/posts/372587d5/p2.png">
-<meta property="og:updated_time" content="2017-04-20T02:02:28.000Z">
+<meta property="og:updated_time" content="2017-04-20T13:53:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="第一个机器学习样例">
 <meta name="twitter:description" content="（本文会用到的所有代码都在这里） 作为“绪论”的总结，我们来运用 Python 解决一个实际问题以对机器学习有具体的感受吧。由于该样例只是为了提供直观，我们就拿比较有名的一个小问题来进行阐述。俗话云：“麻雀虽小，五脏俱全”，我们完全可以通过这个样例来对机器学习的一般性步骤进行一个大致的认知 该问题来自 Coursera 上斯坦福大学机器学习课程（which is 我的入坑课程），其叙述如下：现有包">
@@ -154,7 +154,7 @@
     var _hmt = _hmt || [];
     (function() {
       var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?c4424294d4d5495cd46b7dd741e1cdb0";
+      hm.src = "https://hm.baidu.com/hm.js?d302af09d0ab8c3ceeebb942fca035be";
       var s = document.getElementsByTagName("script")[0];
       s.parentNode.insertBefore(hm, s);
     })();
@@ -485,7 +485,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 根据参数 n、输入的 x、y 返回相对应的损失</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_cost</span><span class="params">(deg, input_x, input_y)</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="number">0.5</span> * ((get_model(deg)(input_x) - input_y) ** <span class="number">2</span>).sum()</div><div class="line"></div><div class="line"><span class="comment"># 定义测试参数集并根据它进行各种实验</span></div><div class="line">test_set = (<span class="number">1</span>, <span class="number">4</span>, <span class="number">10</span>)</div><div class="line"><span class="keyword">for</span> d <span class="keyword">in</span> test_set:</div><div class="line">    <span class="comment"># 输出相应的损失</span></div><div class="line">    print(get_cost(d, x, y))</div></pre></td></tr></table></figure>
 <p>所得的结果是：当<script type="math/tex">n=1,4,10</script>时，损失的头两个数字分别为 96、94 和 75。这么看来似乎是<script type="math/tex">n=10</script>优于<script type="math/tex">n=4</script>而<script type="math/tex">n=1</script>最差；但从上面那张图可以看出，似乎直接选择<script type="math/tex">n=1</script>作为模型的参数才是最好的选择。这里的矛盾的来源正是前文所提到过的过拟合情况</p>
 <p>那么怎么最直观地了解是否出现过拟合了呢？当然还是画图了：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"># 画出相应的图像</div><div class="line">plt.scatter(x, y, c=&quot;g&quot;, s=20)</div><div class="line">for d in test_set:</div><div class="line">    plt.plot(x0, get_model(d)(), label=&quot;degree = &#123;&#125;&quot;.format(d))</div><div class="line">plt.xlim(-2, 4)</div><div class="line"># 将横轴、纵轴的范围分别限制在(-2,4)、(10^5,8 * 10^5)</div><div class="line">plt.ylim(1e5, 8e5)</div><div class="line"># 调用 legend 方法使曲线对应的 label 正确显示</div><div class="line">plt.legend()</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 画出相应的图像</span></div><div class="line">plt.scatter(x, y, c=<span class="string">"g"</span>, s=<span class="number">20</span>)</div><div class="line"><span class="keyword">for</span> d <span class="keyword">in</span> test_set:</div><div class="line">    plt.plot(x0, get_model(d)(), label=<span class="string">"degree = &#123;&#125;"</span>.format(d))</div><div class="line">plt.xlim(<span class="number">-2</span>, <span class="number">4</span>)</div><div class="line"><span class="comment"># 将横轴、纵轴的范围分别限制在(-2,4)、(10^5,8 * 10^5)</span></div><div class="line">plt.ylim(<span class="number">1e5</span>, <span class="number">8e5</span>)</div><div class="line"><span class="comment"># 调用 legend 方法使曲线对应的 label 正确显示</span></div><div class="line">plt.legend()</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
 <p>上面这段代码的运行结果如下图所示：</p>
 <img src="/MLBlog/posts/372587d5/p2.png" alt="线性回归的可视化" title="线性回归的可视化">
 <p>其中，蓝线、绿线、红线分别代表<script type="math/tex">n=1</script>、<script type="math/tex">n=4</script>、<script type="math/tex">n=10</script>的情况（上图的右上角亦有说明）。可以看出，从<script type="math/tex">n=4</script>开始模型就已经开始出现过拟合现象了，到<script type="math/tex">n=10</script>时模型已经变得非常不合理</p>
@@ -642,7 +642,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
           
             <div class="site-state-item site-state-posts">
               <a href="/MLBlog/archives">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -653,7 +653,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
             
             <div class="site-state-item site-state-categories">
               <a href="/MLBlog/categories/index.html">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -664,7 +664,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
             
             <div class="site-state-item site-state-tags">
               <a href="/MLBlog/tags/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
