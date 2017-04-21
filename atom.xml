@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Python 与机器学习</title>
   <subtitle>Python &amp; Machine Learning</subtitle>
-  <link href="/MLBlog/atom.xml" rel="self"/>
+  <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
+  <link href="http://www.carefree0910.com/"/>
   <updated>2017-04-20T13:23:52.000Z</updated>
-  <id>http://yoursite.com/</id>
+  <id>http://www.carefree0910.com/</id>
   
   <author>
     <name>射命丸咲</name>
@@ -17,8 +17,8 @@
   
   <entry>
     <title>“朴素贝叶斯”小结</title>
-    <link href="http://yoursite.com/posts/a75c0d1b/"/>
-    <id>http://yoursite.com/posts/a75c0d1b/</id>
+    <link href="http://www.carefree0910.com/posts/a75c0d1b/"/>
+    <id>http://www.carefree0910.com/posts/a75c0d1b/</id>
     <published>2017-04-20T12:52:08.000Z</published>
     <updated>2017-04-20T13:23:52.000Z</updated>
     
@@ -39,17 +39,17 @@
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="小结" scheme="http://yoursite.com/tags/%E5%B0%8F%E7%BB%93/"/>
+      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
     
   </entry>
   
   <entry>
     <title>推导与推广</title>
-    <link href="http://yoursite.com/posts/e312d61a/"/>
-    <id>http://yoursite.com/posts/e312d61a/</id>
+    <link href="http://www.carefree0910.com/posts/e312d61a/"/>
+    <id>http://www.carefree0910.com/posts/e312d61a/</id>
     <published>2017-04-20T11:10:17.000Z</published>
     <updated>2017-04-20T13:51:11.000Z</updated>
     
@@ -161,17 +161,17 @@ p\left( c_{k} \middle| X = x \right) = p\left( y = c_{k} \right)\prod_{i = 1}^{n
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="数学" scheme="http://yoursite.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
   <entry>
     <title>MergedNB 的实现</title>
-    <link href="http://yoursite.com/posts/7c13f69c/"/>
-    <id>http://yoursite.com/posts/7c13f69c/</id>
+    <link href="http://www.carefree0910.com/posts/7c13f69c/"/>
+    <id>http://www.carefree0910.com/posts/7c13f69c/</id>
     <published>2017-04-20T09:02:35.000Z</published>
     <updated>2017-04-20T13:30:40.000Z</updated>
     
@@ -346,17 +346,17 @@ y = f(x^{*}) = \arg{\max_{c_k}{p\left( y = c_{k} \right)\prod_{j \in S_{1}}^{}{p
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>GaussianNB 的实现</title>
-    <link href="http://yoursite.com/posts/c836ba35/"/>
-    <id>http://yoursite.com/posts/c836ba35/</id>
+    <link href="http://www.carefree0910.com/posts/c836ba35/"/>
+    <id>http://www.carefree0910.com/posts/c836ba35/</id>
     <published>2017-04-20T07:34:35.000Z</published>
     <updated>2017-04-20T13:51:56.000Z</updated>
     
@@ -386,17 +386,17 @@ p\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{1}{\sqr
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>MultinomialNB 的实现</title>
-    <link href="http://yoursite.com/posts/74647589/"/>
-    <id>http://yoursite.com/posts/74647589/</id>
+    <link href="http://www.carefree0910.com/posts/74647589/"/>
+    <id>http://www.carefree0910.com/posts/74647589/</id>
     <published>2017-04-20T06:50:30.000Z</published>
     <updated>2017-04-20T13:53:28.000Z</updated>
     
@@ -493,17 +493,17 @@ y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)<
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>框架的实现</title>
-    <link href="http://yoursite.com/posts/fa51e28/"/>
-    <id>http://yoursite.com/posts/fa51e28/</id>
+    <link href="http://www.carefree0910.com/posts/fa51e28/"/>
+    <id>http://www.carefree0910.com/posts/fa51e28/</id>
     <published>2017-04-20T06:31:53.000Z</published>
     <updated>2017-04-20T12:50:15.000Z</updated>
     
@@ -543,17 +543,17 @@ y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)<
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>朴素贝叶斯算法</title>
-    <link href="http://yoursite.com/posts/ea9b7d09/"/>
-    <id>http://yoursite.com/posts/ea9b7d09/</id>
+    <link href="http://www.carefree0910.com/posts/ea9b7d09/"/>
+    <id>http://www.carefree0910.com/posts/ea9b7d09/</id>
     <published>2017-04-20T04:15:21.000Z</published>
     <updated>2017-04-20T13:53:26.000Z</updated>
     
@@ -895,19 +895,19 @@ y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)&
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="数学" scheme="http://yoursite.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
-      <category term="算法" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95/"/>
+      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
   <entry>
     <title>参数估计</title>
-    <link href="http://yoursite.com/posts/d007d6bc/"/>
-    <id>http://yoursite.com/posts/d007d6bc/</id>
+    <link href="http://www.carefree0910.com/posts/d007d6bc/"/>
+    <id>http://www.carefree0910.com/posts/d007d6bc/</id>
     <published>2017-04-20T03:52:09.000Z</published>
     <updated>2017-04-20T13:22:34.000Z</updated>
     
@@ -947,17 +947,17 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="数学" scheme="http://yoursite.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
   <entry>
     <title>贝叶斯决策论</title>
-    <link href="http://yoursite.com/posts/a0e8b2e/"/>
-    <id>http://yoursite.com/posts/a0e8b2e/</id>
+    <link href="http://www.carefree0910.com/posts/a0e8b2e/"/>
+    <id>http://www.carefree0910.com/posts/a0e8b2e/</id>
     <published>2017-04-20T03:13:19.000Z</published>
     <updated>2017-04-20T12:50:04.000Z</updated>
     
@@ -990,17 +990,17 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="数学" scheme="http://yoursite.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
   <entry>
     <title>朴素贝叶斯综述</title>
-    <link href="http://yoursite.com/posts/1607712a/"/>
-    <id>http://yoursite.com/posts/1607712a/</id>
+    <link href="http://www.carefree0910.com/posts/1607712a/"/>
+    <id>http://www.carefree0910.com/posts/1607712a/</id>
     <published>2017-04-20T02:38:05.000Z</published>
     <updated>2017-04-20T13:05:59.000Z</updated>
     
@@ -1057,19 +1057,19 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
     
     </summary>
     
-      <category term="朴素贝叶斯" scheme="http://yoursite.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
+      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
     
     
-      <category term="综述" scheme="http://yoursite.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
     
-      <category term="目录" scheme="http://yoursite.com/tags/%E7%9B%AE%E5%BD%95/"/>
+      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
     
   </entry>
   
   <entry>
     <title>“绪论”小结</title>
-    <link href="http://yoursite.com/posts/c939f06b/"/>
-    <id>http://yoursite.com/posts/c939f06b/</id>
+    <link href="http://www.carefree0910.com/posts/c939f06b/"/>
+    <id>http://www.carefree0910.com/posts/c939f06b/</id>
     <published>2017-04-20T01:48:45.000Z</published>
     <updated>2017-04-20T02:02:14.000Z</updated>
     
@@ -1093,17 +1093,17 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
     
     </summary>
     
-      <category term="绪论" scheme="http://yoursite.com/categories/%E7%BB%AA%E8%AE%BA/"/>
+      <category term="绪论" scheme="http://www.carefree0910.com/categories/%E7%BB%AA%E8%AE%BA/"/>
     
     
-      <category term="小结" scheme="http://yoursite.com/tags/%E5%B0%8F%E7%BB%93/"/>
+      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
     
   </entry>
   
   <entry>
     <title>第一个机器学习样例</title>
-    <link href="http://yoursite.com/posts/372587d5/"/>
-    <id>http://yoursite.com/posts/372587d5/</id>
+    <link href="http://www.carefree0910.com/posts/372587d5/"/>
+    <id>http://www.carefree0910.com/posts/372587d5/</id>
     <published>2017-04-20T01:03:45.000Z</published>
     <updated>2017-04-20T13:53:24.000Z</updated>
     
@@ -1207,17 +1207,17 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
     
     </summary>
     
-      <category term="绪论" scheme="http://yoursite.com/categories/%E7%BB%AA%E8%AE%BA/"/>
+      <category term="绪论" scheme="http://www.carefree0910.com/categories/%E7%BB%AA%E8%AE%BA/"/>
     
     
-      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>人生苦短，我用 Python</title>
-    <link href="http://yoursite.com/posts/698a0893/"/>
-    <id>http://yoursite.com/posts/698a0893/</id>
+    <link href="http://www.carefree0910.com/posts/698a0893/"/>
+    <id>http://www.carefree0910.com/posts/698a0893/</id>
     <published>2017-04-20T00:51:16.000Z</published>
     <updated>2017-04-20T02:03:18.000Z</updated>
     
@@ -1238,19 +1238,19 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
     
     </summary>
     
-      <category term="绪论" scheme="http://yoursite.com/categories/%E7%BB%AA%E8%AE%BA/"/>
+      <category term="绪论" scheme="http://www.carefree0910.com/categories/%E7%BB%AA%E8%AE%BA/"/>
     
     
-      <category term="Python" scheme="http://yoursite.com/tags/Python/"/>
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
     
-      <category term="综述" scheme="http://yoursite.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
     
   </entry>
   
   <entry>
     <title>机器学习综述</title>
-    <link href="http://yoursite.com/posts/a0837b26/"/>
-    <id>http://yoursite.com/posts/a0837b26/</id>
+    <link href="http://www.carefree0910.com/posts/a0837b26/"/>
+    <id>http://www.carefree0910.com/posts/a0837b26/</id>
     <published>2017-04-19T15:28:56.000Z</published>
     <updated>2017-04-20T07:26:39.000Z</updated>
     
@@ -1329,17 +1329,17 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
     
     </summary>
     
-      <category term="绪论" scheme="http://yoursite.com/categories/%E7%BB%AA%E8%AE%BA/"/>
+      <category term="绪论" scheme="http://www.carefree0910.com/categories/%E7%BB%AA%E8%AE%BA/"/>
     
     
-      <category term="综述" scheme="http://yoursite.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
     
   </entry>
   
   <entry>
     <title>PyML</title>
-    <link href="http://yoursite.com/posts/4f2fecf/"/>
-    <id>http://yoursite.com/posts/4f2fecf/</id>
+    <link href="http://www.carefree0910.com/posts/4f2fecf/"/>
+    <id>http://www.carefree0910.com/posts/4f2fecf/</id>
     <published>2017-04-19T12:13:19.000Z</published>
     <updated>2017-04-21T02:44:10.000Z</updated>
     
@@ -1369,9 +1369,9 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
     </summary>
     
     
-      <category term="综述" scheme="http://yoursite.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
     
-      <category term="目录" scheme="http://yoursite.com/tags/%E7%9B%AE%E5%BD%95/"/>
+      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
     
   </entry>
   
