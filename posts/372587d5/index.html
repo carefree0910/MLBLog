@@ -99,13 +99,13 @@
 <meta property="og:url" content="http://www.carefree0910.com/posts/372587d5/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="（本文会用到的所有代码都在这里） 作为“绪论”的总结，我们来运用 Python 解决一个实际问题以对机器学习有具体的感受吧。由于该样例只是为了提供直观，我们就拿比较有名的一个小问题来进行阐述。俗话云：“麻雀虽小，五脏俱全”，我们完全可以通过这个样例来对机器学习的一般性步骤进行一个大致的认知 该问题来自 Coursera 上斯坦福大学机器学习课程（which is 我的入坑课程），其叙述如下：现有包">
-<meta property="og:image" content="http://www.carefree0910.com/MLBlog/posts/372587d5/p1.png">
-<meta property="og:image" content="http://www.carefree0910.com/MLBlog/posts/372587d5/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/372587d5/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/372587d5/p2.png">
 <meta property="og:updated_time" content="2017-04-20T13:53:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="第一个机器学习样例">
 <meta name="twitter:description" content="（本文会用到的所有代码都在这里） 作为“绪论”的总结，我们来运用 Python 解决一个实际问题以对机器学习有具体的感受吧。由于该样例只是为了提供直观，我们就拿比较有名的一个小问题来进行阐述。俗话云：“麻雀虽小，五脏俱全”，我们完全可以通过这个样例来对机器学习的一般性步骤进行一个大致的认知 该问题来自 Coursera 上斯坦福大学机器学习课程（which is 我的入坑课程），其叙述如下：现有包">
-<meta name="twitter:image" content="http://www.carefree0910.com/MLBlog/posts/372587d5/p1.png">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/372587d5/p1.png">
 
 
 
@@ -466,7 +466,7 @@
 X = \frac{X - \bar X}{std(X)}</script><p>其中<script type="math/tex">\bar X</script>表示<script type="math/tex">X</script>（房子面积）的均值、<script type="math/tex">std(X)</script>表示<script type="math/tex">X</script>的标准差（Standard Deviation）。代码实现则如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入需要用到的库</span></div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line"></div><div class="line"><span class="comment"># 定义存储输入数据（x）和目标数据（y）的数组</span></div><div class="line">x, y = [], []</div><div class="line"><span class="comment"># 遍历数据集，变量 sample 对应的正是一个个样本</span></div><div class="line"><span class="keyword">for</span> sample <span class="keyword">in</span> open(<span class="string">"../_Data/prices.txt"</span>, <span class="string">"r"</span>):</div><div class="line">    <span class="comment"># 由于数据是用逗号隔开的，所以调用 Python 中的 split 方法并将逗号作为参数传入</span></div><div class="line">    _x, _y = sample.split(<span class="string">","</span>)</div><div class="line">    <span class="comment"># 将字符串数据转化为浮点数</span></div><div class="line">    x.append(float(_x))</div><div class="line">    y.append(float(_y))</div><div class="line"><span class="comment"># 读取完数据后，将它们转化为 Numpy 数组以方便进一步的处理</span></div><div class="line">x, y = np.array(x), np.array(y)</div><div class="line"><span class="comment"># 标准化</span></div><div class="line">x = (x - x.mean()) / x.std()</div><div class="line"><span class="comment"># 将原始数据以散点图的形式画出</span></div><div class="line">plt.figure()</div><div class="line">plt.scatter(x, y, c=<span class="string">"g"</span>, s=<span class="number">20</span>)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
 <p>上面这段代码的运行结果如下图所示：</p>
-<img src="/MLBlog/posts/372587d5/p1.png" alt="预处理后的数据散点图" title="预处理后的数据散点图">
+<img src="/posts/372587d5/p1.png" alt="预处理后的数据散点图" title="预处理后的数据散点图">
 <p>这里横轴是标准化后的房子面积，纵轴是房子价格。以上我们已经比较好地完成了机器学习任务的第一步：数据预处理</p>
 <h1 id="选择与训练模型"><a href="#选择与训练模型" class="headerlink" title="选择与训练模型"></a>选择与训练模型</h1><p>在弄好数据之后、下一步就要开始选择相应的学习方法和模型了。幸运的是，通过可视化原始数据，我们可以非常直观地感受到：我们很有可能通过线性回归（Linear Regression）中的多项式拟合来得到一个不错的结果。其模型的数学表达式如下：</p>
 <p><strong><em>注意：用多项式拟合散点只是线性回归的很小的一部分、但是它的直观意义比较明显。考虑到问题比较简单、我们才选用了多项式拟合。线性回归的详细讨论超出了本书的范围，这里不做赘述</em></strong></p>
@@ -487,7 +487,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
 <p>那么怎么最直观地了解是否出现过拟合了呢？当然还是画图了：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 画出相应的图像</span></div><div class="line">plt.scatter(x, y, c=<span class="string">"g"</span>, s=<span class="number">20</span>)</div><div class="line"><span class="keyword">for</span> d <span class="keyword">in</span> test_set:</div><div class="line">    plt.plot(x0, get_model(d)(), label=<span class="string">"degree = &#123;&#125;"</span>.format(d))</div><div class="line">plt.xlim(<span class="number">-2</span>, <span class="number">4</span>)</div><div class="line"><span class="comment"># 将横轴、纵轴的范围分别限制在(-2,4)、(10^5,8 * 10^5)</span></div><div class="line">plt.ylim(<span class="number">1e5</span>, <span class="number">8e5</span>)</div><div class="line"><span class="comment"># 调用 legend 方法使曲线对应的 label 正确显示</span></div><div class="line">plt.legend()</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
 <p>上面这段代码的运行结果如下图所示：</p>
-<img src="/MLBlog/posts/372587d5/p2.png" alt="线性回归的可视化" title="线性回归的可视化">
+<img src="/posts/372587d5/p2.png" alt="线性回归的可视化" title="线性回归的可视化">
 <p>其中，蓝线、绿线、红线分别代表<script type="math/tex">n=1</script>、<script type="math/tex">n=4</script>、<script type="math/tex">n=10</script>的情况（上图的右上角亦有说明）。可以看出，从<script type="math/tex">n=4</script>开始模型就已经开始出现过拟合现象了，到<script type="math/tex">n=10</script>时模型已经变得非常不合理</p>
 <p>至此，可以说这个问题就已经基本解决了。在这个样例里面，除了交叉验证、我们涵盖了机器学习中的大部分主要步骤（之所以没有进行交叉验证是因为数据太少了……）。代码部分加起来总共 40~50 行，应该算是一个比较合适的长度。希望大家能够通过这个样例对机器学习有个大概的理解、也希望它能引起大家对机器学习的兴趣</p>
 

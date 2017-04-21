@@ -99,12 +99,12 @@
 <meta property="og:url" content="http://www.carefree0910.com/posts/a0837b26/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="“机器学习”在最近虽可能不至于到人尽皆知的程度、却也是非常火热的词汇。机器学习是英文单词“Machine Learning”（简称ML）的直译，从字面上便说明了这门技术是让机器进行“学习”的技术。然而我们知道机器终究是死的，所谓的“学习”归根结底亦只是人类“赋予”机器的一系列运算。这个“赋予”的过程可以有很多种实现，而 Python 正是其中相对容易上手、同时性能又相当不错的一门语言。作为综述，我">
-<meta property="og:image" content="http://www.carefree0910.com/MLBlog/posts/a0837b26/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/a0837b26/p1.png">
 <meta property="og:updated_time" content="2017-04-20T07:26:39.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="机器学习综述">
 <meta name="twitter:description" content="“机器学习”在最近虽可能不至于到人尽皆知的程度、却也是非常火热的词汇。机器学习是英文单词“Machine Learning”（简称ML）的直译，从字面上便说明了这门技术是让机器进行“学习”的技术。然而我们知道机器终究是死的，所谓的“学习”归根结底亦只是人类“赋予”机器的一系列运算。这个“赋予”的过程可以有很多种实现，而 Python 正是其中相对容易上手、同时性能又相当不错的一门语言。作为综述，我">
-<meta name="twitter:image" content="http://www.carefree0910.com/MLBlog/posts/a0837b26/p1.png">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/a0837b26/p1.png">
 
 
 
@@ -447,7 +447,7 @@
 <li>泛化能力针对的其实是学习方法，它用于衡量该学习方法学习到的模型在整个样本空间上的表现</li>
 </ul>
 <p>这一点当然是十分重要的，因为我们拿来训练我们模型的数据终究只是样本空间的一个很小的采样，如果只是过分专注于它们的话、就会出现所谓的“过拟合”（Over Fitting）的情况。当然，如果过分罔顾训练数据，又会出现“欠拟合”（Under Fitting）。我们可以用一张图来直观感受过拟合和欠拟合（如下图所示，左为欠拟合、右为过拟合）：</p>
-<img src="/MLBlog/posts/a0837b26/p1.png" alt="欠拟合与过拟合" title="欠拟合与过拟合">
+<img src="/posts/a0837b26/p1.png" alt="欠拟合与过拟合" title="欠拟合与过拟合">
 <p>所以我们需要“张弛有度”、找到最好的那个平衡点。统计学习中的结构风险最小化（Structural Risk Minimization、简称 SRM）就是研究这个的，它和传统的经验风险最小化（Empirical Risk Minimization、简称 ERM）相比，注重于对风险上界的最小化、而不是单纯使经验风险最小化。它有一个原则：在使得风险上界最小的函数子集中、挑选出使得经验风险最小的函数。而这个函数子集，正是我们之前提到过的假设空间</p>
 <p><strong><em>注意：所谓经验风险，可以理解为训练数据集上的风险。相对应的，ERM 则可以理解为只注重训练数据集的学习方法，它的理论基础是经验风险在某种足够合理的数学意义上一致收敛于期望风险、亦即所谓的“真正的”风险</em></strong></p>
 <p>关于 SRM 和 ERM 的详细讨论会涉及到诸如 VC 维和正则化的概念，这里不进行详细展开、但我们需要有这么一个直观：为了使我们学习方法训练出的模型泛化能力足够好，我们需要对我们的模型做出一定的“限制”、而这个“限制”就表现在假设空间的选取上。一个非常普遍的做法是对模型的复杂度做出一定的惩罚、从而使模型趋于精简。这与所谓的“奥卡姆剃刀原理”<del>（奥卡姆：我的剃刀还能再战 500 年）</del>不谋而合：“如无必要，勿增实体”“切勿浪费较多的东西去做，用较少的东西、同样可以做好事情”</p>

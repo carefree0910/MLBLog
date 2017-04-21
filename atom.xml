@@ -319,15 +319,15 @@ y = f(x^{*}) = \arg{\max_{c_k}{p\left( y = c_{k} \right)\prod_{j \in S_{1}}^{}{p
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 实现转换混合型数据的方法，要注意利用 MultinomialNB 的相应变量</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_transfer_x</span><span class="params">(self, x)</span>:</span></div><div class="line">    _feat_dics = self._multinomial[<span class="string">"feat_dics"</span>]</div><div class="line">    idx = <span class="number">0</span></div><div class="line">    <span class="keyword">for</span> d, discrete <span class="keyword">in</span> enumerate(self._whether_discrete):</div><div class="line">        <span class="comment"># 如果是连续维度，直接调用 float 方法将其转为浮点数</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> discrete:</div><div class="line">            x[d] = float(x[d])</div><div class="line">        <span class="comment"># 如果是离散维度，利用转换字典进行数值化</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            x[d] = _feat_dics[idx][x[d]]</div><div class="line">        <span class="keyword">if</span> discrete:</div><div class="line">            idx += <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> x</div></pre></td></tr></table></figure>
 <p>至此，混合型朴素贝叶斯模型就搭建完毕了。为了比较合理地对它进行评估，我们不妨采用 UCI 上一个我认为有些病态的数据集进行测试。问题的描述大概可以概括如下：</p>
 <p>“训练数据包含了某银行一项业务的目标客户的信息、电话销售记录以及后来他是否购买了这项业务的信息。我们希望做到：根据客户的基本信息和历史联系记录，预测他是否会购买这项业务”。UCI 上的原问题描述则如下图所示：</p>
-<img src="/MLBlog/posts/7c13f69c/p1.png" alt="p1.png" title="">
+<img src="/posts/7c13f69c/p1.png" alt="p1.png" title="">
 <p>概括其主要内容、就是它是一个有 17 个属性的二类分类问题。之所以我认为它是病态的，是因为我发现即使是 17 个属性几乎完全一样的两个人，他们选择是否购买业务的结果也会截然相反。事实上从心理学的角度来说，想要很好地预测人的行为确实是一项非常困难的事情、尤其是当该行为直接牵扯到较大的利益时</p>
 <p>完整的数据集可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/bank1.0.txt" target="_blank" rel="external">这里</a>（最后一列数据是类别）。按照数据的特性、我们可以通过和之前用来评估 MultinomialNB 的代码差不多的代码（注意额外定义一个记录离散型维度的数组即可）得出如下图所示的结果：</p>
-<img src="/MLBlog/posts/7c13f69c/p2.png" alt="p2.png" title="">
+<img src="/posts/7c13f69c/p2.png" alt="p2.png" title="">
 <p>虽然准确率达到了 89%左右，但其实该问题不应该用准确率作为评判的标准。因为如果我们观察数据就会发现、数据存在着严重的非均衡现象。事实上，88%的客户最终都是没有购买这个业务的、但我们更关心的是那一小部分购买了业务的客户，这种情况我们通常会用 F1-score 来衡量模型的好坏。此外，该问题非常需要人为进行数据清洗、因为其原始数据非常杂乱。此外，我们可以对该问题中的各个离散维度进行可视化。该数据共 9 个离散维度，我们可以将它们合并在同一个图中以方便获得该数据离散部分的直观（如下图所示；由于各个特征的各个取值通常比较长（比如”manager”之类的），为整洁、我们直接将横坐标置为等差数列而没有进行转换）：</p>
-<img src="/MLBlog/posts/7c13f69c/p3.png" alt="p3.png" title="">
+<img src="/posts/7c13f69c/p3.png" alt="p3.png" title="">
 <p>其中天蓝色代表类别 yes、亦即购买了业务；橙色则代表 no、亦即没有购买业务。可以看到、所有离散维度的特征都是前面所说的“无足轻重”的特征</p>
 <p>连续维度的可视化是几乎同理的，唯一的差别在于它不是柱状图而是正态分布密度函数的函数曲线。具体的代码实现从略、感兴趣的观众老爷们可以尝试动手实现一下，这里仅放出程序运行的结果。该数据共 7 个连续维度，我们同样把它们放在同一个图中：</p>
-<img src="/MLBlog/posts/7c13f69c/p4.png" alt="p4.png" title="">
+<img src="/posts/7c13f69c/p4.png" alt="p4.png" title="">
 <p>其中，天蓝色曲线代表类别 yes、橙色曲线代表类别 no。可以看到，两种类别的数据在各个维度上的正态分布的均值、方差都几乎一致</p>
 <p>从以上的分析已经可以比较直观地感受到、该问题确实相当病态。特别地，考虑到朴素贝叶斯的算法、不难想象此时的混合型朴素贝叶斯模型基本就只是根据各类别的先验概率来进行分类决策</p>
 <p>至此，朴素贝叶斯算法的理论、实现就差不多都说了一遍。作为收尾，下篇文章会补上之前没有展开叙述的一些细节、同时也会简要地介绍一下其余的贝叶斯分类器</p>
@@ -463,20 +463,20 @@ y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)<
 <p>需要指出的是，今后获取各种数据的过程都会放在上述<code>DataUtil</code>中的这个<code>get_dataset</code>方法中，其完整版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py#L94" target="_blank" rel="external">这里</a>。下面就放出 MultinomialNB 的评估用代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    <span class="comment"># 导入标准库time以计时，导入DataUtil类以获取数据</span></div><div class="line">    <span class="keyword">import</span> time</div><div class="line">    <span class="keyword">from</span> Util <span class="keyword">import</span> DataUtil</div><div class="line">    <span class="comment"># 遍历1.0、1.5两个版本的气球数据集</span></div><div class="line">    <span class="keyword">for</span> dataset <span class="keyword">in</span> (<span class="string">"balloon1.0"</span>, <span class="string">"balloon1.5"</span>):</div><div class="line">        <span class="comment"># 读入数据</span></div><div class="line">        _x, _y = DataUtil.get_dataset(dataset, <span class="string">"../../_Data/&#123;&#125;.txt"</span>.format(dataset))</div><div class="line">        <span class="comment"># 实例化模型并进行训练、同时记录整个过程花费的时间</span></div><div class="line">        learning_time = time.time()</div><div class="line">        nb = MultinomialNB()</div><div class="line">        nb.fit(_x, _y)</div><div class="line">        learning_time = time.time() - learning_time</div><div class="line">        <span class="comment"># 评估模型的表现，同时记录评估过程花费的时间</span></div><div class="line">        estimation_time = time.time()</div><div class="line">        nb.evaluate(_x, _y)</div><div class="line">        estimation_time = time.time() - estimation_time</div><div class="line">        <span class="comment"># 将记录下来的耗时输出</span></div><div class="line">        print(</div><div class="line">            <span class="string">"Model building  : &#123;:12.6&#125; s\n"</span></div><div class="line">            <span class="string">"Estimation      : &#123;:12.6&#125; s\n"</span></div><div class="line">            <span class="string">"Total           : &#123;:12.6&#125; s"</span>.format(</div><div class="line">                learning_time, estimation_time,</div><div class="line">                learning_time + estimation_time</div><div class="line">            )</div><div class="line">        )</div></pre></td></tr></table></figure>
 <p>上面这段代码的运行结果如下图所示：</p>
-<img src="/MLBlog/posts/74647589/p4.png" alt="p4.png" title="">
+<img src="/posts/74647589/p4.png" alt="p4.png" title="">
 <p>由于数据量太少、所以建模和评估的过程耗费的时间已是可以忽略不计的程度。同时正如前文所提及的，气球数据集1.5是“不太均衡”的数据集，所以朴素贝叶斯在其上的表现会比较差</p>
 <p>仅仅在虚构的数据集上进行评估可能不太有说服力，我们可以拿 UCI 上一个比较出名<del>（简单）</del>的“蘑菇数据集（Mushroom Data Set）”来评估一下我们的模型。该数据集的大致描述如下：它有 8124 个样本、22 个属性，类别取值有两个：“能吃”或“有毒”；该数据每个单一样本都占一行、属性之间使用逗号隔开。选择该数据集的原因是它无需进行额外的数据预处理、样本量和属性量都相对合适、二类分类问题也相对来说具有代表性。更重要的是，它所有维度的特征取值都是离散的、从而非常适合用来测试我们的 MultinomialNB 模型</p>
 <p>完整的数据集可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/mushroom.txt" target="_blank" rel="external">这里</a>（第一列数据是类别），我们的模型在其上的表现则如下图所示： </p>
-<img src="/MLBlog/posts/74647589/p1.png" alt="p1.png" title="">
+<img src="/posts/74647589/p1.png" alt="p1.png" title="">
 <p>其中第一、二行分别是训练集、测试集上的准确率，接下来三行则分别是建立模型、评估模型和总花费时间的记录</p>
 <p>当然，仅仅看一个结果没有什么意思、也完全无法知道模型到底干了什么。为了获得更好的直观，我们可以进行一定的可视化，比如说将极大似然估计法得到的条件概率画出（如综述所示的那样）。可视化的代码实现如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入 matplotlib 库以进行可视化</span></div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line"><span class="comment"># 进行一些设置使得 matplotlib 能够显示中文</span></div><div class="line"><span class="keyword">from</span> pylab <span class="keyword">import</span> mpl</div><div class="line"><span class="comment"># 将字体设为“仿宋”</span></div><div class="line">mpl.rcParams[<span class="string">'font.sans-serif'</span>] = [<span class="string">'FangSong'</span>]</div><div class="line">mpl.rcParams[<span class="string">'axes.unicode_minus'</span>] = <span class="keyword">False</span></div><div class="line"><span class="comment"># 利用 MultinomialNB 搭建过程中记录的变量获取条件概率</span></div><div class="line">data = nb[<span class="string">"data"</span>]</div><div class="line"><span class="comment"># 定义颜色字典，将类别 e（能吃）设为天蓝色、类别 p（有毒）设为橙色</span></div><div class="line">colors = &#123;<span class="string">"e"</span>: <span class="string">"lightSkyBlue"</span>, <span class="string">"p"</span>: <span class="string">"orange"</span>&#125;</div><div class="line"><span class="comment"># 利用转换字典定义其“反字典”，后面可视化会用上</span></div><div class="line">_rev_feat_dics = [&#123;_val: _key <span class="keyword">for</span> _key, _val <span class="keyword">in</span> _feat_dic.items()&#125; </div><div class="line">    <span class="keyword">for</span> _feat_dic <span class="keyword">in</span> self._feat_dics]</div><div class="line"><span class="comment"># 遍历各维度进行可视化</span></div><div class="line"><span class="comment"># 利用 MultinomialNB 搭建过程中记录的变量，获取画图所需的信息</span></div><div class="line"><span class="keyword">for</span> _j <span class="keyword">in</span> range(nb[<span class="string">"x"</span>].shape[<span class="number">1</span>]):</div><div class="line">    sj = nb[<span class="string">"n_possibilities"</span>][_j]</div><div class="line">    tmp_x = np.arange(<span class="number">1</span>, sj+<span class="number">1</span>)</div><div class="line">    <span class="comment"># 利用 matplotlib 对 LaTeX 的支持来写标题，两个 $ 之间的即是 LaTeX 语句</span></div><div class="line">    title = <span class="string">"$j = &#123;&#125;; S_j = &#123;&#125;$"</span>.format(_j+<span class="number">1</span>, sj)</div><div class="line">    plt.figure()</div><div class="line">    plt.title(title)</div><div class="line">    <span class="comment"># 根据条件概率的大小画出柱状图</span></div><div class="line">    <span class="keyword">for</span> _c <span class="keyword">in</span> range(len(nb.label_dic)):</div><div class="line">        plt.bar(tmp_x<span class="number">-0.35</span>*_c, data[_j][_c, :], width=<span class="number">0.35</span>,</div><div class="line">                facecolor=colors[nb.label_dic[_c]], edgecolor=<span class="string">"white"</span>, </div><div class="line">                label=<span class="string">"class: &#123;&#125;"</span>.format(nb.label_dic[_c]))</div><div class="line">    <span class="comment"># 利用上文定义的“反字典”将横坐标转换成特征的各个取值</span></div><div class="line">    plt.xticks([i <span class="keyword">for</span> i <span class="keyword">in</span> range(sj + <span class="number">2</span>)], [<span class="string">""</span>] + [_rev_dic[i] <span class="keyword">for</span> i <span class="keyword">in</span> range(sj)] + [<span class="string">""</span>])</div><div class="line">    plt.ylim(<span class="number">0</span>, <span class="number">1.0</span>)</div><div class="line">    plt.legend()</div><div class="line">    <span class="comment"># 保存画好的图像</span></div><div class="line">    plt.savefig(<span class="string">"d&#123;&#125;"</span>.format(j+<span class="number">1</span>))</div></pre></td></tr></table></figure>
 <p>由于蘑菇数据一共有 22 维，所以上述代码会生成 22 张图，从这些图可以非常清晰地看出训练数据集各维度特征的分布。下选出几组有代表性的图片进行说明</p>
 <p>一般来说，一组数据特征中会有相对“重要”的特征和相对“无足轻重”的特征，通过以上实现的可视化可以比较轻松地辨析出在离散型朴素贝叶斯中这两者的区别。比如说，在离散型朴素贝叶斯里、相对重要的特征的表现会如下图所示（左图对应第 5 维、右图对应第 19 维）：</p>
-<img src="/MLBlog/posts/74647589/p2.png" alt="“优秀”的特征" title="“优秀”的特征">
+<img src="/posts/74647589/p2.png" alt="“优秀”的特征" title="“优秀”的特征">
 <p>可以看出，蘑菇数据集在第 19 维上两个类别各自的“优势特征”都非常明显、第 5 维上两个类别各自特征的取值更是基本没有交集。可以想象，即使只根据第 5 维的取值来进行类别的判定、最后的准确率也一定会非常高</p>
 <p>那么与之相反的、在 MultinomialNB 中相对没那么重要的特征的表现则会形如下图所示（左图对应第 3 维、右图对应第 16 维）：</p>
-<img src="/MLBlog/posts/74647589/p3.png" alt="“无用”的特征" title="“无用”的特征">
+<img src="/posts/74647589/p3.png" alt="“无用”的特征" title="“无用”的特征">
 <p>可以看出，蘑菇数据集在第 3 维上两个类的特征取值基本没有什么差异、第 16 维数据更是似乎完全没有存在的价值。像这样的数据就可以考虑直接剔除掉</p>
 <p>看到这里的观众老爷如果再回过头去看上一篇文章所讲的框架、想必会有些新的体会吧 ( σ’ω’)σ</p>
 ]]></content>
@@ -520,7 +520,7 @@ y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)<
 <p>总之先来看看这个框架的初始化步骤吧<del>（前方高能）</del></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NaiveBayes</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._x, self._y：记录训练集的变量</div><div class="line">        self._data：核心数组，存储实际使用的条件概率的相关信息</div><div class="line">        self._func：模型核心——决策函数，能够根据输入的x、y输出对应的后验概率</div><div class="line">        self._n_possibilities：记录各个维度特征取值个数的数组</div><div class="line">        self._labelled_x：记录按类别分开后的输入数据的数组</div><div class="line">        self._label_zip：记录类别相关信息的数组，视具体算法、定义会有所不同</div><div class="line">        self._cat_counter：核心数组，记录第i类数据的个数（cat是category的缩写）</div><div class="line">        self._con_counter：核心数组，用于记录数据条件概率的原始极大似然估计</div><div class="line">        self.label_dic：核心字典，用于记录数值化类别时的转换关系</div><div class="line">        self._feat_dics：核心字典，用于记录数值化各维度特征（feat）时的转换关系</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        self._x = self._y = <span class="keyword">None</span></div><div class="line">        self._data = self._func = <span class="keyword">None</span></div><div class="line">        self._n_possibilities = <span class="keyword">None</span></div><div class="line">        self._labelled_x = self._label_zip = <span class="keyword">None</span></div><div class="line">        self._cat_counter = self._con_counter = <span class="keyword">None</span></div><div class="line">        self.label_dic = self._feat_dics = <span class="keyword">None</span></div></pre></td></tr></table></figure>
 <p>其中、<code>self._con_counter[d][c][p]</code><script type="math/tex">=\hat p(x^{(d)}=p|y=c)</script>（con 是 conditional 的缩写）</p>
-<img src="/MLBlog/posts/fa51e28/p1.jpg" alt="注释比代码还多是想闹哪样？？？(╯‵□′)╯︵┻━┻" title="注释比代码还多是想闹哪样？？？(╯‵□′)╯︵┻━┻">
+<img src="/posts/fa51e28/p1.jpg" alt="注释比代码还多是想闹哪样？？？(╯‵□′)╯︵┻━┻" title="注释比代码还多是想闹哪样？？？(╯‵□′)╯︵┻━┻">
 <p>总之和我一样陷入了茫然的观众老爷们可以先不太在意这一坨是什么玩意儿，毕竟这些东西是抽象程度比较高的属性……等结合具体算法时、这些属性的意义可能就会明确得多</p>
 <p>下面进入正题……首先来看怎么计算先验概率（直接利用上面的<code>self._cat_counter</code>属性即可）</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_prior_probability</span><span class="params">(self, lb=<span class="number">1</span>)</span>:</span></div><div class="line">    <span class="keyword">return</span> [(_c_num + lb) / (len(self._y) + lb * len(self._cat_counter))</div><div class="line">            <span class="keyword">for</span> _c_num <span class="keyword">in</span> self._cat_counter]</div></pre></td></tr></table></figure>
@@ -588,7 +588,7 @@ y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)<
 \Theta = \left\{ y = c_{1},{y = c}_{2},\ldots,{y = c}_{K} \right\}</script><p>朴素贝叶斯总的参数空间<script type="math/tex">\tilde{\Theta}</script>本应包括模型参数的先验概率<script type="math/tex">p\left( \theta_{k} \right) = p(y = c_{k})</script>、样本空间在模型参数下的条件概率<script type="math/tex">p\left( X \middle| \theta_{k} \right) = p(X|y = c_{k})</script>和样本空间本身的概率<script type="math/tex">p(X)</script>；但由于我们采取样本空间的子集<script type="math/tex">\tilde{X}</script>作为训练集，所以在给定的<script type="math/tex">\tilde{X}</script>下、<script type="math/tex">p\left( X \right) = p(\tilde{X})</script>是常数，因此可以把它从参数空间中删去。换句话说，我们关心的东西只有模型参数的先验概率和样本空间在模型参数下的条件概率</p>
 <script type="math/tex; mode=display">
 \tilde{\Theta} = \left\{ p\left( \theta \right),p\left( X \middle| \theta \right):\theta \in \Theta \right\}</script><p>行动空间<script type="math/tex">A</script>就是朴素贝叶斯总的参数空间<script type="math/tex">\tilde{\Theta}</script></p>
-<p>决策就是后验概率最大化（在<a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>里，我们会证明该决策为贝叶斯决策）</p>
+<p>决策就是后验概率最大化（在<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>里，我们会证明该决策为贝叶斯决策）</p>
 <script type="math/tex; mode=display">
 \delta\left( \tilde{X} \right) = \hat{\theta} = \arg{\max_{\tilde\theta\in\tilde\Theta}{p\left( \tilde{\theta} \middle| \tilde{X} \right)}}</script><p>在<script type="math/tex">\hat{\theta}</script>确定后，模型的决策就可以具体写成（这一步用到了独立性假设）</p>
 <script type="math/tex; mode=display">
@@ -602,7 +602,7 @@ L\left( \theta,\delta\left( \tilde{X} \right) \right) = \sum_{i = 1}^{N}{\tilde{
 I\left( y_{i} \neq f\left( x_{i} \right) \right) = \left\{ \begin{matrix}
 1,\ if\ y_{i} \neq f\left( x_{i} \right) \\
 0,if\ y_{i} \neq f\left( x_{i} \right) \\
-\end{matrix} \right.\</script><p>从上述定义出发、可以利用<a href="/MLBlog/posts/d007d6bc/" title="上一篇文章">上一篇文章</a>中讲解的两种参数估计方法导出离散型朴素贝叶斯的算法（详见<a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>）：</p>
+\end{matrix} \right.\</script><p>从上述定义出发、可以利用<a href="/posts/d007d6bc/" title="上一篇文章">上一篇文章</a>中讲解的两种参数估计方法导出离散型朴素贝叶斯的算法（详见<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>）：</p>
 <ul>
 <li>输入：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
 <li>过程（利用 ML 估计导出模型的具体参数）：<ul>
@@ -927,7 +927,7 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 \frac{\partial\ln p}{\partial\theta} = 0 \Rightarrow \theta = \frac{x_{1} + x_{2}}{2}</script><p>由于<script type="math/tex">x_{1} + x_{2} = 1</script>，所以得<script type="math/tex">\hat{\theta} = 0.5</script>、亦即应该估计从暗箱中抽出黑球的概率是 50%；进一步地、既然暗箱中的两个球完全一样，我们应该估计暗箱中的颜色分布为 1 黑 1 白。</p>
 <p>从以上的讨论可以看出，极大似然估计视待估参数为一个未知但固定的量、不考虑“观察者”的影响（亦即不考虑先验知识的影响），是传统的频率学派的做法</p>
 <h1 id="极大后验概率估计（MAP估计）"><a href="#极大后验概率估计（MAP估计）" class="headerlink" title="极大后验概率估计（MAP估计）"></a>极大后验概率估计（MAP估计）</h1><p>相比起极大似然估计，极大后验概率估计是更贴合贝叶斯学派思想的做法；事实上、甚至也有不少人直接称其为“贝叶斯估计”（注：贝叶斯估计的定义有许多，本人接触到的就有 3、4 种；囿于实力，本人无法辨析哪种才是真正的贝叶斯估计、所以我们不会进行相关的讨论）</p>
-<p>在讨论 MAP 估计之前，我们有必要先知道何为后验概率<script type="math/tex">p(\theta|\tilde{X})</script>：它可以理解为参数<script type="math/tex">\theta</script>在训练集<script type="math/tex">\tilde{X}</script>下所谓的“真实的出现概率”，能够利用参数的先验概率<script type="math/tex">p\left( \theta \right)</script>、样本的先验概率<script type="math/tex">p(\tilde{X})</script>和条件概率<script type="math/tex">p\left( \tilde{X}|\theta \right) = \prod_{i = 1}^{N}{p\left( x_{i}|\theta \right)}</script>通过贝叶斯公式导出（详见<a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>）</p>
+<p>在讨论 MAP 估计之前，我们有必要先知道何为后验概率<script type="math/tex">p(\theta|\tilde{X})</script>：它可以理解为参数<script type="math/tex">\theta</script>在训练集<script type="math/tex">\tilde{X}</script>下所谓的“真实的出现概率”，能够利用参数的先验概率<script type="math/tex">p\left( \theta \right)</script>、样本的先验概率<script type="math/tex">p(\tilde{X})</script>和条件概率<script type="math/tex">p\left( \tilde{X}|\theta \right) = \prod_{i = 1}^{N}{p\left( x_{i}|\theta \right)}</script>通过贝叶斯公式导出（详见<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>）</p>
 <p>而 MAP 估计的核心思想、就是将待估参数<script type="math/tex">\theta</script>看成是一个随机变量、从而引入了极大似然估计里面没有引入的、参数<script type="math/tex">\theta</script>的先验分布。MAP 估计<script type="math/tex">{\hat{\theta}}_{\text{MAP}}</script>的定义为：</p>
 <script type="math/tex; mode=display">
 {\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{p(\theta|\tilde{X}) = \arg{\max_\theta{p(\theta)\prod_{i = 1}^{N}{p(x_{i}|\theta)}}}}}</script><p>同样的，为了计算简洁，我们通常对上式取对数：</p>
@@ -981,7 +981,7 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 \rho(\delta) = E_\xi R(\theta,\delta)</script><h2 id="贝叶斯决策"><a href="#贝叶斯决策" class="headerlink" title="贝叶斯决策"></a>贝叶斯决策</h2><p>贝叶斯决策（通常用<script type="math/tex">\delta^*</script>来表示）满足：</p>
 <script type="math/tex; mode=display">
 \rho(\delta^*)=\inf_\delta\rho(\delta)</script><p>换句话说，贝叶斯决策<script type="math/tex">\delta^*</script>是在某个先验分布下使得平均风险最小的决策</p>
-<p>寻找一般意义下的贝叶斯决策是相当不平凡的数学问题，为简洁、我们需要结合具体的机器学习算法来推导相应的贝叶斯决策。相关的讨论会在<a href="/MLBlog/posts/ea9b7d09/" title="说明朴素贝叶斯算法的文章">说明朴素贝叶斯算法的文章</a>中进行，这里就暂时先按下不表</p>
+<p>寻找一般意义下的贝叶斯决策是相当不平凡的数学问题，为简洁、我们需要结合具体的机器学习算法来推导相应的贝叶斯决策。相关的讨论会在<a href="/posts/ea9b7d09/" title="说明朴素贝叶斯算法的文章">说明朴素贝叶斯算法的文章</a>中进行，这里就暂时先按下不表</p>
 ]]></content>
     
     <summary type="html">
@@ -1008,14 +1008,14 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 <p>由于朴素贝叶斯这一块能够扯到的理论还是相当多的，我们会把内容分成数学理论部分与程序实现部分，观众老爷们可以按需阅读 ( σ’ω’)σ</p>
 <p>以下是目录：</p>
 <ul>
-<li><a href="/MLBlog/posts/a0e8b2e/" title="贝叶斯决策论">贝叶斯决策论</a></li>
-<li><a href="/MLBlog/posts/d007d6bc/" title="参数估计">参数估计</a></li>
-<li><a href="/MLBlog/posts/ea9b7d09/" title="朴素贝叶斯算法">朴素贝叶斯算法</a></li>
-<li><a href="/MLBlog/posts/fa51e28/" title="框架的实现">框架的实现</a></li>
-<li><a href="/MLBlog/posts/74647589/" title="MultinomialNB 的实现">MultinomialNB 的实现</a></li>
-<li><a href="/MLBlog/posts/c836ba35/" title="GaussianNB 的实现">GaussianNB 的实现</a></li>
-<li><a href="/MLBlog/posts/7c13f69c/" title="MergedNB 的实现">MergedNB 的实现</a></li>
-<li><a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>
+<li><a href="/posts/a0e8b2e/" title="贝叶斯决策论">贝叶斯决策论</a></li>
+<li><a href="/posts/d007d6bc/" title="参数估计">参数估计</a></li>
+<li><a href="/posts/ea9b7d09/" title="朴素贝叶斯算法">朴素贝叶斯算法</a></li>
+<li><a href="/posts/fa51e28/" title="框架的实现">框架的实现</a></li>
+<li><a href="/posts/74647589/" title="MultinomialNB 的实现">MultinomialNB 的实现</a></li>
+<li><a href="/posts/c836ba35/" title="GaussianNB 的实现">GaussianNB 的实现</a></li>
+<li><a href="/posts/7c13f69c/" title="MergedNB 的实现">MergedNB 的实现</a></li>
+<li><a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>
 </li>
 </ul>
 <a id="more"></a>
@@ -1029,8 +1029,8 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 </ul>
 <h1 id="程序运行的结果预览"><a href="#程序运行的结果预览" class="headerlink" title="程序运行的结果预览"></a>程序运行的结果预览</h1><p>本来要说的话、朴素贝叶斯是很难让人直观地看出来它干了什么的，不过<del>聪明而机智的</del>我想出了一个方法：把中间产生的那些条件概率可视化出来不就可以<del>蒙混过关</del>了！</p>
 <p>于是我们的朴素贝叶斯模型可以生成类似于这样的图：</p>
-<img src="/MLBlog/posts/1607712a/p1.png" alt="离散型朴素贝叶斯的可视化" title="离散型朴素贝叶斯的可视化">
-<img src="/MLBlog/posts/1607712a/p2.png" alt="连续型朴素贝叶斯的可视化" title="连续型朴素贝叶斯的可视化">
+<img src="/posts/1607712a/p1.png" alt="离散型朴素贝叶斯的可视化" title="离散型朴素贝叶斯的可视化">
+<img src="/posts/1607712a/p2.png" alt="连续型朴素贝叶斯的可视化" title="连续型朴素贝叶斯的可视化">
 <p><strong><em>注意：这些图是分开生成的，是我用画图软件<del>（很傻地）</del>很辛苦地把它们拼在一起的</em></strong></p>
 <p>以上 16 张图（离散型特征 9 张、连续型特征 7 张）对应着一个有 16 个特征的、UCI 上的“银行业务数据集”，完整的原始数据集可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/bank1.0.txt" target="_blank" rel="external">这里</a></p>
 <p>然后我们实现的朴素贝叶斯模型的最大特点就是：无需对数据进行太多预处理。还是以银行业务数据集为例，它每个样本大概长下面这样：</p>
@@ -1044,14 +1044,14 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 &lt;p&gt;由于朴素贝叶斯这一块能够扯到的理论还是相当多的，我们会把内容分成数学理论部分与程序实现部分，观众老爷们可以按需阅读 ( σ’ω’)σ&lt;/p&gt;
 &lt;p&gt;以下是目录：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;/MLBlog/posts/a0e8b2e/&quot; title=&quot;贝叶斯决策论&quot;&gt;贝叶斯决策论&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/MLBlog/posts/d007d6bc/&quot; title=&quot;参数估计&quot;&gt;参数估计&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/MLBlog/posts/ea9b7d09/&quot; title=&quot;朴素贝叶斯算法&quot;&gt;朴素贝叶斯算法&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/MLBlog/posts/fa51e28/&quot; title=&quot;框架的实现&quot;&gt;框架的实现&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/MLBlog/posts/74647589/&quot; title=&quot;MultinomialNB 的实现&quot;&gt;MultinomialNB 的实现&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/MLBlog/posts/c836ba35/&quot; title=&quot;GaussianNB 的实现&quot;&gt;GaussianNB 的实现&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/MLBlog/posts/7c13f69c/&quot; title=&quot;MergedNB 的实现&quot;&gt;MergedNB 的实现&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/MLBlog/posts/e312d61a/&quot; title=&quot;推导与推广&quot;&gt;推导与推广&lt;/a&gt;
+&lt;li&gt;&lt;a href=&quot;/posts/a0e8b2e/&quot; title=&quot;贝叶斯决策论&quot;&gt;贝叶斯决策论&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/posts/d007d6bc/&quot; title=&quot;参数估计&quot;&gt;参数估计&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/posts/ea9b7d09/&quot; title=&quot;朴素贝叶斯算法&quot;&gt;朴素贝叶斯算法&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/posts/fa51e28/&quot; title=&quot;框架的实现&quot;&gt;框架的实现&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/posts/74647589/&quot; title=&quot;MultinomialNB 的实现&quot;&gt;MultinomialNB 的实现&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/posts/c836ba35/&quot; title=&quot;GaussianNB 的实现&quot;&gt;GaussianNB 的实现&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/posts/7c13f69c/&quot; title=&quot;MergedNB 的实现&quot;&gt;MergedNB 的实现&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/posts/e312d61a/&quot; title=&quot;推导与推广&quot;&gt;推导与推广&lt;/a&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
     
@@ -1167,7 +1167,7 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 X = \frac{X - \bar X}{std(X)}</script><p>其中<script type="math/tex">\bar X</script>表示<script type="math/tex">X</script>（房子面积）的均值、<script type="math/tex">std(X)</script>表示<script type="math/tex">X</script>的标准差（Standard Deviation）。代码实现则如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入需要用到的库</span></div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line"></div><div class="line"><span class="comment"># 定义存储输入数据（x）和目标数据（y）的数组</span></div><div class="line">x, y = [], []</div><div class="line"><span class="comment"># 遍历数据集，变量 sample 对应的正是一个个样本</span></div><div class="line"><span class="keyword">for</span> sample <span class="keyword">in</span> open(<span class="string">"../_Data/prices.txt"</span>, <span class="string">"r"</span>):</div><div class="line">    <span class="comment"># 由于数据是用逗号隔开的，所以调用 Python 中的 split 方法并将逗号作为参数传入</span></div><div class="line">    _x, _y = sample.split(<span class="string">","</span>)</div><div class="line">    <span class="comment"># 将字符串数据转化为浮点数</span></div><div class="line">    x.append(float(_x))</div><div class="line">    y.append(float(_y))</div><div class="line"><span class="comment"># 读取完数据后，将它们转化为 Numpy 数组以方便进一步的处理</span></div><div class="line">x, y = np.array(x), np.array(y)</div><div class="line"><span class="comment"># 标准化</span></div><div class="line">x = (x - x.mean()) / x.std()</div><div class="line"><span class="comment"># 将原始数据以散点图的形式画出</span></div><div class="line">plt.figure()</div><div class="line">plt.scatter(x, y, c=<span class="string">"g"</span>, s=<span class="number">20</span>)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
 <p>上面这段代码的运行结果如下图所示：</p>
-<img src="/MLBlog/posts/372587d5/p1.png" alt="预处理后的数据散点图" title="预处理后的数据散点图">
+<img src="/posts/372587d5/p1.png" alt="预处理后的数据散点图" title="预处理后的数据散点图">
 <p>这里横轴是标准化后的房子面积，纵轴是房子价格。以上我们已经比较好地完成了机器学习任务的第一步：数据预处理</p>
 <h1 id="选择与训练模型"><a href="#选择与训练模型" class="headerlink" title="选择与训练模型"></a>选择与训练模型</h1><p>在弄好数据之后、下一步就要开始选择相应的学习方法和模型了。幸运的是，通过可视化原始数据，我们可以非常直观地感受到：我们很有可能通过线性回归（Linear Regression）中的多项式拟合来得到一个不错的结果。其模型的数学表达式如下：</p>
 <p><strong><em>注意：用多项式拟合散点只是线性回归的很小的一部分、但是它的直观意义比较明显。考虑到问题比较简单、我们才选用了多项式拟合。线性回归的详细讨论超出了本书的范围，这里不做赘述</em></strong></p>
@@ -1188,7 +1188,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
 <p>那么怎么最直观地了解是否出现过拟合了呢？当然还是画图了：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 画出相应的图像</span></div><div class="line">plt.scatter(x, y, c=<span class="string">"g"</span>, s=<span class="number">20</span>)</div><div class="line"><span class="keyword">for</span> d <span class="keyword">in</span> test_set:</div><div class="line">    plt.plot(x0, get_model(d)(), label=<span class="string">"degree = &#123;&#125;"</span>.format(d))</div><div class="line">plt.xlim(<span class="number">-2</span>, <span class="number">4</span>)</div><div class="line"><span class="comment"># 将横轴、纵轴的范围分别限制在(-2,4)、(10^5,8 * 10^5)</span></div><div class="line">plt.ylim(<span class="number">1e5</span>, <span class="number">8e5</span>)</div><div class="line"><span class="comment"># 调用 legend 方法使曲线对应的 label 正确显示</span></div><div class="line">plt.legend()</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
 <p>上面这段代码的运行结果如下图所示：</p>
-<img src="/MLBlog/posts/372587d5/p2.png" alt="线性回归的可视化" title="线性回归的可视化">
+<img src="/posts/372587d5/p2.png" alt="线性回归的可视化" title="线性回归的可视化">
 <p>其中，蓝线、绿线、红线分别代表<script type="math/tex">n=1</script>、<script type="math/tex">n=4</script>、<script type="math/tex">n=10</script>的情况（上图的右上角亦有说明）。可以看出，从<script type="math/tex">n=4</script>开始模型就已经开始出现过拟合现象了，到<script type="math/tex">n=10</script>时模型已经变得非常不合理</p>
 <p>至此，可以说这个问题就已经基本解决了。在这个样例里面，除了交叉验证、我们涵盖了机器学习中的大部分主要步骤（之所以没有进行交叉验证是因为数据太少了……）。代码部分加起来总共 40~50 行，应该算是一个比较合适的长度。希望大家能够通过这个样例对机器学习有个大概的理解、也希望它能引起大家对机器学习的兴趣</p>
 ]]></content>
@@ -1296,7 +1296,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
 <li>泛化能力针对的其实是学习方法，它用于衡量该学习方法学习到的模型在整个样本空间上的表现</li>
 </ul>
 <p>这一点当然是十分重要的，因为我们拿来训练我们模型的数据终究只是样本空间的一个很小的采样，如果只是过分专注于它们的话、就会出现所谓的“过拟合”（Over Fitting）的情况。当然，如果过分罔顾训练数据，又会出现“欠拟合”（Under Fitting）。我们可以用一张图来直观感受过拟合和欠拟合（如下图所示，左为欠拟合、右为过拟合）：</p>
-<img src="/MLBlog/posts/a0837b26/p1.png" alt="欠拟合与过拟合" title="欠拟合与过拟合">
+<img src="/posts/a0837b26/p1.png" alt="欠拟合与过拟合" title="欠拟合与过拟合">
 <p>所以我们需要“张弛有度”、找到最好的那个平衡点。统计学习中的结构风险最小化（Structural Risk Minimization、简称 SRM）就是研究这个的，它和传统的经验风险最小化（Empirical Risk Minimization、简称 ERM）相比，注重于对风险上界的最小化、而不是单纯使经验风险最小化。它有一个原则：在使得风险上界最小的函数子集中、挑选出使得经验风险最小的函数。而这个函数子集，正是我们之前提到过的假设空间</p>
 <p><strong><em>注意：所谓经验风险，可以理解为训练数据集上的风险。相对应的，ERM 则可以理解为只注重训练数据集的学习方法，它的理论基础是经验风险在某种足够合理的数学意义上一致收敛于期望风险、亦即所谓的“真正的”风险</em></strong></p>
 <p>关于 SRM 和 ERM 的详细讨论会涉及到诸如 VC 维和正则化的概念，这里不进行详细展开、但我们需要有这么一个直观：为了使我们学习方法训练出的模型泛化能力足够好，我们需要对我们的模型做出一定的“限制”、而这个“限制”就表现在假设空间的选取上。一个非常普遍的做法是对模型的复杂度做出一定的惩罚、从而使模型趋于精简。这与所谓的“奥卡姆剃刀原理”<del>（奥卡姆：我的剃刀还能再战 500 年）</del>不谋而合：“如无必要，勿增实体”“切勿浪费较多的东西去做，用较少的东西、同样可以做好事情”</p>
@@ -1341,16 +1341,16 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
     <link href="http://www.carefree0910.com/posts/4f2fecf/"/>
     <id>http://www.carefree0910.com/posts/4f2fecf/</id>
     <published>2017-04-19T12:13:19.000Z</published>
-    <updated>2017-04-21T02:44:10.000Z</updated>
+    <updated>2017-04-21T15:22:31.000Z</updated>
     
     <content type="html"><![CDATA[<p>其实要说搭博客的想法的话，在相当久之前就已经有了。然而由于种种原因<del>（懒）</del>，导致一直搁置至今</p>
 <p>不过搭一个相对好看的博客比我想象的要难不少，我在经历了打算从头搭建<script type="math/tex">\rightarrow</script>打算使用 WordPress<script type="math/tex">\rightarrow</script>打算使用 Jekyll 这三个阶段后，最终还是选择了 Hexo + Next 主题这一个组合</p>
-<h1 id="主旨"><a href="#主旨" class="headerlink" title="主旨"></a>主旨</h1><p>虽然我大言不惭地将站点命名为了“Python 与机器学习”，但其实该博客更像是针对我的个人 repo——<a href="">MachineLearning</a> 的一个文档（另一个文档为我的个人<a href="https://zhuanlan.zhihu.com/carefree0910-pyml" target="_blank" rel="external">知乎专栏</a>）。这里所说的文档不仅包括了代码的实现思路、调用方法，还包括了背后的理论基础等等。不过囿于本人学识尚浅，许多地方可能都会有错漏，届时希望大家能不吝指出 ( σ’ω’)σ</p>
+<h1 id="主旨"><a href="#主旨" class="headerlink" title="主旨"></a>主旨</h1><p>虽然我大言不惭地将站点命名为了“Python 与机器学习”，但其实该博客更像是针对我的个人 repo——<a href="https://github.com/carefree0910/MachineLearning" target="_blank" rel="external">MachineLearning</a> 的一个文档（另一个文档为我的个人<a href="https://zhuanlan.zhihu.com/carefree0910-pyml" target="_blank" rel="external">知乎专栏</a>）。这里所说的文档不仅包括了代码的实现思路、调用方法，还包括了背后的理论基础等等。不过囿于本人学识尚浅，许多地方可能都会有错漏，届时希望大家能不吝指出 ( σ’ω’)σ</p>
 <h1 id="内容"><a href="#内容" class="headerlink" title="内容"></a>内容</h1><p>由于我也在<del>苦逼</del>绝赞学习中，所以内容会不断更新；特别是在当前这种几乎一个星期就出一个新技术的时代，“啃老本”这种想法几乎是不可行的<del>（说得好像你有老本似的）</del></p>
 <p>截止至 2017-4-19、本博客的内容包括：</p>
 <ul>
-<li><a href="/MLBlog/posts/a0837b26/" title="Python 与机器学习绪论（Introduction）">Python 与机器学习绪论（Introduction）</a></li>
-<li><a href="/MLBlog/posts/1607712a/" title="朴素贝叶斯（Naive Bayes）">朴素贝叶斯（Naive Bayes）</a></li>
+<li><a href="/posts/a0837b26/" title="Python 与机器学习绪论（Introduction）">Python 与机器学习绪论（Introduction）</a></li>
+<li><a href="/posts/1607712a/" title="朴素贝叶斯（Naive Bayes）">朴素贝叶斯（Naive Bayes）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/c_CvDTree" target="_blank" rel="external">决策树（Decision Tree）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/d_Ensemble" target="_blank" rel="external">集成学习（Ensemble Learning）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/e_SVM" target="_blank" rel="external">支持向量机（Support Vector Machine）</a></li>

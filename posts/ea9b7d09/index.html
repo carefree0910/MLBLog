@@ -434,7 +434,7 @@ y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)<
 \Theta = \left\{ y = c_{1},{y = c}_{2},\ldots,{y = c}_{K} \right\}</script><p>朴素贝叶斯总的参数空间<script type="math/tex">\tilde{\Theta}</script>本应包括模型参数的先验概率<script type="math/tex">p\left( \theta_{k} \right) = p(y = c_{k})</script>、样本空间在模型参数下的条件概率<script type="math/tex">p\left( X \middle| \theta_{k} \right) = p(X|y = c_{k})</script>和样本空间本身的概率<script type="math/tex">p(X)</script>；但由于我们采取样本空间的子集<script type="math/tex">\tilde{X}</script>作为训练集，所以在给定的<script type="math/tex">\tilde{X}</script>下、<script type="math/tex">p\left( X \right) = p(\tilde{X})</script>是常数，因此可以把它从参数空间中删去。换句话说，我们关心的东西只有模型参数的先验概率和样本空间在模型参数下的条件概率</p>
 <script type="math/tex; mode=display">
 \tilde{\Theta} = \left\{ p\left( \theta \right),p\left( X \middle| \theta \right):\theta \in \Theta \right\}</script><p>行动空间<script type="math/tex">A</script>就是朴素贝叶斯总的参数空间<script type="math/tex">\tilde{\Theta}</script></p>
-<p>决策就是后验概率最大化（在<a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>里，我们会证明该决策为贝叶斯决策）</p>
+<p>决策就是后验概率最大化（在<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>里，我们会证明该决策为贝叶斯决策）</p>
 <script type="math/tex; mode=display">
 \delta\left( \tilde{X} \right) = \hat{\theta} = \arg{\max_{\tilde\theta\in\tilde\Theta}{p\left( \tilde{\theta} \middle| \tilde{X} \right)}}</script><p>在<script type="math/tex">\hat{\theta}</script>确定后，模型的决策就可以具体写成（这一步用到了独立性假设）</p>
 <script type="math/tex; mode=display">
@@ -448,7 +448,7 @@ L\left( \theta,\delta\left( \tilde{X} \right) \right) = \sum_{i = 1}^{N}{\tilde{
 I\left( y_{i} \neq f\left( x_{i} \right) \right) = \left\{ \begin{matrix}
 1,\ if\ y_{i} \neq f\left( x_{i} \right) \\
 0,if\ y_{i} \neq f\left( x_{i} \right) \\
-\end{matrix} \right.\</script><p>从上述定义出发、可以利用<a href="/MLBlog/posts/d007d6bc/" title="上一篇文章">上一篇文章</a>中讲解的两种参数估计方法导出离散型朴素贝叶斯的算法（详见<a href="/MLBlog/posts/e312d61a/" title="推导与推广">推导与推广</a>）：</p>
+\end{matrix} \right.\</script><p>从上述定义出发、可以利用<a href="/posts/d007d6bc/" title="上一篇文章">上一篇文章</a>中讲解的两种参数估计方法导出离散型朴素贝叶斯的算法（详见<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>）：</p>
 <ul>
 <li>输入：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
 <li>过程（利用 ML 估计导出模型的具体参数）：<ul>
