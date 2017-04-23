@@ -1,0 +1,1014 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="（本文会用到的所有代码都在这里） 在实现完计算各种信息量的函数之后，我们就可以着手实现决策树本身了。由前文的讨论可知、组成决策树主体的是一个个的 Node，所以我们接下来首先要实现的就是 Node 这个结构。而且由于我们所关心的 ID3、C4.5 和 CART 分类树的 Node 在大多数情况下表现一致、只有少数几个地方有所不同，因此我们可以写一个统一的 Node 结构的基类CvDNode来囊括我">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="节点结构的实现">
+<meta property="og:url" content="http://www.carefree0910.com/posts/41abb98b/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="（本文会用到的所有代码都在这里） 在实现完计算各种信息量的函数之后，我们就可以着手实现决策树本身了。由前文的讨论可知、组成决策树主体的是一个个的 Node，所以我们接下来首先要实现的就是 Node 这个结构。而且由于我们所关心的 ID3、C4.5 和 CART 分类树的 Node 在大多数情况下表现一致、只有少数几个地方有所不同，因此我们可以写一个统一的 Node 结构的基类CvDNode来囊括我">
+<meta property="og:updated_time" content="2017-04-23T00:45:19.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="节点结构的实现">
+<meta name="twitter:description" content="（本文会用到的所有代码都在这里） 在实现完计算各种信息量的函数之后，我们就可以着手实现决策树本身了。由前文的讨论可知、组成决策树主体的是一个个的 Node，所以我们接下来首先要实现的就是 Node 这个结构。而且由于我们所关心的 ID3、C4.5 和 CART 分类树的 Node 在大多数情况下表现一致、只有少数几个地方有所不同，因此我们可以写一个统一的 Node 结构的基类CvDNode来囊括我">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/41abb98b/"/>
+
+
+
+
+
+  <title> 节点结构的实现 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/41abb98b/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                节点结构的实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-22T22:17:38+08:00">
+                2017-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/决策树/" itemprop="url" rel="index">
+                    <span itemprop="name">决策树</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Node.py" target="_blank" rel="external">这里</a>）</p>
+<p>在实现完计算各种信息量的函数之后，我们就可以着手实现决策树本身了。由前文的讨论可知、组成决策树主体的是一个个的 Node，所以我们接下来首先要实现的就是 Node 这个结构。而且由于我们所关心的 ID3、C4.5 和 CART 分类树的 Node 在大多数情况下表现一致、只有少数几个地方有所不同，因此我们可以写一个统一的 Node 结构的基类<code>CvDNode</code>来囊括我们所有关心的决策树生成算法，该基类需要实现如下功能：</p>
+<ul>
+<li>根据离散型特征划分数据（ID3、C4.5、CART）</li>
+<li>根据连续型特征划分数据（C4.5、CART）</li>
+<li>根据当前的数据判定所属的类别</li>
+</ul>
+<p>虽然说起来显得轻巧，但这之中的抽象还是比较繁琐的</p>
+<a id="more"></a>
+<p>我们先看看这个基类的基本框架该如何搭建：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="comment"># 导入之前定义的Cluster类以计算各种信息量</span></div><div class="line"><span class="keyword">from</span> c_Tree.Cluster <span class="keyword">import</span> Cluster</div><div class="line"></div><div class="line"><span class="comment"># 定义一个足够抽象的基类以囊括所有我们关心的算法</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CvDNode</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._x, self._y：记录数据集的变量</div><div class="line">        self.base, self.chaos：记录对数的底和当前的不确定性</div><div class="line">        self.criterion, self.category：记录该Node计算信息增益的方法和所属的类别</div><div class="line">        self.left_child, self.right_child：针对连续型特征和CART、记录该Node的左右子节点</div><div class="line">        self._children, self.leafs：记录该Node的所有子节点和所有下属的叶节点</div><div class="line">        self.sample_weight：记录样本权重</div><div class="line">        self.wc：记录着各个维度的特征是否连续的列表（whether continuous的缩写）</div><div class="line">        self.tree：记录着该Node所属的Tree</div><div class="line">        self.feature_dim, self.tar, self.feats：记录该Node划分标准的相关信息。具体而言：</div><div class="line">            self.feature_dim：记录着作为划分标准的特征所对应的维度</div><div class="line">            self.tar：针对连续型特征和CART、记录二分标准</div><div class="line">            self.feats：记录该Node能进行选择的、作为划分标准的特征的维度</div><div class="line">        self.parent, self.is_root：记录该Node的父节点以及该Node是否为根节点</div><div class="line">        self._depth, self.prev_feat：记录Node的深度和其父节点的划分标准</div><div class="line">        self.is_cart：记录该Node是否使用了CART算法</div><div class="line">        self.is_continuous：记录该Node选择的划分标准对应的特征是否连续</div><div class="line">        self.pruned：记录该Node是否已被剪掉，后面实现局部剪枝算法时会用到</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, tree=None, base=<span class="number">2</span>, chaos=None,</span></span></div><div class="line">               depth=<span class="number">0</span>, parent=None, is_root=True, prev_feat=<span class="string">"Root"</span>):</div><div class="line">        self._x = self._y = <span class="keyword">None</span></div><div class="line">        self.base, self.chaos = base, chaos</div><div class="line">        self.criterion = self.category = <span class="keyword">None</span></div><div class="line">        self.left_child = self.right_child = <span class="keyword">None</span></div><div class="line">        self._children, self.leafs = &#123;&#125;, &#123;&#125;</div><div class="line">        self.sample_weight = <span class="keyword">None</span></div><div class="line">        self.wc = <span class="keyword">None</span></div><div class="line">        self.tree = tree</div><div class="line">        <span class="comment"># 如果传入了Tree的话就进行相应的初始化</span></div><div class="line">        <span class="keyword">if</span> tree <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            <span class="comment"># 由于数据预处理是由Tree完成的</span></div><div class="line">            <span class="comment"># 所以各个维度的特征是否是连续型随机变量也是由Tree记录的</span></div><div class="line">            self.wc = tree.whether_continuous</div><div class="line">            <span class="comment"># 这里的nodes变量是Tree中记录所有Node的列表</span></div><div class="line">            tree.nodes.append(self)</div><div class="line">        self.feature_dim, self.tar, self.feats = <span class="keyword">None</span>, <span class="keyword">None</span>, []</div><div class="line">        self.parent, self.is_root = parent, is_root</div><div class="line">        self._depth, self.prev_feat = depth, prev_feat</div><div class="line">        self.is_cart = self.is_continuous = self.pruned = <span class="keyword">False</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, item)</span>:</span></div><div class="line">        <span class="keyword">if</span> isinstance(item, str):</div><div class="line">            <span class="keyword">return</span> getattr(self, <span class="string">"_"</span> + item)</div><div class="line"></div><div class="line">    <span class="comment"># 重载 __lt__ 方法，使得Node之间可以比较谁更小、进而方便调试和可视化</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span><span class="params">(self, other)</span>:</span></div><div class="line">        <span class="keyword">return</span> self.prev_feat &lt; other.prev_feat</div><div class="line">    </div><div class="line">    <span class="comment"># 重载 __str__ 和 __repr__ 方法，同样是为了方便调试和可视化</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> self.category <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            <span class="keyword">return</span> <span class="string">"CvDNode (&#123;&#125;) (&#123;&#125; -&gt; &#123;&#125;)"</span>.format(</div><div class="line">                self._depth, self.prev_feat, self.feature_dim)</div><div class="line">        <span class="keyword">return</span> <span class="string">"CvDNode (&#123;&#125;) (&#123;&#125; -&gt; class: &#123;&#125;)"</span>.format(</div><div class="line">            self._depth, self.prev_feat, self.tree.label_dic[self.category])</div><div class="line">    __repr__ = __str__</div></pre></td></tr></table></figure>
+<p>可以看到，除了重载 <strong>getitem</strong> 方法以外、我们还重载 <strong>lt</strong>、<strong>str</strong> 和 <strong>repr</strong> 方法。这是因为决策树模型的结构比起朴素贝叶斯模型而言要复杂一些，为了开发过程中的调试和最后的可视化更加便利、通常来说最好让我们模型的表现更贴近内置类型的表现</p>
+<p>然后我们需要定义几个 property 以使开发过程变得便利：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义children属性，主要是区分开连续+CART的情况和其余情况</span></div><div class="line"><span class="comment"># 有了该属性后，想要获得所有子节点时就不用分情况讨论了</span></div><div class="line"><span class="meta">@property</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">children</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">return</span> &#123;</div><div class="line">        <span class="string">"left"</span>: self.left_child, <span class="string">"right"</span>: self.right_child</div><div class="line">    &#125; <span class="keyword">if</span> (self.is_cart <span class="keyword">or</span> self.is_continuous) <span class="keyword">else</span> self._children</div><div class="line"></div><div class="line"><span class="comment"># 递归定义height（高度）属性：</span></div><div class="line"><span class="comment"># 叶节点高度都定义为1、其余节点的高度定义为最高的子节点的高度+1</span></div><div class="line"><span class="meta">@property</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">height</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">if</span> self.category <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">return</span> <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> <span class="number">1</span> + max([_child.height <span class="keyword">if</span> _child <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">else</span> <span class="number">0</span></div><div class="line">        <span class="keyword">for</span> _child <span class="keyword">in</span> self.children.values()])</div><div class="line"></div><div class="line"><span class="comment"># 定义info_dic（信息字典）属性，它记录了该Node的主要信息</span></div><div class="line"><span class="comment"># 在更新各个Node的叶节点时，被记录进各个self.leafs属性的就是该字典</span></div><div class="line"><span class="meta">@property</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">info_dic</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">return</span> &#123;<span class="string">"chaos"</span>: self.chaos, <span class="string">"y"</span>: self._y&#125;</div></pre></td></tr></table></figure>
+<p>以上就是<code>CvDNode</code>的基本框架，接下来就可以在这个框架的基础上实现决策树的各种生成算法了。首先需要指出的是，由于 Node 结构是会被 Tree 结构封装的、所以我们应该将数据预处理操作交给 Tree 来做。其次，由于我们实现的是抽象程度比较高的基类，所以我们要做比较完备的分情况讨论</p>
+<p><strong><em>注意：把 ID3、C4.5 和 CART 这三种算法分开实现是可行且高效的、此时各个部分的代码都会显得更加简洁可读一些；但这样做的话，整体的代码量就会不可避免地骤增。具体应当选择何种实现方案需要看具体的需求</em></strong></p>
+<p>我们先来看看实现生成算法所需要做的一些准备工作，比如定义停止继续生成的准则、定义停止后该 Node 的行为等</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义第一种停止准则：当特征维度为0或当前Node的数据的不确定性小于阈值时停止</span></div><div class="line"><span class="comment"># 同时，如果用户指定了决策树的最大深度，那么当该Node的深度太深时也停止</span></div><div class="line"><span class="comment"># 若满足了停止条件，该函数会返回True、否则会返回False</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">stop1</span><span class="params">(self, eps)</span>:</span></div><div class="line">    <span class="keyword">if</span> (</div><div class="line">        self._x.shape[<span class="number">1</span>] == <span class="number">0</span> <span class="keyword">or</span> (self.chaos <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> self.chaos &lt;= eps)</div><div class="line">        <span class="keyword">or</span> (self.tree.max_depth <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> self._depth &gt;= self.tree.max_depth)</div><div class="line">    ):</div><div class="line">        <span class="comment"># 调用处理停止情况的方法</span></div><div class="line">        self._handle_terminate()</div><div class="line">        <span class="keyword">return</span> <span class="keyword">True</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">False</span></div><div class="line"></div><div class="line"><span class="comment"># 定义第二种停止准则，当最大信息增益仍然小于阈值时停止</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">stop2</span><span class="params">(self, max_gain, eps)</span>:</span></div><div class="line">    <span class="keyword">if</span> max_gain &lt;= eps:</div><div class="line">        self._handle_terminate()</div><div class="line">        <span class="keyword">return</span> <span class="keyword">True</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">False</span></div><div class="line"></div><div class="line"><span class="comment"># 利用bincount方法定义根据数据生成该Node所属类别的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_category</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">return</span> np.argmax(np.bincount(self._y))</div><div class="line"></div><div class="line"><span class="comment"># 定义处理停止情况的方法，核心思想就是把该Node转化为一个叶节点</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_handle_terminate</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="comment"># 首先要生成该Node所属的类别</span></div><div class="line">    self.category = self.get_category()</div><div class="line">    <span class="comment"># 然后一路回溯、更新父节点、父节点的父节点、……等等记录叶节点的属性leafs</span></div><div class="line">    _parent = self.parent</div><div class="line">    <span class="keyword">while</span> _parent <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        _parent.leafs[id(self)] = self.info_dic</div><div class="line">        _parent = _parent.parent</div></pre></td></tr></table></figure>
+<p>接下来就要实现生成算法的核心了，我们可以将它分成三步以使逻辑清晰：</p>
+<ul>
+<li>定义一个方法使其能将一个有子节点的 Node 转化为叶节点（局部剪枝）</li>
+<li>定义一个方法使其能挑选出最好的划分标准</li>
+<li>定义一个方法使其能根据划分标准进行生成</li>
+</ul>
+<p>我们先来看看如何进行局部剪枝：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">prune</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="comment"># 调用相应方法进行计算该Node所属类别</span></div><div class="line">    self.category = self.get_category()</div><div class="line">    <span class="comment"># 记录由于该Node转化为叶节点而被剪去的、下属的叶节点</span></div><div class="line">    _pop_lst = [key <span class="keyword">for</span> key <span class="keyword">in</span> self.leafs]</div><div class="line">    <span class="comment"># 然后一路回溯、更新各个parent的属性leafs（使用id作为key以避免重复）</span></div><div class="line">    _parent = self.parent</div><div class="line">    <span class="keyword">while</span> _parent <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">for</span> _k <span class="keyword">in</span> _pop_lst:</div><div class="line">            <span class="comment"># 删去由于局部剪枝而被剪掉的叶节点</span></div><div class="line">            _parent.leafs.pop(_k)</div><div class="line">        _parent.leafs[id(self)] = self.info_dic</div><div class="line">        _parent = _parent.parent</div><div class="line">    <span class="comment"># 调用mark_pruned方法将自己所有子节点、子节点的子节点……</span></div><div class="line">    <span class="comment"># 的pruned属性置为True，因为它们都被“剪掉”了</span></div><div class="line">    self.mark_pruned()</div><div class="line">    <span class="comment"># 重置各个属性</span></div><div class="line">    self.feature_dim = <span class="keyword">None</span></div><div class="line">    self.left_child = self.right_child = <span class="keyword">None</span></div><div class="line">    self._children = &#123;&#125;</div><div class="line">    self.leafs = &#123;&#125;</div></pre></td></tr></table></figure>
+<p>第 16 行的 mark_pruned 方法用于给各个被局部剪枝剪掉的 Node 打上一个标记、从而今后 Tree 可以根据这些标记将被剪掉的 Node 从它记录所有 Node 的列表<code>nodes</code>中删去。该方法同样是通过递归实现的，代码十分简洁：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">mark_pruned</span><span class="params">(self)</span>:</span></div><div class="line">    self.pruned = <span class="keyword">True</span></div><div class="line">    <span class="comment"># 遍历各个子节点</span></div><div class="line">    <span class="keyword">for</span> _child <span class="keyword">in</span> self.children.values():</div><div class="line">        <span class="comment"># 如果当前的子节点不是None的话、递归调用mark_pruned方法</span></div><div class="line">        <span class="comment">#（连续型特征和CART算法有可能导致children中出现None，</span></div><div class="line">        <span class="comment"># 因为此时children由left_child和right_child组成，它们有可能是None）</span></div><div class="line">        <span class="keyword">if</span> _child <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            _child.mark_pruned()</div></pre></td></tr></table></figure>
+<p>有了能够进行局部剪枝的方法后，我们就能实现拿来挑选最佳划分标准的方法了。开发时需要时刻注意分清楚二分（连续 / CART）和多分（其它）的情况</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, sample_weight, eps=<span class="number">1e-8</span>)</span>:</span></div><div class="line">    self._x, self._y = np.atleast_2d(x), np.array(y)</div><div class="line">    self.sample_weight = sample_weight</div><div class="line">    <span class="comment"># 若满足第一种停止准则、则退出函数体</span></div><div class="line">    <span class="keyword">if</span> self.stop1(eps):</div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="comment"># 用该Node的数据实例化Cluster类以计算各种信息量</span></div><div class="line">    _cluster = Cluster(self._x, self._y, sample_weight, self.base)</div><div class="line">    <span class="comment"># 对于根节点、我们需要额外算一下其数据的不确定性</span></div><div class="line">    <span class="keyword">if</span> self.is_root:</div><div class="line">        <span class="keyword">if</span> self.criterion == <span class="string">"gini"</span>:</div><div class="line">            self.chaos = _cluster.gini()</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self.chaos = _cluster.ent()</div><div class="line">    _max_gain, _chaos_lst = <span class="number">0</span>, []</div><div class="line">    _max_feature = _max_tar = <span class="keyword">None</span></div><div class="line">    <span class="comment"># 遍历还能选择的特征</span></div><div class="line">    <span class="keyword">for</span> feat <span class="keyword">in</span> self.feats:</div><div class="line">        <span class="comment"># 如果是连续型特征或是CART算法，需要额外计算二分标准的取值集合</span></div><div class="line">        <span class="keyword">if</span> self.wc[feat]:</div><div class="line">            _samples = np.sort(self._x.T[feat])</div><div class="line">            _set = (_samples[:<span class="number">-1</span>] + _samples[<span class="number">1</span>:]) * <span class="number">0.5</span></div><div class="line">        <span class="keyword">elif</span> self.is_cart:</div><div class="line">            _set = self.tree.feature_sets[feat]</div><div class="line">        <span class="comment"># 然后遍历这些二分标准并调用二类问题相关的、计算信息量的方法</span></div><div class="line">        <span class="keyword">if</span> self.is_cart <span class="keyword">or</span> self.wc[feat]:</div><div class="line">            <span class="keyword">for</span> tar <span class="keyword">in</span> _set:</div><div class="line">                _tmp_gain, _tmp_chaos_lst = _cluster.bin_info_gain(</div><div class="line">                    feat, tar, criterion=self.criterion,</div><div class="line">                    get_chaos_lst=<span class="keyword">True</span>, continuous=self.wc[feat])</div><div class="line">                <span class="keyword">if</span> _tmp_gain &gt; _max_gain:</div><div class="line">                    (_max_gain, _chaos_lst), _max_feature, _max_tar = (</div><div class="line">                        _tmp_gain, _tmp_chaos_lst), feat, tar</div><div class="line">        <span class="comment"># 对于离散型特征的ID3和C4.5算法，调用普通的计算信息量的方法</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _tmp_gain, _tmp_chaos_lst = _cluster.info_gain(</div><div class="line">                feat, self.criterion, <span class="keyword">True</span>, self.tree.feature_sets[feat])</div><div class="line">            <span class="keyword">if</span> _tmp_gain &gt; _max_gain:</div><div class="line">                (_max_gain, _chaos_lst), _max_feature = (</div><div class="line">                    _tmp_gain, _tmp_chaos_lst), feat</div><div class="line">    <span class="comment"># 若满足第二种停止准则、则退出函数体</span></div><div class="line">    <span class="keyword">if</span> self.stop2(_max_gain, eps):</div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="comment"># 更新相关的属性</span></div><div class="line">    self.feature_dim = _max_feature</div><div class="line">    <span class="keyword">if</span> self.is_cart <span class="keyword">or</span> self.wc[_max_feature]:</div><div class="line">        self.tar = _max_tar</div><div class="line">        <span class="comment"># 调用根据划分标准进行生成的方法</span></div><div class="line">        self._gen_children(_chaos_lst)</div><div class="line">        <span class="comment"># 如果该Node的左子节点和右子节点都是叶节点且所属类别一样</span></div><div class="line">        <span class="comment"># 那么就将它们合并、亦即进行局部剪枝</span></div><div class="line">        <span class="keyword">if</span> (self.left_child.category <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span></div><div class="line">                self.left_child.category == self.right_child.category):</div><div class="line">            self.prune()</div><div class="line">            <span class="comment"># 调用Tree的相关方法，将被剪掉的、该Node的左右子节点</span></div><div class="line">            <span class="comment"># 从Tree的记录所有Node的列表nodes中除去</span></div><div class="line">            self.tree.reduce_nodes()</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="comment"># 调用根据划分标准进行生成的方法</span></div><div class="line">        self._gen_children(_chaos_lst)</div></pre></td></tr></table></figure>
+<p>根据划分标准进行生成的方法相当冗长、因为需要进行相当多的分情况讨论。它的实现用到了递归的思想，真正写起来就会发现其实并不困难、只不过会有些繁琐。囿于篇幅、我们略去它的实现细节，其算法描述则如下：</p>
+<ul>
+<li>根据划分标准将数据划分成若干份</li>
+<li>依次用这若干份数据实例化新 Node（新 Node 即是当前 Node 的子节点），同时将当前 Node 的相关信息传给新 Node。这里需要注意的是，如果划分标准是离散型特征的话：<ul>
+<li>若算法是 ID3 或 C4.5，需将该特征对应的维度从新 Node 的<code>self.feats</code>属性中除去</li>
+<li>若算法是 CART，需要将二分标准从新 Node 的二分标准取值集合中除去</li>
+</ul>
+</li>
+<li>最后对新 Node 调用<code>fit</code>方法、完成递归</li>
+</ul>
+<p>我个人实现的版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Node.py#L171" target="_blank" rel="external">这里</a></p>
+<p>以上我们就实现了 Node 结构并在其上实现了决策树的生成算法，接下来我们要做的就是实现 Tree 结构来将各个 Node 封装起来</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/e0705aab/" rel="prev" title="信息量计算的实现">
+                <i class="fa fa-chevron-left"></i> 信息量计算的实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/b07c81ec/" rel="next" title="树结构的实现">
+                树结构的实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

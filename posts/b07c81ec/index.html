@@ -1,0 +1,1022 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="（本文会用到的所有代码都在这里） 由前文的诸多讨论可知，Tree 结构需要做到如下几点：  定义好需要在各个 Node 上调用的“全局变量” 做好数据预处理的工作、保证传给 Node 的数据是合乎要求的 对各个 Node 进行合适的封装，做到： 生成决策树时能够正确地调用它们的生成算法 进行后剪枝时能够正确地调用它们的局部剪枝函数   定义预测函数和评估函数以供用户调用  既然 Node 我们可以">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="树结构的实现">
+<meta property="og:url" content="http://www.carefree0910.com/posts/b07c81ec/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="（本文会用到的所有代码都在这里） 由前文的诸多讨论可知，Tree 结构需要做到如下几点：  定义好需要在各个 Node 上调用的“全局变量” 做好数据预处理的工作、保证传给 Node 的数据是合乎要求的 对各个 Node 进行合适的封装，做到： 生成决策树时能够正确地调用它们的生成算法 进行后剪枝时能够正确地调用它们的局部剪枝函数   定义预测函数和评估函数以供用户调用  既然 Node 我们可以">
+<meta property="og:updated_time" content="2017-04-22T15:32:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="树结构的实现">
+<meta name="twitter:description" content="（本文会用到的所有代码都在这里） 由前文的诸多讨论可知，Tree 结构需要做到如下几点：  定义好需要在各个 Node 上调用的“全局变量” 做好数据预处理的工作、保证传给 Node 的数据是合乎要求的 对各个 Node 进行合适的封装，做到： 生成决策树时能够正确地调用它们的生成算法 进行后剪枝时能够正确地调用它们的局部剪枝函数   定义预测函数和评估函数以供用户调用  既然 Node 我们可以">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/b07c81ec/"/>
+
+
+
+
+
+  <title> 树结构的实现 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/b07c81ec/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                树结构的实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-22T23:07:52+08:00">
+                2017-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/决策树/" itemprop="url" rel="index">
+                    <span itemprop="name">决策树</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Tree.py" target="_blank" rel="external">这里</a>）</p>
+<p>由前文的诸多讨论可知，Tree 结构需要做到如下几点：</p>
+<ul>
+<li>定义好需要在各个 Node 上调用的“全局变量”</li>
+<li>做好数据预处理的工作、保证传给 Node 的数据是合乎要求的</li>
+<li>对各个 Node 进行合适的封装，做到：<ul>
+<li>生成决策树时能够正确地调用它们的生成算法</li>
+<li>进行后剪枝时能够正确地调用它们的局部剪枝函数</li>
+</ul>
+</li>
+<li>定义预测函数和评估函数以供用户调用</li>
+</ul>
+<p>既然 Node 我们可以抽象出一个基类<code>CvDNode</code>，我们自然也能相应地对 Tree 结构抽象出一个基类<code>CvDBase</code></p>
+<a id="more"></a>
+<p>下面先来看看如何搭建该基类的基本框架：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> copy <span class="keyword">import</span> deepcopy</div><div class="line"><span class="comment"># 导入Node结构以进行封装</span></div><div class="line"><span class="keyword">from</span> c_CvDTree.Node <span class="keyword">import</span> *</div><div class="line"></div><div class="line"><span class="comment"># 定义一个足够抽象的Tree结构的基类以适应我们Node结构的基类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CvDBase</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.nodes：记录所有Node的列表</div><div class="line">        self.roots：主要用于CART剪枝的属性，可先按下不表</div><div class="line">（用于存储算法过程中产生的各个决策树）</div><div class="line">            self.max_depth：记录决策树最大深度的属性</div><div class="line">        self.root, self.feature_sets：根节点和记录可选特征维度的列表</div><div class="line">            self.label_dic：和朴素贝叶斯里面相应的属性意义一致、是类别的转换字典</div><div class="line">        self.prune_alpha, self.layers：主要用于ID3和C4.5剪枝的两个属性，可先按下不表</div><div class="line">（self.prune_alpha是“惩罚因子”，self.layers则记录着每一“层”的Node）</div><div class="line">        self.whether_continuous：记录着各个维度的特征是否连续的列表</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, max_depth=None, node=None)</span>:</span></div><div class="line">        self.nodes, self.layers, self.roots = [], [], []</div><div class="line">        self.max_depth = max_depth</div><div class="line">        self.root = node</div><div class="line">        self.feature_sets = []</div><div class="line">        self.label_dic = &#123;&#125;</div><div class="line">        self.prune_alpha = <span class="number">1</span></div><div class="line">        self.whether_continuous = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> <span class="string">"CvDTree (&#123;&#125;)"</span>.format(self.root.height)</div><div class="line"></div><div class="line">    __repr__ = __str__</div></pre></td></tr></table></figure>
+<p>回忆朴素贝叶斯的实现，可以知道在第二章的混合型朴素贝叶斯中、我们要求用户告诉程序哪些维度的特征是连续的；这里我们介绍一种非常简易却有一定合理性的做法、从而可以让程序在进行数据预处理时自动识别出连续特征对应的维度：</p>
+<ul>
+<li>将训练集中每个维度特征的所有可能的取值算出来，这一步可以用 Python 内置的数据结构<code>set</code>来完成</li>
+<li>如果第 i 维可能的取值个数<script type="math/tex">S_i</script>比上训练集总样本数 N 大于某个阈值，亦即若：  <script type="math/tex; mode=display">
+S_i\ge\beta N</script>那么就认为第 i 维的特征是连续型随机变量<br><script type="math/tex">\beta</script>的具体取值需要视情况而定。一般来说在样本数 N 足够大时、可以取得比较小（比如取就是个不错的选择）；但是样本数 N 比较小时，我们可能需要将取得大一些（比如取）。具体应该取什么值还是要看具体的任务和数据，毕竟这种自动识别的方法还是过于朴素了</li>
+</ul>
+<p>以上所叙述的数据预处理的实现如下（注：我们在朴素贝叶斯的实现里用到过的<code>quantize_data</code>方法中整合了如下代码中的核心部分）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_data</span><span class="params">(self, x, continuous_rate=<span class="number">0.2</span>)</span>:</span></div><div class="line">    <span class="comment"># 利用set获取各个维度特征的所有可能取值</span></div><div class="line">    self.feature_sets = [set(dimension) <span class="keyword">for</span> dimension <span class="keyword">in</span> x.T]</div><div class="line">    data_len, data_dim = x.shape</div><div class="line">    <span class="comment"># 判断是否连续</span></div><div class="line">    self.whether_continuous = np.array(</div><div class="line">        [len(feat) &gt;= continuous_rate * data_len <span class="keyword">for</span> feat <span class="keyword">in</span> self.feature_sets])</div><div class="line">    self.root.feats = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(x.shape[<span class="number">1</span>])]</div><div class="line">    self.root.feed_tree(self)</div></pre></td></tr></table></figure>
+<p>最后一行我们对根节点调用了<code>feed_tree</code>方法，该方法会做以下三件事：</p>
+<ul>
+<li>让决策树中所有的 Node 记录一下它们所属的 Tree 结构</li>
+<li>将自己记录在 Tree 中记录所有 Node 的列表<code>nodes</code>里</li>
+<li>根据 Tree 的相应属性更新记录连续特征的列表</li>
+</ul>
+<p>实现的时候同样利用上了递归：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_tree</span><span class="params">(self, tree)</span>:</span></div><div class="line">    self.tree = tree</div><div class="line">    self.tree.nodes.append(self)</div><div class="line">    self.wc = tree.whether_continuous</div><div class="line">    <span class="keyword">for</span> child <span class="keyword">in</span> self.children.values():</div><div class="line">        <span class="keyword">if</span> child <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            child.feed_tree(tree)</div></pre></td></tr></table></figure>
+<p><strong><em>注意：以上代码应定义在<code>CvDNode</code>里面</em></strong></p>
+<p>接下来就是对生成算法的封装了。考虑到第二节会讲到的剪枝算法、我们需要做的是：</p>
+<ul>
+<li>将类别向量数值化（和朴素贝叶斯里面的数值化类别向量的方法一样）</li>
+<li>将数据集切分成训练集和交叉验证集、同时处理好样本权重</li>
+<li>对根节点调用决策树的生成算法</li>
+<li>调用自己的剪枝算法</li>
+</ul>
+<p>具体的代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 参数alpha和剪枝有关、可按下不表</span></div><div class="line"><span class="comment"># cv_rate用于控制交叉验证集的大小，train_only则控制程序是否进行数据集的切分</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, alpha=None, sample_weight=None, eps=<span class="number">1e-8</span>,</span></span></div><div class="line">    cv_rate=<span class="number">0.2</span>, train_only=False):</div><div class="line">    <span class="comment"># 数值化类别向量</span></div><div class="line">    _dic = &#123;c: i <span class="keyword">for</span> i, c <span class="keyword">in</span> enumerate(set(y))&#125;</div><div class="line">    y = np.array([_dic[yy] <span class="keyword">for</span> yy <span class="keyword">in</span> y])</div><div class="line">    self.label_dic = &#123;value: key <span class="keyword">for</span> key, value <span class="keyword">in</span> _dic.items()&#125;</div><div class="line">    x = np.array(x)</div><div class="line">    <span class="comment"># 根据特征个数定出alpha</span></div><div class="line">    self.prune_alpha = alpha <span class="keyword">if</span> alpha <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">else</span> x.shape[<span class="number">1</span>] / <span class="number">2</span></div><div class="line">    <span class="comment"># 如果需要划分数据集的话</span></div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> train_only <span class="keyword">and</span> self.root.is_cart:</div><div class="line">        <span class="comment"># 根据cv_rate将数据集随机分成训练集和交叉验证集</span></div><div class="line">        <span class="comment"># 实现的核心思想是利用下标来进行各种切分</span></div><div class="line">        _train_num = int(len(x) * (<span class="number">1</span>-cv_rate))</div><div class="line">        _indices = np.random.permutation(np.arange(len(x)))</div><div class="line">        _train_indices = _indices[:_train_num]</div><div class="line">        _test_indices = _indices[_train_num:]</div><div class="line">        <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            <span class="comment"># 注意对切分后的样本权重做归一化处理</span></div><div class="line">            _train_weights = sample_weight[_train_indices]</div><div class="line">            _test_weights = sample_weight[_test_indices]</div><div class="line">            _train_weights /= np.sum(_train_weights)</div><div class="line">            _test_weights /= np.sum(_test_weights)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _train_weights = _test_weights = <span class="keyword">None</span></div><div class="line">        x_train, y_train = x[_train_indices], y[_train_indices]</div><div class="line">        x_cv, y_cv = x[_test_indices], y[_test_indices]</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        x_train, y_train, _train_weights = x, y, sample_weight</div><div class="line">        x_cv = y_cv = _test_weights = <span class="keyword">None</span></div><div class="line">    self.feed_data(x_train)</div><div class="line">    <span class="comment"># 调用根节点的生成算法</span></div><div class="line">    self.root.fit(x_train, y_train, _train_weights, eps)</div><div class="line">    <span class="comment"># 调用对Node剪枝算法的封装</span></div><div class="line">    self.prune(x_cv, y_cv, _test_weights)</div></pre></td></tr></table></figure>
+<p>这里我们用到了<code>np.random.permutation</code>方法，它其实可以看成两行代码的缩写、亦即：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">_indices = np.random.permutation(np.arange(n))</div></pre></td></tr></table></figure>
+<p>从效果上来说等价于</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">_indices = np.arange(n)</div><div class="line">np.random.shuffle(_indices)</div></pre></td></tr></table></figure>
+<p>不过前者不仅写起来更便利、而且运行速度也要稍微快一点，是故我们选择了前一种方法来进行实现</p>
+<p>除了<code>fit</code>这个函数以外，回忆 Node 中生成算法的实现过程、可知彼时我们调用了 Tree 的<code>reduce_nodes</code>方法来将被剪掉的 Node 从<code>nodes</code>中除去。该方法的实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">reduce_nodes</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(self.nodes)<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>):</div><div class="line">        <span class="keyword">if</span> self.nodes[i].pruned:</div><div class="line">            self.nodes.pop(i)</div></pre></td></tr></table></figure>
+<p><strong><em>注意：虽然该实现相当简单直观、不过其中却蕴含了一个具有普适意义的编程思想：如果要在遍历列表的同时进行当前列表元素的删除操作、就一定要从后往前遍历</em></strong></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/41abb98b/" rel="prev" title="节点结构的实现">
+                <i class="fa fa-chevron-left"></i> 节点结构的实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/1a7aa546/" rel="next" title="决策树的剪枝算法">
+                决策树的剪枝算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

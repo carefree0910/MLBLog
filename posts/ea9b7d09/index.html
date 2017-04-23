@@ -99,7 +99,7 @@
 <meta property="og:url" content="http://www.carefree0910.com/posts/ea9b7d09/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="首先要叙述朴素贝叶斯算法的基本假设：  独立性假设：假设单一样本X_i的 n 个维度X_i^{(1)},...,X_i^{(n)}彼此之间在各种意义上相互独立  这当然是很强的假设，在现实任务中也大多无法满足该假设。由此会衍生出所谓的半朴素贝叶斯和贝叶斯网，这里先按下不表 然后就是算法。我们打算先只叙述它的基本思想和各个公式，相关的定义和证明会放在后面的文章中。不过其实仅对着接下来的公式敲代码的话">
-<meta property="og:updated_time" content="2017-04-20T13:53:26.000Z">
+<meta property="og:updated_time" content="2017-04-22T12:53:28.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="朴素贝叶斯算法">
 <meta name="twitter:description" content="首先要叙述朴素贝叶斯算法的基本假设：  独立性假设：假设单一样本X_i的 n 个维度X_i^{(1)},...,X_i^{(n)}彼此之间在各种意义上相互独立  这当然是很强的假设，在现实任务中也大多无法满足该假设。由此会衍生出所谓的半朴素贝叶斯和贝叶斯网，这里先按下不表 然后就是算法。我们打算先只叙述它的基本思想和各个公式，相关的定义和证明会放在后面的文章中。不过其实仅对着接下来的公式敲代码的话">
@@ -449,18 +449,18 @@ I\left( y_{i} \neq f\left( x_{i} \right) \right) = \left\{ \begin{matrix}
 1,\ if\ y_{i} \neq f\left( x_{i} \right) \\
 0,if\ y_{i} \neq f\left( x_{i} \right) \\
 \end{matrix} \right.\</script><p>从上述定义出发、可以利用<a href="/posts/d007d6bc/" title="上一篇文章">上一篇文章</a>中讲解的两种参数估计方法导出离散型朴素贝叶斯的算法（详见<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>）：</p>
-<ul>
-<li>输入：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
-<li>过程（利用 ML 估计导出模型的具体参数）：<ul>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
+<li><strong>过程</strong>（利用 ML 估计导出模型的具体参数）：<ol>
 <li>计算先验概率<script type="math/tex">p(y = c_{k})</script>的极大似然估计：  <script type="math/tex; mode=display">
 \hat{p}\left( y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}{N},\ k = 1,2,\ldots,K</script></li>
 <li>计算条件概率<script type="math/tex">p(X^{\left( j \right)} = a_{jl}|y = c_{k})</script>的极大似然估计（设每一个单独输入的 n 维向量<script type="math/tex">x_{i}</script>的第 j 维特征<script type="math/tex">x^{\left( j \right)}</script>可能的取值集合为<script type="math/tex">\{ a_{j1},\ldots,a_{jS_{j}}\}</script>）：  <script type="math/tex; mode=display">
 \hat{p}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I(x_{i}^{\left( j \right)} = a_{jl},y_{i} = c_{k})}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}</script></li>
-</ul>
+</ol>
 </li>
-<li>输出（利用 MAP 估计进行决策）：朴素贝叶斯模型，能够估计数据<script type="math/tex">x^{*} = \left( {x^{*}}^{\left( 1 \right)},\ldots,{x^{*}}^{\left( n \right)} \right)^{T}</script>的类别：  <script type="math/tex; mode=display">
+<li><strong>输出</strong>（利用 MAP 估计进行决策）：朴素贝叶斯模型，能够估计数据<script type="math/tex">x^{*} = \left( {x^{*}}^{\left( 1 \right)},\ldots,{x^{*}}^{\left( n \right)} \right)^{T}</script>的类别：  <script type="math/tex; mode=display">
 y = f(x^{*}) = \arg{\max_{c_k}{\hat{p}\left( y = c_{k} \right)\prod_{j = 1}^{n}{\hat{p}(X^{\left( j \right)} = {x^{*}}^{\left( j \right)}|y = c_{k})}}}</script></li>
-</ul>
+</ol>
 <p>由上述算法可以清晰地梳理出朴素贝叶斯算法背后的数学思想：</p>
 <ul>
 <li>使用极大似然估计导出模型的具体参数（先验概率、条件概率）</li>
@@ -863,7 +863,7 @@ p\left( 用脚踩| 不爆炸\right) = p\left( 紫色| 爆炸\right) = 0</script>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">26</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -874,7 +874,7 @@ p\left( 用脚踩| 不爆炸\right) = p\left( 紫色| 爆炸\right) = 0</script>
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

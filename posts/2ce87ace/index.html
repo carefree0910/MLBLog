@@ -1,0 +1,1097 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数学," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野">
+<meta name="keywords" content="数学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据的信息">
+<meta property="og:url" content="http://www.carefree0910.com/posts/2ce87ace/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2ce87ace/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2ce87ace/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2ce87ace/p3.png">
+<meta property="og:updated_time" content="2017-04-23T02:54:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据的信息">
+<meta name="twitter:description" content="本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/2ce87ace/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/2ce87ace/"/>
+
+
+
+
+
+  <title> 数据的信息 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/2ce87ace/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                数据的信息
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-22T19:29:24+08:00">
+                2017-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/决策树/" itemprop="url" rel="index">
+                    <span itemprop="name">决策树</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野</p>
+<a id="more"></a>
+<h1 id="信息论简介"><a href="#信息论简介" class="headerlink" title="信息论简介"></a>信息论简介</h1><p><strong>（注：本节有许多内容节选、修改、总结自维基百科）</strong></p>
+<p>被誉为信息论创始人的是克劳德·艾尔伍德·香农（Claude Elwood Shannon，1916.4.30－2001.2.26），他是美国数学家、电子工程师和密码学家，是密歇根大学学士、麻省理工学院博士。他在 1948 年发表的划时代的论文——“通信的数学原理”奠定了现代信息论的基础</p>
+<p>信息论（Information Theory）涉及的领域相当多，包括但不限于信息的量化、存储和通信、统计推断、自然语言处理、密码学等等。信息论的主要内容可以类比人类最广泛的交流手段——语言来阐述。一种简洁的语言（以英语为例）通常有如下两个重要特点：</p>
+<ul>
+<li>最常用的一些词汇（比如“a”、“the”、“I”）应该要比相对而言不太常用的词（比如“Python”、“Machine”、“Learning”）要短一些</li>
+<li>如果句子的某一部分被漏听或者由于噪声干扰（比如身处闹市）而被误听，听者应该仍然可以抓住句子的大概意思</li>
+</ul>
+<p>其中第二点被称作为“鲁棒性（Robustness）”。如果把电子通信系统比作一种语言的话，这种鲁棒性（Robustness）不可或缺。信息论的基本研究课题是信源编码和信道编码（通俗一点来讲就是怎么发出信息和怎么传递信息），将鲁棒性引入通信正是通过其中的信道编码来完成的，由此可见信息论的重要性</p>
+<p>注意这些内容同消息的重要性之间是毫不相干的。例如，像“你好；再见”这样的话语和像“救命”这样的紧急请求，在说起来或写起来所花的时间是差不多的，然而明显后者更重要也更有意义。信息论却不会考虑一段消息的重要性或内在意义，因为这些属于信息的质量的问题而不是信息量和可读性方面上的问题，后者只是由概率这一因素单独决定的</p>
+<p>既然我们我们关注的是信息量，我们就需要有一个度量方法。决策树生成算法背后的思想正是利用该度量方法来衡量一种“数据划分”的优劣、从而生成一个“判定序列”。具体而言，它会不断地寻找数据的划分方法、使得在该划分下我们能够获得的信息量最大（更详细的叙述会在后文给出）</p>
+<h1 id="不确定性"><a href="#不确定性" class="headerlink" title="不确定性"></a>不确定性</h1><p>在决策树的生成中，获得的信息量的度量方法是从反方向来定义的：若一种划分能使数据的“不确定性”减少得越多、就意味着该划分能获得越多信息。这是很符合直观的，关键问题就在于应该如何度量数据的不确定性（或说不纯度，Impurity）。常见的度量标准有两个：信息熵（Entropy）和基尼系数（Gini Index），接下来我们就说说它们的定义和性质</p>
+<h2 id="信息熵"><a href="#信息熵" class="headerlink" title="信息熵"></a>信息熵</h2><p>先来看看它的公式：</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = - \sum_{k = 1}^{K}{p_{k}\log p_{k}}</script><p>对于具体的、随机变量<script type="math/tex">y</script>生成的数据集<script type="math/tex">D = \{ y_{1},\ldots,y_{N}\}</script>而言，在实际操作中通常会利用经验熵来估计真正的信息熵：</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = H\left( D \right) = - \sum_{k = 1}^{K}{\frac{|C_{k}|}{|D|}\log\frac{|C_{k}|}{|D|}}</script><p>这里假设随机变量<script type="math/tex">y</script>的取值空间为<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script>，<script type="math/tex">p_{k}</script>表示<script type="math/tex">y</script>取<script type="math/tex">c_{k}</script>的概率：<script type="math/tex">p_{k} = p(y = c_{k})</script>；<script type="math/tex">|C_{k}|</script>代表由随机变量<script type="math/tex">y</script>中类别为<script type="math/tex">c_{k}</script>的样本的个数、<script type="math/tex">|D|</script>代表<script type="math/tex">D</script>的总样本个数（亦即<script type="math/tex">\left| D \right| = N</script>）。可以看到，经验公式背后的思想其实就是“频率估计概率”</p>
+<p>通常来说，公式中对数的底会取为2、此时信息熵<script type="math/tex">H(y)</script>的单位叫作比特（bit）；如果把底取为<script type="math/tex">e</script>（亦即取自然对数）的话，<script type="math/tex">H(y)</script>的单位就称作纳特（nat）</p>
+<p>接下来说明为何上式能够度量数据的不确定性。可以证明（详细推导可参见<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>），当：</p>
+<script type="math/tex; mode=display">
+p_{1} = p_{2} = \ldots = p_{K} = \frac{1}{K}</script><p>时，<script type="math/tex">H(y)</script>达到最大值<script type="math/tex">- \log\frac{1}{K}</script>、亦即<script type="math/tex">\log K</script>。由于<script type="math/tex">p_{k} = p(y = c_{k})</script>，上式即意味着随机变量<script type="math/tex">y</script>取每一个类的概率都是一样的、亦即<script type="math/tex">y</script>完全没有规律可循，想要预测它的取值只能靠运气。换句话说，由<script type="math/tex">y</script>生成出来的数据<script type="math/tex">\{ y_{1},\ldots,y_{N}\}</script>的不确定性是在取值空间为<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script>、样本数为 N 的数据中最大的（想象预测 N 次正 K 面体骰子的结果）</p>
+<p>我们的目的是想让<script type="math/tex">y</script>的不确定性减小、亦即想让<script type="math/tex">y</script>变得有规律以方便我们预测。稍微严谨地来说，就是<script type="math/tex">y</script>取某个类的概率特别大、取其它类的概率都特别小。极端的例子自然就是存在某个<script type="math/tex">k^{*}</script>、使得<script type="math/tex">p\left( {y = c}_{k^{*}} \right) = 1</script>、<script type="math/tex">p\left( y = c_{k} \right) = 0,\forall k \neq k^{*}</script>、亦即<script type="math/tex">y</script>生成的样本总属于<script type="math/tex">c_{k^{*}}</script>类。带入<script type="math/tex">H(y)</script>的定义式，可以发现此时<script type="math/tex">H\left( y \right) = 0</script>、亦即<script type="math/tex">y</script>生成的样本没有不确定性</p>
+<p><strong><em>注意：由于<script type="math/tex">p\log p \rightarrow 0\ (p \rightarrow 0)</script>、所以认为<script type="math/tex">0\log 0 = 0</script></em></strong></p>
+<p>特殊的情况就是二类问题、亦即<script type="math/tex">K = 2</script>的情况。先不妨设<script type="math/tex">y</script>只取 0、1 二值，再设：</p>
+<script type="math/tex; mode=display">
+p\left( y = 0 \right) = p,\ \ p\left( y = 1 \right) = 1 - p,\ \ 0 \leq p \leq 1</script><p>那么此时的信息熵<script type="math/tex">H(y)</script>即为：</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = - \operatorname{plog}p - \left( 1 - p \right)\log{(1 - p)}</script><p>由此可得<script type="math/tex">H(y)</script>随<script type="math/tex">p</script>变化的函数曲线。底为 2 时函数图像如下图所示：</p>
+<img src="/posts/2ce87ace/p1.png" alt="p1.png" title="">
+<p>如前文所述，在<script type="math/tex">p = 0.5</script>时<script type="math/tex">H(y)</script>取得最大值 1。底为<script type="math/tex">e</script>时函数图像则如下图所示：</p>
+<img src="/posts/2ce87ace/p2.png" alt="p2.png" title="">
+<p>虽然最大值仍在<script type="math/tex">p = 0.5</script>时取得，但是此时<script type="math/tex">H(y)</script>仅有 0.693（<script type="math/tex">\ln 2</script>）左右</p>
+<p>如果对上述二类问题稍作推广：<script type="math/tex">y \in \{ Y_{1},Y_{2}\}</script>、其中<script type="math/tex">Y_{1}</script>、<script type="math/tex">Y_{2}</script>都是一个集合，那么此时信息熵的定义式即为：</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = - p\left( y \in Y_{1} \right)\log{p\left( y \in Y_{1} \right)} - p\left( y \in Y_{2} \right)\log{p(y \in Y_{2})}</script><p>且易知：</p>
+<script type="math/tex; mode=display">
+p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>如无特殊说明，今后谈及二类问题时讨论的范围都包括推广后的二类问题</p>
+<p>以上的叙述说明了，<script type="math/tex">y</script>越乱意味着<script type="math/tex">H(y)</script>越大、<script type="math/tex">y</script>越有规律意味着<script type="math/tex">H(y)</script>越小，亦即<script type="math/tex">H(y)</script>确实可以作为不确定性的度量标准</p>
+<h2 id="基尼系数"><a href="#基尼系数" class="headerlink" title="基尼系数"></a>基尼系数</h2><p>基尼系数的定义会更简洁一些：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \right) = \sum_{k = 1}^{K}{p_{k}(1 - p_{k})} = 1 - \sum_{k = 1}^{K}p_{k}^{2}</script><p>同样可以利用经验基尼系数来进行估计：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \right) = \text{Gini}\left( D \right) = 1 - \sum_{k = 1}^{K}\left( \frac{\left| C_{k} \right|}{\left| D \right|} \right)^{2}</script><p>以及同样可以证明，当</p>
+<script type="math/tex; mode=display">
+p_{1} = p_{2} = \ldots = p_{K} = \frac{1}{K}</script><p>时，<script type="math/tex">\text{Gini}(y)</script>取得最大值<script type="math/tex">1 - \frac{1}{K}</script>；当存在<script type="math/tex">k^{*}</script>使得<script type="math/tex">p_{k^{*}} = 1</script>时、<script type="math/tex">\text{Gini}\left( y \right) = 0</script>。特别地、当<script type="math/tex">K = 2</script>时，可以导出：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \right) = 2p(1 - p)</script><p>此时<script type="math/tex">\text{Gini}(y)</script>的函数图像如下图所示：</p>
+<img src="/posts/2ce87ace/p3.png" alt="p3.png" title="">
+<p>虽然最大值仍在<script type="math/tex">p = 0.5</script>时取得，但是此时<script type="math/tex">\text{Gini}(y)</script>仅有 0.5。我们同样可以对二类问题进行推广、此时有：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \right) = 1 - p^{2}\left( y \in Y_{1} \right) - p^{2}(y \in Y_{2})</script><p>且</p>
+<script type="math/tex; mode=display">
+p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>以上的叙述说明了<script type="math/tex">\text{Gini}(y)</script>也可以用来度量不确定性</p>
+<h1 id="信息的增益"><a href="#信息的增益" class="headerlink" title="信息的增益"></a>信息的增益</h1><p>在定义完不确定性的度量标准之后，我们就可以看看什么叫“获得信息”、亦即信息的增益了。从直观上来说，信息的增益是针对随机变量<script type="math/tex">y</script>和描述该变量的特征来定义的，此时数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script>，其中<script type="math/tex">x_{i} = \left( x_{i}^{\left( 1 \right)},\ldots,x_{i}^{\left( n \right)} \right)^{T}</script>是描述<script type="math/tex">y_{i}</script>的特征向量、n 则是特征个数。我们可以先研究单一特征的情况（<script type="math/tex">n = 1</script>）：不妨设该特征叫<script type="math/tex">A</script>、数据集<script type="math/tex">D = \{\left( A_{1},y_{1} \right),\ldots,(A_{N},y_{N})\}</script>；此时所谓信息的增益，反映的就是特征<script type="math/tex">A</script>所能给我们带来的关于<script type="math/tex">y</script>的“信息量”的大小</p>
+<p>可以引入条件熵<script type="math/tex">H(y|A)</script>的概念来定义信息的增益，它同样有着比较好的直观：</p>
+<ul>
+<li>所谓条件熵，就是根据特征<script type="math/tex">A</script>的不同取值<script type="math/tex">\{ a_{1},\ldots,a_{m}\}</script>对<script type="math/tex">y</script>进行限制后，先对这些被限制的<script type="math/tex">y</script>分别计算信息熵、再把这些信息熵（一共有 m 个）根据特征取值本身的概率加权求和、从而得到总的条件熵。换句话说，条件熵是由被<script type="math/tex">A</script>不同取值限制的各个部分的<script type="math/tex">y</script>的不确定性以取值本身的概率作为权重加总得到的</li>
+</ul>
+<p>所以，条件熵<script type="math/tex">H(y|A)</script>越小、意味着<script type="math/tex">y</script>被<script type="math/tex">A</script>限制后的总的不确定性越小、从而意味着<script type="math/tex">A</script>更能够帮助我们做出决策</p>
+<p>接下来就是数学定义：</p>
+<script type="math/tex; mode=display">
+H\left( y \middle| A \right) = \sum_{j = 1}^{m}{p\left( A = a_{j} \right)H(y|A = a_{j})}</script><p>其中</p>
+<script type="math/tex; mode=display">
+H\left( y \middle| A = a_{j} \right) = - \sum_{k = 1}^{K}{p\left( y = c_{k} \middle| A = a_{j} \right)\log{p(y = c_{k}|A = a_{j})}}</script><p>同样可以用经验条件熵来估计真正的条件熵：</p>
+<script type="math/tex; mode=display">
+H\left( y \middle| A \right) = H\left( y \middle| D \right) = \sum_{j = 1}^{m}{\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}{\frac{|D_{jk}|}{|D_{j}|}\log\frac{|D_{jk}|}{|D_{j}|}}}</script><p>这里的<script type="math/tex">D_{j}</script>表示在<script type="math/tex">A = a_{j}</script>限制下的数据集。通常可以记<script type="math/tex">D_{j}</script>中的样本<script type="math/tex">y_{i}</script>满足<script type="math/tex">y_{i}^{A} = a_{j}</script>，亦即：</p>
+<script type="math/tex; mode=display">
+y_{i}^{A} = a_{j} \Leftrightarrow \left( A_{i},y_{i} \right) \in Y_{j} \Leftrightarrow A_{i} = a_{j}</script><p>而公式中的<script type="math/tex">|D_{jk}|</script>则代表着<script type="math/tex">D_{j}</script>中第 k 类样本的个数。</p>
+<p>从条件熵的直观含义，信息的增益就可以自然地定义为：</p>
+<script type="math/tex; mode=display">
+g\left( y,A \right) = H\left( y \right) - H(y|A)</script><p>这里的<script type="math/tex">g(y,A)</script>常被称为互信息（Mutual Information），决策树中的 ID3 算法即是利用它来作为特征选取的标准的（相关定义会在后文给出）。但是，如果简单地以<script type="math/tex">g(y,A)</script>作为标准的话，会存在偏向于选择取值较多的特征、也就是 m 比较大的特征的问题。我们仍然可以从直观上去理解为什么会偏向于选取 m 较大的特征以及为什么这样做是不尽合理的：</p>
+<ul>
+<li>我们希望得到的决策树应该是比较深（又不会太深）的决策树，从而它可以基于多个方面而不是片面地根据某些特征来判断</li>
+<li>如果单纯以<script type="math/tex">g(y,A)</script>作为标准，由于<script type="math/tex">g(y,A)</script>的直观意义是<script type="math/tex">y</script>被<script type="math/tex">A</script>划分后不确定性的减少量，可想而知，当<script type="math/tex">A</script>的取值很多时，<script type="math/tex">y</script>会被<script type="math/tex">A</script>划分成很多份、于是其不确定性自然会减少很多、从而 ID3 算法会倾向于选择<script type="math/tex">A</script>作为划分依据。但如果这样做的话，可以想象、我们最终得到的决策树将会是一颗很胖很矮的决策树，这并不是我们想要的</li>
+</ul>
+<p>为解决该问题、我们可以给 m 一个惩罚，由此我们可以得到信息增益比（Information Gain Ratio）的概念，该概念对应着 C4.5 算法：</p>
+<script type="math/tex; mode=display">
+g_{R}(y,A) = \frac{g(y,A)}{H_{A}(y)}</script><p>其中<script type="math/tex">H_{A}(y)</script>是<script type="math/tex">y</script>关于<script type="math/tex">A</script>的熵，它的定义为：</p>
+<script type="math/tex; mode=display">
+H_{A}\left( y \right) = - \sum_{j = 1}^{m}{p\left( y^{A} = a_{j} \right)\log{p(y^{A} = a_{j})}}</script><p>同样可以用经验熵来进行估计：</p>
+<script type="math/tex; mode=display">
+H_{A}\left( y \right) = H_{A}\left( D \right) = - \sum_{j = 1}^{m}{\frac{\left| D_{j} \right|}{\left| D \right|}\log\frac{\left| D_{j} \right|}{\left| D \right|}}</script><p>该定义式和信息熵的定义式很像，它们的性质也有相通之处</p>
+<p>需要指出的是，只需要类比上述的过程、我们同样可以使用基尼系数来定义信息的增益。具体而言，我们可以先定义条件基尼系数：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \middle| A \right) = \sum_{j = 1}^{m}{p\left( A = a_{j} \right)\text{Gini}(y|A = a_{j})}</script><p>其中</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \middle| A = a_{j} \right) = 1 - \sum_{k = 1}^{K}{p^{2}\left( y = c_{k} \middle| A = a_{j} \right)}</script><p>同样可以用经验条件基尼系数来进行估计：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\text{Gini}\left( y \middle| A \right) = \text{Gini}(y|D) &= \sum_{j = 1}^{m}{\frac{\left| D_{i} \right|}{\left| D \right|}\left\lbrack 1 - \sum_{k = 1}^{K}\left( \frac{\left| D_{jk} \right|}{\left| D_{j} \right|} \right)^{2} \right\rbrack} \\
+
+&= 1 - \sum_{j = 1}^{m}\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}\left( \frac{\left| D_{jk} \right|}{\left| D_{j} \right|} \right)^{2}
+\end{align}</script><p>信息的增益则自然地定义为（不妨称之为“基尼增益”）：</p>
+<script type="math/tex; mode=display">
+g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\left( y \middle| A \right)</script><p>决策树算法中的 CART 算法通常会应用这种定义</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/dd35ec8b/" rel="prev" title="决策树综述">
+                <i class="fa fa-chevron-left"></i> 决策树综述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/c6faa205/" rel="next" title="决策树的生成算法">
+                决策树的生成算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#信息论简介"><span class="nav-number">1.</span> <span class="nav-text">信息论简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#不确定性"><span class="nav-number">2.</span> <span class="nav-text">不确定性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息熵"><span class="nav-number">2.1.</span> <span class="nav-text">信息熵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基尼系数"><span class="nav-number">2.2.</span> <span class="nav-text">基尼系数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#信息的增益"><span class="nav-number">3.</span> <span class="nav-text">信息的增益</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.carefree0910.com/"/>
-  <updated>2017-04-20T13:23:52.000Z</updated>
+  <updated>2017-04-23T02:44:13.000Z</updated>
   <id>http://www.carefree0910.com/</id>
   
   <author>
@@ -14,6 +14,1041 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>“决策树”小结</title>
+    <link href="http://www.carefree0910.com/posts/88953f51/"/>
+    <id>http://www.carefree0910.com/posts/88953f51/</id>
+    <published>2017-04-23T02:43:07.000Z</published>
+    <updated>2017-04-23T02:44:13.000Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>决策树是从直观上很好理解的模型，可以把它理解为一个划分规则的序列</li>
+<li>决策树常用的生成算法包括：<ul>
+<li>ID3 算法，它使用互信息作为信息增益的度量</li>
+<li>C4.5 算法，它使用信息增益比作为信息增益的度量</li>
+<li>CART 算法，它规定生成出来的决策树为二叉树、且一般使用基尼增益作为信息增益的度量</li>
+</ul>
+</li>
+<li>决策树常用的剪枝算法有两种，它们都是为了适当地降低模型复杂度、从而期望模型在未知数据上的表现更好</li>
+<li>决策树的代码实现从始到终都贯彻着递归的思想，可以说是递归的一个经典应用</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;决策树是从直观上很好理解的模型，可以把它理解为一个划分规则的序列&lt;/li&gt;
+&lt;li&gt;决策树常用的生成算法包括：&lt;ul&gt;
+&lt;li&gt;ID3 算法，它使用互信息作为信息增益的度量&lt;/li&gt;
+&lt;li&gt;C4.5 算法，它使用信息增益比作为信息增益的度量&lt;/li&gt;
+&lt;li&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>相关数学理论</title>
+    <link href="http://www.carefree0910.com/posts/613bbb2f/"/>
+    <id>http://www.carefree0910.com/posts/613bbb2f/</id>
+    <published>2017-04-23T02:33:22.000Z</published>
+    <updated>2017-04-23T02:42:45.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>这一节会叙述琴生不等式（Jensen’s Inequality）及其一个简单的应用，为此我们需要知道凸函数的概念：</p>
+<ul>
+<li>若函数<script type="math/tex">f(x)</script>对<script type="math/tex">\forall p\in [0,1]</script>、都满足：  <script type="math/tex; mode=display">
+pf\left( x_{1} \right) + \left( 1 - p \right)f\left( x_{2} \right) \leq f\left( px_{1} + \left( 1 - p \right)x_{2} \right)</script>则称<script type="math/tex">f(x)</script>为凸函数（有时又叫上凸函数）</li>
+</ul>
+<p>琴生不等式是针对凸函数提出的，下面就具体说一下其内容与证明</p>
+<a id="more"></a>
+<h1 id="定理内容"><a href="#定理内容" class="headerlink" title="定理内容"></a>定理内容</h1><p>对于<script type="math/tex">\lbrack a,b\rbrack</script>上的凸函数，若</p>
+<script type="math/tex; mode=display">
+p_{1},...,p_{K} \in \left\lbrack 0,1 \right\rbrack,\ \ p_{1} + p_{2} + \ldots + p_{K} = 1</script><p>则有</p>
+<script type="math/tex; mode=display">
+\sum_{k = 1}^{K}{p_{i}f(x_{i})} \leq f(\sum_{k = 1}^{K}{p_{i}x_{i}})</script><p>接下来我们会利用它来证明等概率分布具有最大熵。注意到可以证明函数</p>
+<script type="math/tex; mode=display">
+\hat{H}\left( p \right) = - p\log p</script><p>是一个凸函数，于是熵的定义式可以写成</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = - \sum_{k = 1}^{K}{p_{k}\log p_{k}} = \sum_{k = 1}^{K}{\hat{H}\left( p_{k} \right)}</script><p>从而</p>
+<script type="math/tex; mode=display">
+\frac{1}{K}H\left( y \right) = \frac{1}{K}\sum_{k = 1}^{K}{\hat{H}(p_{k})} \leq \hat{H}\left( \sum_{k = 1}^{K}{\frac{1}{K}p_{k}} \right) = \hat{H}\left( \frac{1}{K} \right) = - \frac{1}{K}\log\frac{1}{K} = \frac{1}{K}\log K</script><p>亦即</p>
+<script type="math/tex; mode=display">
+H\left( y \right) \leq \log K</script><p>等式当且仅当</p>
+<script type="math/tex; mode=display">
+p_{1} = p_{2} = \ldots = p_{K} = \frac{1}{K}</script><p>时取得</p>
+<h1 id="定理证明"><a href="#定理证明" class="headerlink" title="定理证明"></a>定理证明</h1><p>应用数学归纳法可以比较简单地完成证明：</p>
+<ul>
+<li>当时<script type="math/tex">K=2</script>、由凸函数定义直接证毕，此为奠基</li>
+<li>假设<script type="math/tex">K = n</script>时成立、考虑<script type="math/tex">K = n + 1</script>的情况，令  <script type="math/tex; mode=display">
+s_{n} = \sum_{k = 1}^{n}p_{k}</script>则  <script type="math/tex; mode=display">
+\sum_{k = 1}^{n + 1}{p_{k}f\left( x_{k} \right)} = s_{n}\sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} + p_{n + 1}f\left( x_{n + 1} \right)</script>注意到  <script type="math/tex; mode=display">
+\sum_{k = 1}^{n}\frac{p_{k}}{s_{n}} = 1</script>从而由<script type="math/tex">K = n</script>时的琴生不等式可知  <script type="math/tex; mode=display">
+\sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \leq f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right)</script>注意到  <script type="math/tex; mode=display">
+s_{n} + p_{n + 1} = 1</script>从而由凸函数定义知  <script type="math/tex; mode=display">
+s_{n}f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right) + p_{n + 1}f\left( x_{n + 1} \right) \leq f\left( s_{n}\sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} + p_{n + 1}x_{n + 1} \right)</script>综上所述、即得  <script type="math/tex; mode=display">
+\sum_{k = 1}^{n + 1}{p_{k}f(x_{k})} \leq f\left( \sum_{k = 1}^{n + 1}{p_{k}f\left( x_{k} \right)} \right)</script></li>
+</ul>
+<p>琴生不等式的应用非常广泛，证明等概率分布具有最大熵只是其中一个小应用。在许许多多涉及到凸问题的算法中、琴生不等式都显示出了强大的威力</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;这一节会叙述琴生不等式（Jensen’s Inequality）及其一个简单的应用，为此我们需要知道凸函数的概念：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;若函数&lt;script type=&quot;math/tex&quot;&gt;f(x)&lt;/script&gt;对&lt;script type=&quot;math/tex&quot;&gt;\forall p\in [0,1]&lt;/script&gt;、都满足：  &lt;script type=&quot;math/tex; mode=display&quot;&gt;
+pf\left( x_{1} \right) + \left( 1 - p \right)f\left( x_{2} \right) \leq f\left( px_{1} + \left( 1 - p \right)x_{2} \right)&lt;/script&gt;则称&lt;script type=&quot;math/tex&quot;&gt;f(x)&lt;/script&gt;为凸函数（有时又叫上凸函数）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;琴生不等式是针对凸函数提出的，下面就具体说一下其内容与证明&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>评估与可视化</title>
+    <link href="http://www.carefree0910.com/posts/c12a819/"/>
+    <id>http://www.carefree0910.com/posts/c12a819/</id>
+    <published>2017-04-23T01:45:37.000Z</published>
+    <updated>2017-04-23T03:08:44.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>之前我们实现了一个 Node 基类<code>CvDNode</code>和一个 Tree 基类<code>CvDBase</code>；为了评估决策树模型的表现、我们需要先在这两个基类的基础上根据不同的算法实现出各种具体的决策树。由于我们在基类里面已经完成了绝大部分工作、所以在其上进行扩展是平凡的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ID3Node</span><span class="params">(CvDNode)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></div><div class="line">        CvDNode.__init__(self, *args, **kwargs)</div><div class="line">        self.criterion = <span class="string">"ent"</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">C45Node</span><span class="params">(CvDNode)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></div><div class="line">        CvDNode.__init__(self, *args, **kwargs)</div><div class="line">        self.criterion = <span class="string">"ratio"</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CartNode</span><span class="params">(CvDNode)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></div><div class="line">        CvDNode.__init__(self, *args, **kwargs)</div><div class="line">        self.criterion = <span class="string">"gini"</span></div><div class="line">        self.is_cart = <span class="keyword">True</span></div></pre></td></tr></table></figure>
+<p>在<code>CvDBase</code>的基础上定义三种算法对应的 Tree 结构的方法是类似的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ID3Tree</span><span class="params">(CvDBase, ID3Node, metaclass=CvDMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">C45Tree</span><span class="params">(CvDBase, C45Node, metaclass=CvDMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CartTree</span><span class="params">(CvDBase, CartNode, metaclass=CvDMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<p>其中</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CvDMeta</span><span class="params">(type)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(mcs, *args, **kwargs)</span>:</span></div><div class="line">        name, bases, attr = args[:<span class="number">3</span>]</div><div class="line">        _, _node = bases</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, whether_continuous=None, max_depth=None, node=None, **_kwargs)</span>:</span></div><div class="line">            tmp_node = node <span class="keyword">if</span> isinstance(node, CvDNode) <span class="keyword">else</span> _node</div><div class="line">            CvDBase.__init__(self, whether_continuous, max_depth, tmp_node(**_kwargs))</div><div class="line">            self._name = name</div><div class="line"></div><div class="line">        attr[<span class="string">"__init__"</span>] = __init__</div><div class="line">        <span class="keyword">return</span> type(name, bases, attr)</div></pre></td></tr></table></figure>
+<p>接下来就是具体的评估与相应的可视化</p>
+<a id="more"></a>
+<p>我们同样可以使用蘑菇数据集来评估决策树模型的表现，结果如下所示：</p>
+<img src="/posts/c12a819/p1.png" alt="蘑菇数据集上 ID3 算法的表现" title="蘑菇数据集上 ID3 算法的表现">
+<img src="/posts/c12a819/p2.png" alt="蘑菇数据集上 C4.5 算法的表现" title="蘑菇数据集上 C4.5 算法的表现">
+<img src="/posts/c12a819/p3.png" alt="蘑菇数据集上 CART 算法的表现" title="蘑菇数据集上 CART 算法的表现">
+<p>可以看到 CART 算法的表现相对来说要差不少，可能的原因有如下三条：</p>
+<ul>
+<li>CART 算法在选择划分标准时是从所有二分标准里面进行选择的，这里就会比 ID3 和 C4.5 算法多出不少倍的运算量</li>
+<li>由于我们在实现 CART 剪枝算法时为了追求简洁、直接调用了标准库 copy 中的 deepcopy 方法对整颗决策树进行了深拷贝。这一步可能会连不必要的东西也进行了拷贝、从而导致了一些不必要的开销</li>
+<li>CART 算法生成的是二叉决策树，所以可能生成出来的树会更深、各叶节点中的样本数可能也会分布得比较均匀、从而无论是建模过程还是预测过程都会要慢一些</li>
+</ul>
+<p>当然，如果结合蘑菇数据集来说的话、笔者认为最大的问题在于：CART 算法不适合应用于蘑菇数据集。一方面是因为蘑菇数据集全是离散型特征且各特征取值都挺多，另一方面是因为蘑菇数据集相对简单、有一些特征非常具有代表性（我们在说明朴素贝叶斯时也有所提及），仅仅用二分标准划分数据的话、会显得比较没有效率</p>
+<p>为了更客观地评估我们模型的表现，我们可以对成熟第三方库 sklearn 中的决策树模型进行恰当的封装并看看它在蘑菇数据集上的表现：</p>
+<img src="/posts/c12a819/p4.png" alt="蘑菇数据集上 sklearn 决策树的表现（criterion=entropy）" title="蘑菇数据集上 sklearn 决策树的表现（criterion=entropy）">
+<img src="/posts/c12a819/p5.png" alt="蘑菇数据集上 sklearn 决策树的表现（criterion=gini）" title="蘑菇数据集上 sklearn 决策树的表现（criterion=gini）">
+<p>不得不承认、成熟第三方库的效率确实要高很多（比我们的要快 5 倍左右）；这是因为虽然算法思想可能大致相同，但 sklearn 的核心实现都经过了高度优化、且（如不出意料的话）应该都是用 C 或者其它底层语言直接写的。不过正如第一章说过的，要想应用 sklearn 中的决策树、就必须先将数据数值化（即使是离散型数据）；而我们实现的决策树在处理离散型数据时却无需这一步数据预处理、可以直接应用在原始数据上（但处理混合型数据时还是要先进行数值化处理、而且将离散型数据数值化也能显著提升模型的运行速度）</p>
+<p>我们在本系列的综述里面曾说过、决策树可能是从直观上最好理解的模型；事实上，我们之前画过的一些决策树示意图也确实非常直观易懂、于是我们可能自然就会希望程序能将生成类似的东西。虽然不能做到那么漂亮、不过我们确实是能在之前实现的决策树模型的基础上做出类似效果的：</p>
+<img src="/posts/c12a819/p6.png" alt="蘑菇数据集上 ID3 决策树的可视化" title="蘑菇数据集上 ID3 决策树的可视化">
+<img src="/posts/c12a819/p7.png" alt="蘑菇数据集上 C4.5 决策树的可视化" title="蘑菇数据集上 C4.5 决策树的可视化">
+<img src="/posts/c12a819/p8.png" alt="蘑菇数据集上 CART 决策树的可视化" title="蘑菇数据集上 CART 决策树的可视化">
+<p>其中，红色数字代表该 Node 作为划分标准的特征所属的维度，位于各条连线中央的字母代表着该维度特征的各个取值、加号“+”代表着“其它”，绿色字母代表类别标记。以上三张图在一定程度上验证了我们之前的很多说法，比如说 ID3 会倾向选择取值比较多的特征、C4.5 可能会倾向选择取值比较少的特征且倾向于在每个二叉分枝处留下一个小 Node 作为叶节点、CART 各个叶节点上的样本分布较均匀且生成出的决策树会比较深……等等</p>
+<p>我们在说明朴素贝叶斯时曾经提过，即使只根据第 5 维的取值来进行类别的判定、最后的准确率也一定会非常高。验证这一命题的方法很简单——只需将决策树的最大深度设为 1 即可，结果如下图所示：</p>
+<img src="/posts/c12a819/p9.png" alt="p9.png" title="">
+<p>此时模型的表现如下图所示：</p>
+<img src="/posts/c12a819/p10.png" alt="p10.png" title="">
+<p>可以看到其表现确实不错。值得一提的是，单层决策树又可称为“决策树桩（Decision Stump）”、它是有特殊应用场景的（比如我们在下个系列中讲 AdaBoost 时就会用到它）</p>
+<p>至今为止我们用到的数据集都是离散型数据集，为了更全面地进行评估、使用连续型混合型数据集进行评估是有必要的；同时为了增强直观、我们可以用异或数据集来进行评估。原始数据集如下图所示：</p>
+<img src="/posts/c12a819/p11.png" alt="p11.png" title="">
+<p>生成异或数据集（及其它二维数据集）的代码定义在之前提过 DataUtil 类中（可参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py" target="_blank" rel="external">这里</a>），读者也可以在下一章中找到相应的讲解。为使评估更具有直观性、我们可以把四种决策树（ID3、C4.5、CART 决策树和 sklearn 的决策树）在异或数据集上的表现直接画出来：</p>
+<img src="/posts/c12a819/p12.png" alt="异或数据集上 ID3、CART 和 sklearn 决策树的表现" title="异或数据集上 ID3、CART 和 sklearn 决策树的表现">
+<img src="/posts/c12a819/p13.png" alt="异或数据集上 C4.5 决策树的表现" title="异或数据集上 C4.5 决策树的表现">
+<p>可以看到 C4.5 决策树的过拟合现象比较严重。正如我们之前所分析的一般、这很有可能是因为 C4.5 在二叉分枝时会倾向于进行“不均匀的二分”（从上图也可以大概看出）</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;之前我们实现了一个 Node 基类&lt;code&gt;CvDNode&lt;/code&gt;和一个 Tree 基类&lt;code&gt;CvDBase&lt;/code&gt;；为了评估决策树模型的表现、我们需要先在这两个基类的基础上根据不同的算法实现出各种具体的决策树。由于我们在基类里面已经完成了绝大部分工作、所以在其上进行扩展是平凡的：&lt;/p&gt;
+&lt;figure class=&quot;highlight python&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ID3Node&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(CvDNode)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(self, *args, **kwargs)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        CvDNode.__init__(self, *args, **kwargs)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        self.criterion = &lt;span class=&quot;string&quot;&gt;&quot;ent&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;C45Node&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(CvDNode)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(self, *args, **kwargs)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        CvDNode.__init__(self, *args, **kwargs)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        self.criterion = &lt;span class=&quot;string&quot;&gt;&quot;ratio&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;CartNode&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(CvDNode)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(self, *args, **kwargs)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        CvDNode.__init__(self, *args, **kwargs)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        self.criterion = &lt;span class=&quot;string&quot;&gt;&quot;gini&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        self.is_cart = &lt;span class=&quot;keyword&quot;&gt;True&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;在&lt;code&gt;CvDBase&lt;/code&gt;的基础上定义三种算法对应的 Tree 结构的方法是类似的：&lt;/p&gt;
+&lt;figure class=&quot;highlight python&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ID3Tree&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(CvDBase, ID3Node, metaclass=CvDMeta)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;pass&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;C45Tree&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(CvDBase, C45Node, metaclass=CvDMeta)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;pass&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;CartTree&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(CvDBase, CartNode, metaclass=CvDMeta)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;pass&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;其中&lt;/p&gt;
+&lt;figure class=&quot;highlight python&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;CvDMeta&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(type)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;__new__&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(mcs, *args, **kwargs)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        name, bases, attr = args[:&lt;span class=&quot;number&quot;&gt;3&lt;/span&gt;]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        _, _node = bases&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(self, whether_continuous=None, max_depth=None, node=None, **_kwargs)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            tmp_node = node &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; isinstance(node, CvDNode) &lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt; _node&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            CvDBase.__init__(self, whether_continuous, max_depth, tmp_node(**_kwargs))&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;            self._name = name&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        attr[&lt;span class=&quot;string&quot;&gt;&quot;__init__&quot;&lt;/span&gt;] = __init__&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; type(name, bases, attr)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;接下来就是具体的评估与相应的可视化&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>剪枝算法的实现</title>
+    <link href="http://www.carefree0910.com/posts/602f7125/"/>
+    <id>http://www.carefree0910.com/posts/602f7125/</id>
+    <published>2017-04-23T01:25:20.000Z</published>
+    <updated>2017-04-23T03:00:54.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Node.py" target="_blank" rel="external">这里</a>和<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Tree.py" target="_blank" rel="external">这里</a>）</p>
+<p>决策树剪枝算法的实现相对而言比较平凡，只需要把算法依次翻译成程序语言即可</p>
+<a id="more"></a>
+<h1 id="ID3、C4-5-剪枝算法的实现"><a href="#ID3、C4-5-剪枝算法的实现" class="headerlink" title="ID3、C4.5 剪枝算法的实现"></a>ID3、C4.5 剪枝算法的实现</h1><p>回忆算法本身，可以知道我们需要获取“从下往上”这个顺序，为此我们需要先在<code>CvDNode</code>中利用递归定义一个函数来更新 Tree 的<code>self.layers</code>属性：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">update_layers</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="comment"># 根据该Node的深度、在self.layers对应位置的列表中记录自己</span></div><div class="line">    self.tree.layers[self._depth].append(self)</div><div class="line">    <span class="comment"># 遍历所有子节点、完成递归</span></div><div class="line">    <span class="keyword">for</span> _node <span class="keyword">in</span> sorted(self.children):</div><div class="line">        _node = self.children[_node]</div><div class="line">        <span class="keyword">if</span> _node <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            _node.update_layers()</div></pre></td></tr></table></figure>
+<p>然后、在<code>CvDBase</code>中定义一个对应的函数进行封装：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_update_layers</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="comment"># 根据整颗决策树的高度、在self.layers里面放相应数量的列表</span></div><div class="line">    self.layers = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> range(self.root.height)]</div><div class="line">    self.root.update_layers()</div></pre></td></tr></table></figure>
+<p>同时，为了做到合理的代码重用、我们可以先在<code>CvDNode</code>中定义一个计算损失的函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">cost</span><span class="params">(self, pruned=False)</span>:</span></div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> pruned:</div><div class="line">        <span class="keyword">return</span> sum([leaf[<span class="string">"chaos"</span>] * len(leaf[<span class="string">"y"</span>]) <span class="keyword">for</span> leaf <span class="keyword">in</span> self.leafs.values()])</div><div class="line">    <span class="keyword">return</span> self.chaos * len(self._y)</div></pre></td></tr></table></figure>
+<p>有了以上两个函数，算法本身的实现就很直观了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_prune</span><span class="params">(self)</span>:</span></div><div class="line">    self._update_layers()</div><div class="line">    _tmp_nodes = []</div><div class="line">    <span class="comment"># 更新完决策树每一“层”的Node之后，从后往前地向 _tmp_nodes中加Node</span></div><div class="line">    <span class="keyword">for</span> _node_lst <span class="keyword">in</span> self.layers[::<span class="number">-1</span>]:</div><div class="line">        <span class="keyword">for</span> _node <span class="keyword">in</span> _node_lst[::<span class="number">-1</span>]:</div><div class="line">            <span class="keyword">if</span> _node.category <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">                _tmp_nodes.append(_node)</div><div class="line">    _old = np.array([node.cost() + self.prune_alpha * len(node.leafs)</div><div class="line">        <span class="keyword">for</span> node <span class="keyword">in</span> _tmp_nodes])</div><div class="line">    _new = np.array([node.cost(pruned=<span class="keyword">True</span>) + self.prune_alpha</div><div class="line">        <span class="keyword">for</span> node <span class="keyword">in</span> _tmp_nodes])</div><div class="line">    <span class="comment"># 使用 _mask变量存储 _old和 _new对应位置的大小关系</span></div><div class="line">    _mask = _old &gt;= _new</div><div class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">        <span class="comment"># 若只剩根节点就退出循环体</span></div><div class="line">        <span class="keyword">if</span> self.root.height == <span class="number">1</span>:</div><div class="line">            <span class="keyword">return</span></div><div class="line">        p = np.argmax(_mask)</div><div class="line">        <span class="comment"># 如果 _new中有比 _old中对应损失小的损失、则进行局部剪枝</span></div><div class="line">        <span class="keyword">if</span> _mask[p]:</div><div class="line">            _tmp_nodes[p].prune()</div><div class="line">            <span class="comment"># 根据被影响了的Node、更新 _old、_mask对应位置的值</span></div><div class="line">            <span class="keyword">for</span> i, node <span class="keyword">in</span> enumerate(_tmp_nodes):</div><div class="line">                <span class="keyword">if</span> node.affected:</div><div class="line">                    _old[i] = node.cost() + self.prune_alpha * len(node.leafs)</div><div class="line">                    _mask[i] = _old[i] &gt;= _new[i]</div><div class="line">                    node.affected = <span class="keyword">False</span></div><div class="line">            <span class="comment"># 根据被剪掉的Node、将各个变量对应的位置除去（注意从后往前遍历）</span></div><div class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> range(len(_tmp_nodes) - <span class="number">1</span>, <span class="number">-1</span>, <span class="number">-1</span>):</div><div class="line">                <span class="keyword">if</span> _tmp_nodes[i].pruned:</div><div class="line">                    _tmp_nodes.pop(i)</div><div class="line">                    _old = np.delete(_old, i)</div><div class="line">                    _new = np.delete(_new, i)</div><div class="line">                    _mask = np.delete(_mask, i)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line">    self.reduce_nodes()</div></pre></td></tr></table></figure>
+<p>上述代码的第 25 行和第 28 行出现了 Node 的<code>affected</code>属性，这是我们之前没有进行定义的（因为若在彼时定义会显得很突兀）；不过由剪枝算法可知，这个属性的用处与其名字一致——标记一个 Node 是否是“被影响到的”Node。事实上，在一个 Node 进行了局部剪枝后，会有两类 Node “被影响到”：</p>
+<ul>
+<li>该 Node 的子节点、子节点的子节点……等等，它们属于被剪掉的 Node、应该要将它们在<code>_old</code>、<code>_tmp_nodes</code>中对应的位置从这些列表中除去</li>
+<li>该 Node 的父节点、父节点的父节点……等等，它们存储叶节点的列表会因局部剪枝而发生改变、所以要更新<code>_old</code>和<code>_mask</code>列表中对应位置的值</li>
+</ul>
+<p>其中，我们之前定义的 Node 中是用<code>pruned</code>属性来标记该 Node 是否已被剪掉、且介绍了如何通过递归来更新<code>pruned</code>属性；<code>affected</code>属性和<code>pruned</code>属性的本质几乎没什么区别，所以我们同样可以通过递归来更新<code>affected</code>属性。具体而言，我们只需：</p>
+<ul>
+<li>在初始化时令<code>self.affected = False</code></li>
+<li>在局部剪枝函数内部插入<code>_parent.affected = True</code></li>
+</ul>
+<p>即可，其余部分可以保持不变。</p>
+<h1 id="CART-剪枝算法的实现"><a href="#CART-剪枝算法的实现" class="headerlink" title="CART 剪枝算法的实现"></a>CART 剪枝算法的实现</h1><p>同样的，为了做到合理的代码重用、我们先利用之前实现的<code>cost</code>函数、在<code>CvDNode</code>里面定义一个获取 Node 阈值的函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_threshold</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">return</span> (self.cost(pruned=<span class="keyword">True</span>) - self.cost()) / (len(self.leafs) - <span class="number">1</span>)</div></pre></td></tr></table></figure>
+<p>由于算法本身的实现的思想以及用到的工具都和第一种剪枝算法大同小异、所以代码写起来也差不多：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_cart_prune</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="comment"># 暂时将所有节点记录所属Tree的属性置为None</span></div><div class="line">    <span class="comment"># 这样做的必要性会在后文进行说明</span></div><div class="line">    self.root.cut_tree()</div><div class="line">    _tmp_nodes = [node <span class="keyword">for</span> node <span class="keyword">in</span> self.nodes <span class="keyword">if</span> node.category <span class="keyword">is</span> <span class="keyword">None</span>]</div><div class="line">    _thresholds = np.array([node.get_threshold() <span class="keyword">for</span> node <span class="keyword">in</span> _tmp_nodes])</div><div class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">        <span class="comment"># 利用deepcopy对当前根节点进行深拷贝、存入self.roots列表</span></div><div class="line">        <span class="comment"># 如果前面没有把记录Tree的属性置为None，那么这里就也会对整个Tree做</span></div><div class="line">        <span class="comment"># 深拷贝。可以想象、这样会引发严重的内存问题，速度也会被拖慢非常多</span></div><div class="line">        root_copy = deepcopy(self.root)</div><div class="line">        self.roots.append(root_copy)</div><div class="line">        <span class="keyword">if</span> self.root.height == <span class="number">1</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        p = np.argmin(_thresholds)</div><div class="line">        _tmp_nodes[p].prune()</div><div class="line">        <span class="keyword">for</span> i, node <span class="keyword">in</span> enumerate(_tmp_nodes):</div><div class="line">            <span class="comment"># 更新被影响到的Node的阈值</span></div><div class="line">            <span class="keyword">if</span> node.affected:</div><div class="line">                _thresholds[i] = node.get_threshold()</div><div class="line">                node.affected = <span class="keyword">False</span></div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(_tmp_nodes) - <span class="number">1</span>, <span class="number">-1</span>, <span class="number">-1</span>):</div><div class="line">            <span class="comment"># 去除掉各列表相应位置的元素</span></div><div class="line">            <span class="keyword">if</span> _tmp_nodes[i].pruned:</div><div class="line">                _tmp_nodes.pop(i)</div><div class="line">                _thresholds = np.delete(_thresholds, i)</div><div class="line">    self.reduce_nodes()</div></pre></td></tr></table></figure>
+<p>代码第 4 行对根节点调用的<code>cut_tree</code>方法同样是利用递归实现的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">cut_tree</span><span class="params">(self)</span>:</span></div><div class="line">    self.tree = <span class="keyword">None</span></div><div class="line">    <span class="keyword">for</span> child <span class="keyword">in</span> self.children.values():</div><div class="line">        <span class="keyword">if</span> child <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            child.cut_tree()</div></pre></td></tr></table></figure>
+<p>然后就是最后一步、通过交叉验证选出最优树了。注意到之前我们封装生成算法时、最后一行调用了剪枝算法的封装——<code>self.prune</code>方法。由于该方法是第一个接收了交叉验证集<code>x_cv</code>和<code>y_cv</code>的方法、所以我们应该让该方法来做交叉验证。简洁起见，我们直接选用加权正确率作为交叉验证的标准：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义计算加权正确率的函数</span></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">acc</span><span class="params">(y, y_pred, weights)</span>:</span></div><div class="line">    <span class="keyword">if</span> weights <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">return</span> np.sum((np.array(y) == np.array(y_pred)) * weights) / len(y)</div><div class="line">    <span class="keyword">return</span> np.sum(np.array(y) == np.array(y_pred)) / len(y)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">prune</span><span class="params">(self, x_cv, y_cv, weights)</span>:</span></div><div class="line">    <span class="keyword">if</span> self.root.is_cart:</div><div class="line">        <span class="comment"># 如果该Node使用CART剪枝，那么只有在确实传入了交叉验证集的情况下</span></div><div class="line">        <span class="comment"># 才能调用相关函数、否则没有意义</span></div><div class="line">        <span class="keyword">if</span> x_cv <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> y_cv <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            self._cart_prune()</div><div class="line">            _arg = np.argmax([CvDBase.acc(</div><div class="line">                y_cv, tree.predict(x_cv), weights) <span class="keyword">for</span> tree <span class="keyword">in</span> self.roots])</div><div class="line">            _tar_root = self.roots[_arg]</div><div class="line">            <span class="comment"># 由于Node的feed_tree方法会递归地更新nodes属性、所以要先重置</span></div><div class="line">            self.nodes = []</div><div class="line">            _tar_root.feed_tree(self)</div><div class="line">            self.root = _tar_root</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        self._prune()</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Node.py&quot;&gt;这里&lt;/a&gt;和&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Tree.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
+&lt;p&gt;决策树剪枝算法的实现相对而言比较平凡，只需要把算法依次翻译成程序语言即可&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>决策树的剪枝算法</title>
+    <link href="http://www.carefree0910.com/posts/1a7aa546/"/>
+    <id>http://www.carefree0910.com/posts/1a7aa546/</id>
+    <published>2017-04-22T15:33:01.000Z</published>
+    <updated>2017-04-23T02:59:55.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当的“剪枝”、我们在上一节中也已经大量接触了这一概念。剪枝通常分为两类：“预剪枝（Pre-Pruning）”和“后剪枝（Post-Pruning）”，其中“预剪枝”的概念在生成算法中已有定义，彼时我们采取的说法是“停止条件”；而一般提起剪枝时指的都是“后剪枝”，它是指在决策树生成完毕后再对其进行修剪、把多余的节点剪掉。换句话说，后剪枝是从全局出发、通过某种标准对一些 Node 进行局部剪枝，这样就能减少决策树中 Node 的数目、从而有效地降低模型复杂度</p>
+<a id="more"></a>
+<p>是故问题的关键在于如何定出局部剪枝的标准。通常来说我们有两种做法：</p>
+<ul>
+<li>应用交叉验证的思想，若局部剪枝能够使得模型在测试集上的错误率降低、则进行局部剪枝（预剪枝中也应用了类似的思想）</li>
+<li>应用正则化的思想、综合考虑不确定性和模型复杂度来定出一个新的损失（此前我们的损失只考虑了不确定性），用该损失作为一个 Node 是否进行局部剪枝的标准</li>
+</ul>
+<p>第二种做法又涉及到另一个关键问题：如何定量分析决策树中一个 Node 的复杂度？一个直观且合理的方法是：直接使用该 Node 下属叶节点的个数作为复杂度。基于此、第二种做法的数学描述就是：</p>
+<ul>
+<li>定义新损失（<script type="math/tex">T</script>代表一个 Node）  <script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = C\left( T \right) + \alpha\left| T \right|</script>其中，<script type="math/tex">C\left( T \right)</script>即是该 Node 和不确定性相关的损失、<script type="math/tex">|T|</script>则是该 Node 下属叶节点的个数。不妨设第 t 个叶节点含有<script type="math/tex">N_{t}</script>个样本且这<script type="math/tex">N_{t}</script>个样本的不确定性为<script type="math/tex">H_{t}(T)</script>，那么新损失一般可以直接定义为加权不确定性：  <script type="math/tex; mode=display">
+C\left( T \right) = \sum_{t = 1}^{\left| T \right|}{N_{t}H_{t}(T)}</script></li>
+</ul>
+<p>我们会采取这种做法来进行实现。需要指出的是，在这种做法下、仍然可以分支出两种不同的算法：</p>
+<ul>
+<li>直接比较一个 Node 局部剪枝前的损失<script type="math/tex">C_{\alpha}(T)</script>和局部剪枝后的损失<script type="math/tex">C_{\alpha}(t)</script>的大小，若：  <script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) \geq C_{\alpha}(t)</script></li>
+<li>获取一系列的剪枝阈值：<script type="math/tex">0 = \alpha_{0} < \alpha_{1} < \ldots < \alpha_{p} < + \infty</script>，在每个剪枝阈值<script type="math/tex">\alpha_{i}</script>上对相应的 Node 进行局部剪枝并将局部剪枝后得到的决策树<script type="math/tex">T_{i}</script>储存在一个列表中。在<script type="math/tex">\alpha_{p}</script>上我们会对根节点进行局部剪枝，此时剩下来的决策树<script type="math/tex">T_{p}</script>就只包含根节点这一个 Node。最后，通过交叉验证选出<script type="math/tex">T_{0},\ldots,T_{p}</script>中最好的决策树作为最终生成的决策树（注意其中的<script type="math/tex">T_{0}</script>即是没有剪过枝的原始树）</li>
+</ul>
+<p>第一种算法清晰易懂，第二种算法则稍显复杂；一般我们会在 ID3 和 C4.5 中应用第一种剪枝算法、在 CART 中应用第二种剪枝算法。上述这个第二种算法的说明可能有些过于简略、让人摸不着头脑；由于详细的算法叙述会在后文再次进行，所以这里只要有一个大概的直观感受即可，细节可以暂时按下、不必太过纠结</p>
+<h1 id="ID3、C4-5-的剪枝算法"><a href="#ID3、C4-5-的剪枝算法" class="headerlink" title="ID3、C4.5 的剪枝算法"></a>ID3、C4.5 的剪枝算法</h1><p>首先我们来看看第一种算法的详细叙述。虽说算法本身的思想很简单，但由于其中涉及到许多中间变量、所以我们采取类似于伪代码的形式来进行叙述：</p>
+<ol>
+<li><strong>输入</strong>：生成算法产生的原始决策树<script type="math/tex">T</script>，惩罚因子<script type="math/tex">\alpha</script></li>
+<li><strong>过程</strong>：<ol>
+<li>从下往上地获取<script type="math/tex">T</script>中所有 Node，存入列表<code>_tmp_nodes</code></li>
+<li>对<code>_tmp_nodes</code>中的所有 Node 计算损失，存入列表<code>_old</code></li>
+<li>计算<code>_tmp_nodes</code>中所有 Node 进行局部剪枝后的损失，存入列表<code>_new</code></li>
+<li>进入循环体：<ol>
+<li>若<code>_new</code>中所有损失都大于<code>_old</code>中对应的损失、则退出循环体</li>
+<li>否则，设 p 满足：  <script type="math/tex; mode=display">
+p = \arg{\min_{p}{\text{_new}\lbrack p\rbrack \leq \text{_old}\lbrack p\rbrack}}</script>则对<code>_tmp_nodes[p]</code>进行局部剪枝</li>
+<li>在完成局部剪枝后，更新<code>_old</code>、<code>_new</code>、<code>_tmp_nodes</code>等变量。具体而言，我们无需重新计算它们、只需更新“被影响到的” Node 所对应的位置的值即可</li>
+</ol>
+</li>
+<li>最后调用<code>self.reduce_nodes</code>方法、将被剪掉的 Node 从<code>nodes</code>中除去</li>
+</ol>
+</li>
+<li><strong>输出</strong>：修剪过后的决策树<script type="math/tex">T_{\alpha}</script></li>
+</ol>
+<p>我们可以在我们之前用气球数据集 1.0 根据 ID3 算法生成的决策树上过一遍剪枝算法以加深理解。由于算法顺序是从下往上、所以我们先考察最右下方的 Node（该 Node 的划分标准是“测试人员”），该 Node 所包含的数据集如下表所示：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>测试人员</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>不爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>从而：</p>
+<ul>
+<li>局部剪枝前、该 Node 的损失为：  <script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = C\left( T \right) + \alpha\left| T \right| = 0 + 2\alpha = 2\alpha</script></li>
+<li>局部剪枝后、该 Node 的损失为：  <script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) = C\left( t \right) + \alpha\left| t \right| = C\left( t \right) + \alpha</script>其中  <script type="math/tex; mode=display">
+C\left( t \right) = N_{t}H_{t} = 2 \times \left( - \frac{1}{2}\log\frac{1}{2} - \frac{1}{2}\log\frac{1}{2} \right) = 2</script>故  <script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) = 2 + \alpha</script></li>
+</ul>
+<p>回忆生成算法的实现，我们彼时将<script type="math/tex">\alpha</script>定义为了<script type="math/tex">\alpha = \frac{特征个数}{2}</script>（注意：这只是<script type="math/tex">\alpha</script>的一种朴素的定义方法，很难说它有什么合理性、只能说它从直观上有一定道理；如果想让模型表现更好、需要结合具体的问题来分析<script type="math/tex">\alpha</script>应该取何值）。由于气球数据集 1.0 一共有四个特征、所以此时<script type="math/tex">\alpha = 2</script>；结合各个公式、我们发现：</p>
+<script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) = 2\alpha = 4 = 2 + \alpha = C_{\alpha}(t)</script><p>所以我们应该对该 Node 进行局部剪枝。局部剪枝后的决策树如下图所示：</p>
+<img src="/posts/1a7aa546/p1.png" alt="p1.png" title="">
+<p><strong><em>注意：进行局部剪枝后，由于该 Node 中样本只有两个、且一个样本类别为“不爆炸”一个为“爆炸”，所以给该 Node 标注为“不爆炸”、“爆炸”甚至以 50%的概率标注为“不爆炸”等做法都是合理的。为简洁，我们如上图中所做的一般、将其标注为“爆炸”</em></strong></p>
+<p>然后我们需要考察最左下方的 Node（该 Node 的划分标准也是“测试人员”），易知计算过程和上述的没有区别。对其进行局部剪枝后的决策树如下图所示：</p>
+<img src="/posts/1a7aa546/p2.png" alt="p2.png" title="">
+<p>然后我们需要考察右下方的 Node（该 Node 的划分标准是“动作”），该 Node 所包含的数据集如下表所示：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>测试人员</th>
+<th>测试动作</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用手打</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>从而：</p>
+<ul>
+<li><p>局部剪枝前、该 Node 的损失为：  </p>
+<script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = C\left( T \right) + \alpha\left| T \right| = C\left( T \right) + 2\alpha</script><p>其中  </p>
+<script type="math/tex; mode=display">
+\begin{align}
+C\left( T \right) = N_{}H_{} + N_{}H_{} \\
+
+= 2 \times \left( - \frac{1}{2}\log\frac{1}{2} - \frac{1}{2}\log\frac{1}{2} \right) + 4 \times 0 = 2
+\end{align}</script><p>故  </p>
+<script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = 2 + 2\alpha</script></li>
+<li>局部剪枝后、该 Node 的损失为：  <script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) = C\left( t \right) + \alpha\left| t \right| = C\left( t \right) + \alpha</script>其中  <script type="math/tex; mode=display">
+C\left( t \right) = N_{t}H_{t} = 6 \times \left( - \frac{1}{6}\log\frac{1}{6} - \frac{5}{6}\log\frac{5}{6} \right) \approx 3.9</script>故  <script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) \approx 3.9 + \alpha</script></li>
+</ul>
+<p>将<script type="math/tex">\alpha = 2</script>代入、知：</p>
+<script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = 2 + 2\alpha = 6 > 5.9 = 3.9 + \alpha \approx C_{\alpha}(t)</script><p>故应该对该 Node 进行局部剪枝。局部剪枝后的决策树如下图所示：</p>
+<img src="/posts/1a7aa546/p3.png" alt="p3.png" title="">
+<p>然后我们需要考察左下方的 Node（该 Node 的划分标准也是“动作”），易知计算过程和上述的没有区别。对其进行局部剪枝后的决策树如下图所示：</p>
+<img src="/posts/1a7aa546/p4.png" alt="p4.png" title="">
+<p>通过计算易知不应对根节点进行局部剪枝、所以上图所示的决策树即是当<script type="math/tex">\alpha = 2</script>时最终修剪出来的决策树</p>
+<h1 id="CART-剪枝"><a href="#CART-剪枝" class="headerlink" title="CART 剪枝"></a>CART 剪枝</h1><p>第二种剪枝算法（CART 剪枝）中的许多定义可能还不是很清晰，所以我们先对相关概念进行详细一点的直观说明：</p>
+<p>首先需要指出的是：关于第二种算法中出现的一系列的阈值，它们的含义其实和第一种算法中的<script type="math/tex">\alpha</script>一样、都是模型复杂度的“惩罚因子”；不同的是，第一种算法的<script type="math/tex">\alpha</script>是人为给定的、第二种算法中一系列的阈值则是算法生成出来的。其中，<script type="math/tex">\alpha_{0} = 0</script>意味着算法初始不对模型复杂度进行惩罚、此时最优树即是原始树<script type="math/tex">T_{0}</script>。然后我们设想<script type="math/tex">\alpha</script>缓慢增大、亦即缓慢增大对模型复杂度的惩罚，那么到某个阈值<script type="math/tex">\alpha_{1}</script>时，对决策树中某个 Node 进行局部剪枝就是一个更好的选择。我们将该 Node 进行局部剪枝后的决策树<script type="math/tex">T_{1}</script>存进一个列表中、然后继续缓慢增加惩罚因子<script type="math/tex">\alpha</script>，继而到某个阈值<script type="math/tex">\alpha_{2}</script>后、对某个 Node 进行局部剪枝就又会是一个更好的选择……以此类推，直到<script type="math/tex">\alpha</script>变成一个充分大的数<script type="math/tex">\alpha_{p}</script>后、只保留根节点这一个 Node 会是最好的选择，此时就终止算法并通过交叉验证从<script type="math/tex">T_{0},\ldots,T_{p}</script>中选出最好的<script type="math/tex">T_{p^{*}}</script>作为修剪后的决策树。</p>
+<p>那么这个相对比较复杂的算法有什么优异之处呢？可以证明：在 CART 剪枝里得到的决策树<script type="math/tex">T_{0},\ldots,T_{p}</script>中，对<script type="math/tex">\forall i = 0,\ldots,p</script>、<script type="math/tex">T_{i}</script>都是当惩罚因子<script type="math/tex">\alpha \in \lbrack\alpha_{i},\alpha_{i + 1})</script>时的最优决策树。这条性质保证了 CART 算法最终通过交叉验证选出来的决策树<script type="math/tex">T_{p^{*}}</script>具有一定的优良性。</p>
+<p>该算法的详细叙述则如下：</p>
+<ol>
+<li><strong>输入</strong>：在训练集上调用生成算法所产生的原始决策树<script type="math/tex">T</script>，交叉验证集</li>
+<li>过程：<ol>
+<li>从下往上地获取<script type="math/tex">T</script>中所有 Node，存入列表<code>_tmp_nodes</code></li>
+<li>对<code>_tmp_nodes</code>中的所有 Node 计算阈值，存入列表<code>_thresholds</code>；其中，第 t 个 Node 的阈值<script type="math/tex">\alpha_{t}</script>应满足：  <script type="math/tex; mode=display">
+C\left( T_{t} \right) + \alpha_{t}\left| T_{t} \right| = C_{\alpha_{t}}\left( T_{t} \right) = C_{\alpha_{t}}\left( t \right) = C\left( t \right) + \alpha_{t}</script>其中<script type="math/tex">C(t)</script>即是第 t 个 Node 自身数据的不确定性；换言之，<script type="math/tex">C_{\alpha_{t}}(T_{t})</script>代表着第 t 个 Node 进行局部剪枝前的新损失、<script type="math/tex">C_{\alpha_{t}}(t)</script>代表着局部剪枝后的新损失。由上式可求出：  <script type="math/tex; mode=display">
+\alpha_{t} = \frac{C\left( t \right) - C\left( T_{t} \right)}{\left| T_{t} \right| - 1}</script>此即阈值的计算公式</li>
+<li>进入循环体：<ol>
+<li>将当前决策树存入列表<code>self.roots</code></li>
+<li>若当前决策树中只剩根节点、则退出循环体</li>
+<li>否则，取 p 满足：  <script type="math/tex; mode=display">
+p = \arg{\min_{p}{\_\text{thresholds}}}</script>然后对<code>_tmp_nodes[p]</code>进行局部剪枝</li>
+<li>在完成局部剪枝后，更新<code>_thresholds</code>、<code>_tmp_nodes</code>等变量。具体而言，我们无需重新计算它们、只需更新“被影响到的” Node 所对应的位置的值即可</li>
+</ol>
+</li>
+<li>然后调用<code>self.reduce_nodes</code>方法、将被剪掉的 Node 从<code>nodes</code>中除去</li>
+<li>最后利用交叉验证、从<code>self.roots</code>中选出表现最好的决策树<script type="math/tex">T_{p^{*}}</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：修剪过后的决策树<script type="math/tex">T_{p^{*}}</script></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当的“剪枝”、我们在上一节中也已经大量接触了这一概念。剪枝通常分为两类：“预剪枝（Pre-Pruning）”和“后剪枝（Post-Pruning）”，其中“预剪枝”的概念在生成算法中已有定义，彼时我们采取的说法是“停止条件”；而一般提起剪枝时指的都是“后剪枝”，它是指在决策树生成完毕后再对其进行修剪、把多余的节点剪掉。换句话说，后剪枝是从全局出发、通过某种标准对一些 Node 进行局部剪枝，这样就能减少决策树中 Node 的数目、从而有效地降低模型复杂度&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+    
+      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>树结构的实现</title>
+    <link href="http://www.carefree0910.com/posts/b07c81ec/"/>
+    <id>http://www.carefree0910.com/posts/b07c81ec/</id>
+    <published>2017-04-22T15:07:52.000Z</published>
+    <updated>2017-04-22T15:32:30.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Tree.py" target="_blank" rel="external">这里</a>）</p>
+<p>由前文的诸多讨论可知，Tree 结构需要做到如下几点：</p>
+<ul>
+<li>定义好需要在各个 Node 上调用的“全局变量”</li>
+<li>做好数据预处理的工作、保证传给 Node 的数据是合乎要求的</li>
+<li>对各个 Node 进行合适的封装，做到：<ul>
+<li>生成决策树时能够正确地调用它们的生成算法</li>
+<li>进行后剪枝时能够正确地调用它们的局部剪枝函数</li>
+</ul>
+</li>
+<li>定义预测函数和评估函数以供用户调用</li>
+</ul>
+<p>既然 Node 我们可以抽象出一个基类<code>CvDNode</code>，我们自然也能相应地对 Tree 结构抽象出一个基类<code>CvDBase</code></p>
+<a id="more"></a>
+<p>下面先来看看如何搭建该基类的基本框架：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> copy <span class="keyword">import</span> deepcopy</div><div class="line"><span class="comment"># 导入Node结构以进行封装</span></div><div class="line"><span class="keyword">from</span> c_CvDTree.Node <span class="keyword">import</span> *</div><div class="line"></div><div class="line"><span class="comment"># 定义一个足够抽象的Tree结构的基类以适应我们Node结构的基类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CvDBase</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.nodes：记录所有Node的列表</div><div class="line">        self.roots：主要用于CART剪枝的属性，可先按下不表</div><div class="line">（用于存储算法过程中产生的各个决策树）</div><div class="line">            self.max_depth：记录决策树最大深度的属性</div><div class="line">        self.root, self.feature_sets：根节点和记录可选特征维度的列表</div><div class="line">            self.label_dic：和朴素贝叶斯里面相应的属性意义一致、是类别的转换字典</div><div class="line">        self.prune_alpha, self.layers：主要用于ID3和C4.5剪枝的两个属性，可先按下不表</div><div class="line">（self.prune_alpha是“惩罚因子”，self.layers则记录着每一“层”的Node）</div><div class="line">        self.whether_continuous：记录着各个维度的特征是否连续的列表</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, max_depth=None, node=None)</span>:</span></div><div class="line">        self.nodes, self.layers, self.roots = [], [], []</div><div class="line">        self.max_depth = max_depth</div><div class="line">        self.root = node</div><div class="line">        self.feature_sets = []</div><div class="line">        self.label_dic = &#123;&#125;</div><div class="line">        self.prune_alpha = <span class="number">1</span></div><div class="line">        self.whether_continuous = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> <span class="string">"CvDTree (&#123;&#125;)"</span>.format(self.root.height)</div><div class="line"></div><div class="line">    __repr__ = __str__</div></pre></td></tr></table></figure>
+<p>回忆朴素贝叶斯的实现，可以知道在第二章的混合型朴素贝叶斯中、我们要求用户告诉程序哪些维度的特征是连续的；这里我们介绍一种非常简易却有一定合理性的做法、从而可以让程序在进行数据预处理时自动识别出连续特征对应的维度：</p>
+<ul>
+<li>将训练集中每个维度特征的所有可能的取值算出来，这一步可以用 Python 内置的数据结构<code>set</code>来完成</li>
+<li>如果第 i 维可能的取值个数<script type="math/tex">S_i</script>比上训练集总样本数 N 大于某个阈值，亦即若：  <script type="math/tex; mode=display">
+S_i\ge\beta N</script>那么就认为第 i 维的特征是连续型随机变量<br><script type="math/tex">\beta</script>的具体取值需要视情况而定。一般来说在样本数 N 足够大时、可以取得比较小（比如取就是个不错的选择）；但是样本数 N 比较小时，我们可能需要将取得大一些（比如取）。具体应该取什么值还是要看具体的任务和数据，毕竟这种自动识别的方法还是过于朴素了</li>
+</ul>
+<p>以上所叙述的数据预处理的实现如下（注：我们在朴素贝叶斯的实现里用到过的<code>quantize_data</code>方法中整合了如下代码中的核心部分）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_data</span><span class="params">(self, x, continuous_rate=<span class="number">0.2</span>)</span>:</span></div><div class="line">    <span class="comment"># 利用set获取各个维度特征的所有可能取值</span></div><div class="line">    self.feature_sets = [set(dimension) <span class="keyword">for</span> dimension <span class="keyword">in</span> x.T]</div><div class="line">    data_len, data_dim = x.shape</div><div class="line">    <span class="comment"># 判断是否连续</span></div><div class="line">    self.whether_continuous = np.array(</div><div class="line">        [len(feat) &gt;= continuous_rate * data_len <span class="keyword">for</span> feat <span class="keyword">in</span> self.feature_sets])</div><div class="line">    self.root.feats = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(x.shape[<span class="number">1</span>])]</div><div class="line">    self.root.feed_tree(self)</div></pre></td></tr></table></figure>
+<p>最后一行我们对根节点调用了<code>feed_tree</code>方法，该方法会做以下三件事：</p>
+<ul>
+<li>让决策树中所有的 Node 记录一下它们所属的 Tree 结构</li>
+<li>将自己记录在 Tree 中记录所有 Node 的列表<code>nodes</code>里</li>
+<li>根据 Tree 的相应属性更新记录连续特征的列表</li>
+</ul>
+<p>实现的时候同样利用上了递归：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_tree</span><span class="params">(self, tree)</span>:</span></div><div class="line">    self.tree = tree</div><div class="line">    self.tree.nodes.append(self)</div><div class="line">    self.wc = tree.whether_continuous</div><div class="line">    <span class="keyword">for</span> child <span class="keyword">in</span> self.children.values():</div><div class="line">        <span class="keyword">if</span> child <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            child.feed_tree(tree)</div></pre></td></tr></table></figure>
+<p><strong><em>注意：以上代码应定义在<code>CvDNode</code>里面</em></strong></p>
+<p>接下来就是对生成算法的封装了。考虑到第二节会讲到的剪枝算法、我们需要做的是：</p>
+<ul>
+<li>将类别向量数值化（和朴素贝叶斯里面的数值化类别向量的方法一样）</li>
+<li>将数据集切分成训练集和交叉验证集、同时处理好样本权重</li>
+<li>对根节点调用决策树的生成算法</li>
+<li>调用自己的剪枝算法</li>
+</ul>
+<p>具体的代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 参数alpha和剪枝有关、可按下不表</span></div><div class="line"><span class="comment"># cv_rate用于控制交叉验证集的大小，train_only则控制程序是否进行数据集的切分</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, alpha=None, sample_weight=None, eps=<span class="number">1e-8</span>,</span></span></div><div class="line">    cv_rate=<span class="number">0.2</span>, train_only=False):</div><div class="line">    <span class="comment"># 数值化类别向量</span></div><div class="line">    _dic = &#123;c: i <span class="keyword">for</span> i, c <span class="keyword">in</span> enumerate(set(y))&#125;</div><div class="line">    y = np.array([_dic[yy] <span class="keyword">for</span> yy <span class="keyword">in</span> y])</div><div class="line">    self.label_dic = &#123;value: key <span class="keyword">for</span> key, value <span class="keyword">in</span> _dic.items()&#125;</div><div class="line">    x = np.array(x)</div><div class="line">    <span class="comment"># 根据特征个数定出alpha</span></div><div class="line">    self.prune_alpha = alpha <span class="keyword">if</span> alpha <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">else</span> x.shape[<span class="number">1</span>] / <span class="number">2</span></div><div class="line">    <span class="comment"># 如果需要划分数据集的话</span></div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> train_only <span class="keyword">and</span> self.root.is_cart:</div><div class="line">        <span class="comment"># 根据cv_rate将数据集随机分成训练集和交叉验证集</span></div><div class="line">        <span class="comment"># 实现的核心思想是利用下标来进行各种切分</span></div><div class="line">        _train_num = int(len(x) * (<span class="number">1</span>-cv_rate))</div><div class="line">        _indices = np.random.permutation(np.arange(len(x)))</div><div class="line">        _train_indices = _indices[:_train_num]</div><div class="line">        _test_indices = _indices[_train_num:]</div><div class="line">        <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            <span class="comment"># 注意对切分后的样本权重做归一化处理</span></div><div class="line">            _train_weights = sample_weight[_train_indices]</div><div class="line">            _test_weights = sample_weight[_test_indices]</div><div class="line">            _train_weights /= np.sum(_train_weights)</div><div class="line">            _test_weights /= np.sum(_test_weights)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _train_weights = _test_weights = <span class="keyword">None</span></div><div class="line">        x_train, y_train = x[_train_indices], y[_train_indices]</div><div class="line">        x_cv, y_cv = x[_test_indices], y[_test_indices]</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        x_train, y_train, _train_weights = x, y, sample_weight</div><div class="line">        x_cv = y_cv = _test_weights = <span class="keyword">None</span></div><div class="line">    self.feed_data(x_train)</div><div class="line">    <span class="comment"># 调用根节点的生成算法</span></div><div class="line">    self.root.fit(x_train, y_train, _train_weights, eps)</div><div class="line">    <span class="comment"># 调用对Node剪枝算法的封装</span></div><div class="line">    self.prune(x_cv, y_cv, _test_weights)</div></pre></td></tr></table></figure>
+<p>这里我们用到了<code>np.random.permutation</code>方法，它其实可以看成两行代码的缩写、亦即：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">_indices = np.random.permutation(np.arange(n))</div></pre></td></tr></table></figure>
+<p>从效果上来说等价于</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">_indices = np.arange(n)</div><div class="line">np.random.shuffle(_indices)</div></pre></td></tr></table></figure>
+<p>不过前者不仅写起来更便利、而且运行速度也要稍微快一点，是故我们选择了前一种方法来进行实现</p>
+<p>除了<code>fit</code>这个函数以外，回忆 Node 中生成算法的实现过程、可知彼时我们调用了 Tree 的<code>reduce_nodes</code>方法来将被剪掉的 Node 从<code>nodes</code>中除去。该方法的实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">reduce_nodes</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(self.nodes)<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>):</div><div class="line">        <span class="keyword">if</span> self.nodes[i].pruned:</div><div class="line">            self.nodes.pop(i)</div></pre></td></tr></table></figure>
+<p><strong><em>注意：虽然该实现相当简单直观、不过其中却蕴含了一个具有普适意义的编程思想：如果要在遍历列表的同时进行当前列表元素的删除操作、就一定要从后往前遍历</em></strong></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Tree.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
+&lt;p&gt;由前文的诸多讨论可知，Tree 结构需要做到如下几点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;定义好需要在各个 Node 上调用的“全局变量”&lt;/li&gt;
+&lt;li&gt;做好数据预处理的工作、保证传给 Node 的数据是合乎要求的&lt;/li&gt;
+&lt;li&gt;对各个 Node 进行合适的封装，做到：&lt;ul&gt;
+&lt;li&gt;生成决策树时能够正确地调用它们的生成算法&lt;/li&gt;
+&lt;li&gt;进行后剪枝时能够正确地调用它们的局部剪枝函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;定义预测函数和评估函数以供用户调用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;既然 Node 我们可以抽象出一个基类&lt;code&gt;CvDNode&lt;/code&gt;，我们自然也能相应地对 Tree 结构抽象出一个基类&lt;code&gt;CvDBase&lt;/code&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>节点结构的实现</title>
+    <link href="http://www.carefree0910.com/posts/41abb98b/"/>
+    <id>http://www.carefree0910.com/posts/41abb98b/</id>
+    <published>2017-04-22T14:17:38.000Z</published>
+    <updated>2017-04-23T00:45:19.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Node.py" target="_blank" rel="external">这里</a>）</p>
+<p>在实现完计算各种信息量的函数之后，我们就可以着手实现决策树本身了。由前文的讨论可知、组成决策树主体的是一个个的 Node，所以我们接下来首先要实现的就是 Node 这个结构。而且由于我们所关心的 ID3、C4.5 和 CART 分类树的 Node 在大多数情况下表现一致、只有少数几个地方有所不同，因此我们可以写一个统一的 Node 结构的基类<code>CvDNode</code>来囊括我们所有关心的决策树生成算法，该基类需要实现如下功能：</p>
+<ul>
+<li>根据离散型特征划分数据（ID3、C4.5、CART）</li>
+<li>根据连续型特征划分数据（C4.5、CART）</li>
+<li>根据当前的数据判定所属的类别</li>
+</ul>
+<p>虽然说起来显得轻巧，但这之中的抽象还是比较繁琐的</p>
+<a id="more"></a>
+<p>我们先看看这个基类的基本框架该如何搭建：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="comment"># 导入之前定义的Cluster类以计算各种信息量</span></div><div class="line"><span class="keyword">from</span> c_Tree.Cluster <span class="keyword">import</span> Cluster</div><div class="line"></div><div class="line"><span class="comment"># 定义一个足够抽象的基类以囊括所有我们关心的算法</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CvDNode</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._x, self._y：记录数据集的变量</div><div class="line">        self.base, self.chaos：记录对数的底和当前的不确定性</div><div class="line">        self.criterion, self.category：记录该Node计算信息增益的方法和所属的类别</div><div class="line">        self.left_child, self.right_child：针对连续型特征和CART、记录该Node的左右子节点</div><div class="line">        self._children, self.leafs：记录该Node的所有子节点和所有下属的叶节点</div><div class="line">        self.sample_weight：记录样本权重</div><div class="line">        self.wc：记录着各个维度的特征是否连续的列表（whether continuous的缩写）</div><div class="line">        self.tree：记录着该Node所属的Tree</div><div class="line">        self.feature_dim, self.tar, self.feats：记录该Node划分标准的相关信息。具体而言：</div><div class="line">            self.feature_dim：记录着作为划分标准的特征所对应的维度</div><div class="line">            self.tar：针对连续型特征和CART、记录二分标准</div><div class="line">            self.feats：记录该Node能进行选择的、作为划分标准的特征的维度</div><div class="line">        self.parent, self.is_root：记录该Node的父节点以及该Node是否为根节点</div><div class="line">        self._depth, self.prev_feat：记录Node的深度和其父节点的划分标准</div><div class="line">        self.is_cart：记录该Node是否使用了CART算法</div><div class="line">        self.is_continuous：记录该Node选择的划分标准对应的特征是否连续</div><div class="line">        self.pruned：记录该Node是否已被剪掉，后面实现局部剪枝算法时会用到</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, tree=None, base=<span class="number">2</span>, chaos=None,</span></span></div><div class="line">               depth=<span class="number">0</span>, parent=None, is_root=True, prev_feat=<span class="string">"Root"</span>):</div><div class="line">        self._x = self._y = <span class="keyword">None</span></div><div class="line">        self.base, self.chaos = base, chaos</div><div class="line">        self.criterion = self.category = <span class="keyword">None</span></div><div class="line">        self.left_child = self.right_child = <span class="keyword">None</span></div><div class="line">        self._children, self.leafs = &#123;&#125;, &#123;&#125;</div><div class="line">        self.sample_weight = <span class="keyword">None</span></div><div class="line">        self.wc = <span class="keyword">None</span></div><div class="line">        self.tree = tree</div><div class="line">        <span class="comment"># 如果传入了Tree的话就进行相应的初始化</span></div><div class="line">        <span class="keyword">if</span> tree <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            <span class="comment"># 由于数据预处理是由Tree完成的</span></div><div class="line">            <span class="comment"># 所以各个维度的特征是否是连续型随机变量也是由Tree记录的</span></div><div class="line">            self.wc = tree.whether_continuous</div><div class="line">            <span class="comment"># 这里的nodes变量是Tree中记录所有Node的列表</span></div><div class="line">            tree.nodes.append(self)</div><div class="line">        self.feature_dim, self.tar, self.feats = <span class="keyword">None</span>, <span class="keyword">None</span>, []</div><div class="line">        self.parent, self.is_root = parent, is_root</div><div class="line">        self._depth, self.prev_feat = depth, prev_feat</div><div class="line">        self.is_cart = self.is_continuous = self.pruned = <span class="keyword">False</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, item)</span>:</span></div><div class="line">        <span class="keyword">if</span> isinstance(item, str):</div><div class="line">            <span class="keyword">return</span> getattr(self, <span class="string">"_"</span> + item)</div><div class="line"></div><div class="line">    <span class="comment"># 重载 __lt__ 方法，使得Node之间可以比较谁更小、进而方便调试和可视化</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span><span class="params">(self, other)</span>:</span></div><div class="line">        <span class="keyword">return</span> self.prev_feat &lt; other.prev_feat</div><div class="line">    </div><div class="line">    <span class="comment"># 重载 __str__ 和 __repr__ 方法，同样是为了方便调试和可视化</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> self.category <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            <span class="keyword">return</span> <span class="string">"CvDNode (&#123;&#125;) (&#123;&#125; -&gt; &#123;&#125;)"</span>.format(</div><div class="line">                self._depth, self.prev_feat, self.feature_dim)</div><div class="line">        <span class="keyword">return</span> <span class="string">"CvDNode (&#123;&#125;) (&#123;&#125; -&gt; class: &#123;&#125;)"</span>.format(</div><div class="line">            self._depth, self.prev_feat, self.tree.label_dic[self.category])</div><div class="line">    __repr__ = __str__</div></pre></td></tr></table></figure>
+<p>可以看到，除了重载 <strong>getitem</strong> 方法以外、我们还重载 <strong>lt</strong>、<strong>str</strong> 和 <strong>repr</strong> 方法。这是因为决策树模型的结构比起朴素贝叶斯模型而言要复杂一些，为了开发过程中的调试和最后的可视化更加便利、通常来说最好让我们模型的表现更贴近内置类型的表现</p>
+<p>然后我们需要定义几个 property 以使开发过程变得便利：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义children属性，主要是区分开连续+CART的情况和其余情况</span></div><div class="line"><span class="comment"># 有了该属性后，想要获得所有子节点时就不用分情况讨论了</span></div><div class="line"><span class="meta">@property</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">children</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">return</span> &#123;</div><div class="line">        <span class="string">"left"</span>: self.left_child, <span class="string">"right"</span>: self.right_child</div><div class="line">    &#125; <span class="keyword">if</span> (self.is_cart <span class="keyword">or</span> self.is_continuous) <span class="keyword">else</span> self._children</div><div class="line"></div><div class="line"><span class="comment"># 递归定义height（高度）属性：</span></div><div class="line"><span class="comment"># 叶节点高度都定义为1、其余节点的高度定义为最高的子节点的高度+1</span></div><div class="line"><span class="meta">@property</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">height</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">if</span> self.category <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">return</span> <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> <span class="number">1</span> + max([_child.height <span class="keyword">if</span> _child <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">else</span> <span class="number">0</span></div><div class="line">        <span class="keyword">for</span> _child <span class="keyword">in</span> self.children.values()])</div><div class="line"></div><div class="line"><span class="comment"># 定义info_dic（信息字典）属性，它记录了该Node的主要信息</span></div><div class="line"><span class="comment"># 在更新各个Node的叶节点时，被记录进各个self.leafs属性的就是该字典</span></div><div class="line"><span class="meta">@property</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">info_dic</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">return</span> &#123;<span class="string">"chaos"</span>: self.chaos, <span class="string">"y"</span>: self._y&#125;</div></pre></td></tr></table></figure>
+<p>以上就是<code>CvDNode</code>的基本框架，接下来就可以在这个框架的基础上实现决策树的各种生成算法了。首先需要指出的是，由于 Node 结构是会被 Tree 结构封装的、所以我们应该将数据预处理操作交给 Tree 来做。其次，由于我们实现的是抽象程度比较高的基类，所以我们要做比较完备的分情况讨论</p>
+<p><strong><em>注意：把 ID3、C4.5 和 CART 这三种算法分开实现是可行且高效的、此时各个部分的代码都会显得更加简洁可读一些；但这样做的话，整体的代码量就会不可避免地骤增。具体应当选择何种实现方案需要看具体的需求</em></strong></p>
+<p>我们先来看看实现生成算法所需要做的一些准备工作，比如定义停止继续生成的准则、定义停止后该 Node 的行为等</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义第一种停止准则：当特征维度为0或当前Node的数据的不确定性小于阈值时停止</span></div><div class="line"><span class="comment"># 同时，如果用户指定了决策树的最大深度，那么当该Node的深度太深时也停止</span></div><div class="line"><span class="comment"># 若满足了停止条件，该函数会返回True、否则会返回False</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">stop1</span><span class="params">(self, eps)</span>:</span></div><div class="line">    <span class="keyword">if</span> (</div><div class="line">        self._x.shape[<span class="number">1</span>] == <span class="number">0</span> <span class="keyword">or</span> (self.chaos <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> self.chaos &lt;= eps)</div><div class="line">        <span class="keyword">or</span> (self.tree.max_depth <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> self._depth &gt;= self.tree.max_depth)</div><div class="line">    ):</div><div class="line">        <span class="comment"># 调用处理停止情况的方法</span></div><div class="line">        self._handle_terminate()</div><div class="line">        <span class="keyword">return</span> <span class="keyword">True</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">False</span></div><div class="line"></div><div class="line"><span class="comment"># 定义第二种停止准则，当最大信息增益仍然小于阈值时停止</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">stop2</span><span class="params">(self, max_gain, eps)</span>:</span></div><div class="line">    <span class="keyword">if</span> max_gain &lt;= eps:</div><div class="line">        self._handle_terminate()</div><div class="line">        <span class="keyword">return</span> <span class="keyword">True</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">False</span></div><div class="line"></div><div class="line"><span class="comment"># 利用bincount方法定义根据数据生成该Node所属类别的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_category</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">return</span> np.argmax(np.bincount(self._y))</div><div class="line"></div><div class="line"><span class="comment"># 定义处理停止情况的方法，核心思想就是把该Node转化为一个叶节点</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_handle_terminate</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="comment"># 首先要生成该Node所属的类别</span></div><div class="line">    self.category = self.get_category()</div><div class="line">    <span class="comment"># 然后一路回溯、更新父节点、父节点的父节点、……等等记录叶节点的属性leafs</span></div><div class="line">    _parent = self.parent</div><div class="line">    <span class="keyword">while</span> _parent <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        _parent.leafs[id(self)] = self.info_dic</div><div class="line">        _parent = _parent.parent</div></pre></td></tr></table></figure>
+<p>接下来就要实现生成算法的核心了，我们可以将它分成三步以使逻辑清晰：</p>
+<ul>
+<li>定义一个方法使其能将一个有子节点的 Node 转化为叶节点（局部剪枝）</li>
+<li>定义一个方法使其能挑选出最好的划分标准</li>
+<li>定义一个方法使其能根据划分标准进行生成</li>
+</ul>
+<p>我们先来看看如何进行局部剪枝：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">prune</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="comment"># 调用相应方法进行计算该Node所属类别</span></div><div class="line">    self.category = self.get_category()</div><div class="line">    <span class="comment"># 记录由于该Node转化为叶节点而被剪去的、下属的叶节点</span></div><div class="line">    _pop_lst = [key <span class="keyword">for</span> key <span class="keyword">in</span> self.leafs]</div><div class="line">    <span class="comment"># 然后一路回溯、更新各个parent的属性leafs（使用id作为key以避免重复）</span></div><div class="line">    _parent = self.parent</div><div class="line">    <span class="keyword">while</span> _parent <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">for</span> _k <span class="keyword">in</span> _pop_lst:</div><div class="line">            <span class="comment"># 删去由于局部剪枝而被剪掉的叶节点</span></div><div class="line">            _parent.leafs.pop(_k)</div><div class="line">        _parent.leafs[id(self)] = self.info_dic</div><div class="line">        _parent = _parent.parent</div><div class="line">    <span class="comment"># 调用mark_pruned方法将自己所有子节点、子节点的子节点……</span></div><div class="line">    <span class="comment"># 的pruned属性置为True，因为它们都被“剪掉”了</span></div><div class="line">    self.mark_pruned()</div><div class="line">    <span class="comment"># 重置各个属性</span></div><div class="line">    self.feature_dim = <span class="keyword">None</span></div><div class="line">    self.left_child = self.right_child = <span class="keyword">None</span></div><div class="line">    self._children = &#123;&#125;</div><div class="line">    self.leafs = &#123;&#125;</div></pre></td></tr></table></figure>
+<p>第 16 行的 mark_pruned 方法用于给各个被局部剪枝剪掉的 Node 打上一个标记、从而今后 Tree 可以根据这些标记将被剪掉的 Node 从它记录所有 Node 的列表<code>nodes</code>中删去。该方法同样是通过递归实现的，代码十分简洁：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">mark_pruned</span><span class="params">(self)</span>:</span></div><div class="line">    self.pruned = <span class="keyword">True</span></div><div class="line">    <span class="comment"># 遍历各个子节点</span></div><div class="line">    <span class="keyword">for</span> _child <span class="keyword">in</span> self.children.values():</div><div class="line">        <span class="comment"># 如果当前的子节点不是None的话、递归调用mark_pruned方法</span></div><div class="line">        <span class="comment">#（连续型特征和CART算法有可能导致children中出现None，</span></div><div class="line">        <span class="comment"># 因为此时children由left_child和right_child组成，它们有可能是None）</span></div><div class="line">        <span class="keyword">if</span> _child <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            _child.mark_pruned()</div></pre></td></tr></table></figure>
+<p>有了能够进行局部剪枝的方法后，我们就能实现拿来挑选最佳划分标准的方法了。开发时需要时刻注意分清楚二分（连续 / CART）和多分（其它）的情况</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, sample_weight, eps=<span class="number">1e-8</span>)</span>:</span></div><div class="line">    self._x, self._y = np.atleast_2d(x), np.array(y)</div><div class="line">    self.sample_weight = sample_weight</div><div class="line">    <span class="comment"># 若满足第一种停止准则、则退出函数体</span></div><div class="line">    <span class="keyword">if</span> self.stop1(eps):</div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="comment"># 用该Node的数据实例化Cluster类以计算各种信息量</span></div><div class="line">    _cluster = Cluster(self._x, self._y, sample_weight, self.base)</div><div class="line">    <span class="comment"># 对于根节点、我们需要额外算一下其数据的不确定性</span></div><div class="line">    <span class="keyword">if</span> self.is_root:</div><div class="line">        <span class="keyword">if</span> self.criterion == <span class="string">"gini"</span>:</div><div class="line">            self.chaos = _cluster.gini()</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self.chaos = _cluster.ent()</div><div class="line">    _max_gain, _chaos_lst = <span class="number">0</span>, []</div><div class="line">    _max_feature = _max_tar = <span class="keyword">None</span></div><div class="line">    <span class="comment"># 遍历还能选择的特征</span></div><div class="line">    <span class="keyword">for</span> feat <span class="keyword">in</span> self.feats:</div><div class="line">        <span class="comment"># 如果是连续型特征或是CART算法，需要额外计算二分标准的取值集合</span></div><div class="line">        <span class="keyword">if</span> self.wc[feat]:</div><div class="line">            _samples = np.sort(self._x.T[feat])</div><div class="line">            _set = (_samples[:<span class="number">-1</span>] + _samples[<span class="number">1</span>:]) * <span class="number">0.5</span></div><div class="line">        <span class="keyword">elif</span> self.is_cart:</div><div class="line">            _set = self.tree.feature_sets[feat]</div><div class="line">        <span class="comment"># 然后遍历这些二分标准并调用二类问题相关的、计算信息量的方法</span></div><div class="line">        <span class="keyword">if</span> self.is_cart <span class="keyword">or</span> self.wc[feat]:</div><div class="line">            <span class="keyword">for</span> tar <span class="keyword">in</span> _set:</div><div class="line">                _tmp_gain, _tmp_chaos_lst = _cluster.bin_info_gain(</div><div class="line">                    feat, tar, criterion=self.criterion,</div><div class="line">                    get_chaos_lst=<span class="keyword">True</span>, continuous=self.wc[feat])</div><div class="line">                <span class="keyword">if</span> _tmp_gain &gt; _max_gain:</div><div class="line">                    (_max_gain, _chaos_lst), _max_feature, _max_tar = (</div><div class="line">                        _tmp_gain, _tmp_chaos_lst), feat, tar</div><div class="line">        <span class="comment"># 对于离散型特征的ID3和C4.5算法，调用普通的计算信息量的方法</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _tmp_gain, _tmp_chaos_lst = _cluster.info_gain(</div><div class="line">                feat, self.criterion, <span class="keyword">True</span>, self.tree.feature_sets[feat])</div><div class="line">            <span class="keyword">if</span> _tmp_gain &gt; _max_gain:</div><div class="line">                (_max_gain, _chaos_lst), _max_feature = (</div><div class="line">                    _tmp_gain, _tmp_chaos_lst), feat</div><div class="line">    <span class="comment"># 若满足第二种停止准则、则退出函数体</span></div><div class="line">    <span class="keyword">if</span> self.stop2(_max_gain, eps):</div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="comment"># 更新相关的属性</span></div><div class="line">    self.feature_dim = _max_feature</div><div class="line">    <span class="keyword">if</span> self.is_cart <span class="keyword">or</span> self.wc[_max_feature]:</div><div class="line">        self.tar = _max_tar</div><div class="line">        <span class="comment"># 调用根据划分标准进行生成的方法</span></div><div class="line">        self._gen_children(_chaos_lst)</div><div class="line">        <span class="comment"># 如果该Node的左子节点和右子节点都是叶节点且所属类别一样</span></div><div class="line">        <span class="comment"># 那么就将它们合并、亦即进行局部剪枝</span></div><div class="line">        <span class="keyword">if</span> (self.left_child.category <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span></div><div class="line">                self.left_child.category == self.right_child.category):</div><div class="line">            self.prune()</div><div class="line">            <span class="comment"># 调用Tree的相关方法，将被剪掉的、该Node的左右子节点</span></div><div class="line">            <span class="comment"># 从Tree的记录所有Node的列表nodes中除去</span></div><div class="line">            self.tree.reduce_nodes()</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="comment"># 调用根据划分标准进行生成的方法</span></div><div class="line">        self._gen_children(_chaos_lst)</div></pre></td></tr></table></figure>
+<p>根据划分标准进行生成的方法相当冗长、因为需要进行相当多的分情况讨论。它的实现用到了递归的思想，真正写起来就会发现其实并不困难、只不过会有些繁琐。囿于篇幅、我们略去它的实现细节，其算法描述则如下：</p>
+<ul>
+<li>根据划分标准将数据划分成若干份</li>
+<li>依次用这若干份数据实例化新 Node（新 Node 即是当前 Node 的子节点），同时将当前 Node 的相关信息传给新 Node。这里需要注意的是，如果划分标准是离散型特征的话：<ul>
+<li>若算法是 ID3 或 C4.5，需将该特征对应的维度从新 Node 的<code>self.feats</code>属性中除去</li>
+<li>若算法是 CART，需要将二分标准从新 Node 的二分标准取值集合中除去</li>
+</ul>
+</li>
+<li>最后对新 Node 调用<code>fit</code>方法、完成递归</li>
+</ul>
+<p>我个人实现的版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Node.py#L171" target="_blank" rel="external">这里</a></p>
+<p>以上我们就实现了 Node 结构并在其上实现了决策树的生成算法，接下来我们要做的就是实现 Tree 结构来将各个 Node 封装起来</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Node.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
+&lt;p&gt;在实现完计算各种信息量的函数之后，我们就可以着手实现决策树本身了。由前文的讨论可知、组成决策树主体的是一个个的 Node，所以我们接下来首先要实现的就是 Node 这个结构。而且由于我们所关心的 ID3、C4.5 和 CART 分类树的 Node 在大多数情况下表现一致、只有少数几个地方有所不同，因此我们可以写一个统一的 Node 结构的基类&lt;code&gt;CvDNode&lt;/code&gt;来囊括我们所有关心的决策树生成算法，该基类需要实现如下功能：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;根据离散型特征划分数据（ID3、C4.5、CART）&lt;/li&gt;
+&lt;li&gt;根据连续型特征划分数据（C4.5、CART）&lt;/li&gt;
+&lt;li&gt;根据当前的数据判定所属的类别&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;虽然说起来显得轻巧，但这之中的抽象还是比较繁琐的&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>信息量计算的实现</title>
+    <link href="http://www.carefree0910.com/posts/e0705aab/"/>
+    <id>http://www.carefree0910.com/posts/e0705aab/</id>
+    <published>2017-04-22T14:07:57.000Z</published>
+    <updated>2017-04-22T14:20:24.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Cluster.py" target="_blank" rel="external">这里</a>）</p>
+<p>由于决策树的生成算法中会用到各种定义下的信息量的计算，所以我们应该先把这些计算信息量相关的算法实现出来。注意到这些算法同样是在不断地进行计数工作，所以我们同样需要尽量尝试利用好上一章讲述过的 bincount 方法。由于我们是在决策树模型中调用这些算法的，所以数据预处理应该交由决策树来做、这里就只需要专注于算法本身。值得一提的是，这一套算法不仅能够应用在决策树中，在遇到任何其它需要计算信息量的场合时都能够进行应用</p>
+<a id="more"></a>
+<p>首先实现其基本结构：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> math</div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cluster</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._x, self._y：记录数据集的变量</div><div class="line">        self._counters：类别向量的计数器，记录第i类数据的个数</div><div class="line">            self._sample_weight：记录样本权重的属性</div><div class="line">        self._con_chaos_cache, self._ent_cache, self._gini_cache：记录中间结果的属性</div><div class="line">            self._base：记录对数的底的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, x, y, sample_weight=None, base=<span class="number">2</span>)</span>:</span></div><div class="line">        <span class="comment"># 这里我们要求输入的是Numpy向量（矩阵）</span></div><div class="line">        self._x, self._y = x.T, y</div><div class="line">        <span class="comment"># 利用样本权重对类别向量y进行计数</span></div><div class="line">        <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            self._counters = np.bincount(self._y)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self._counters = np.bincount(self._y,</div><div class="line">                weights=sample_weight*len(sample_weight))</div><div class="line">        self._sample_weight = sample_weight</div><div class="line">        self._con_chaos_cache = self._ent_cache = self._gini_cache = <span class="keyword">None</span></div><div class="line">        self._base = base</div></pre></td></tr></table></figure>
+<p>接下来就需要定义计算不确定性的两个函数。由于一个 Cluster 只接受一份数据，所以其实总的不确定性只用计算一次：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义计算信息熵的函数</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">ent</span><span class="params">(self, ent=None, eps=<span class="number">1e-12</span>)</span>:</span></div><div class="line">    <span class="comment"># 如果已经计算过且调用时没有额外给各类别样本的个数、就直接调用结果</span></div><div class="line">    <span class="keyword">if</span> self._ent_cache <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> ent <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">return</span> self._ent_cache</div><div class="line">    _len = len(self._y)</div><div class="line">    <span class="comment"># 如果调用时没有给各类别样本的个数，就利用结构本身的计数器来获取相应个数</span></div><div class="line">    <span class="keyword">if</span> ent <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        ent = self._counters</div><div class="line">    <span class="comment"># 使用eps来让算法的数值稳定性更好</span></div><div class="line">    _ent_cache = max(eps, -sum(</div><div class="line">        [_c / _len * math.log(_c / _len, self._base) <span class="keyword">if</span> _c != <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span> <span class="keyword">for</span> _c <span class="keyword">in</span> ent]))</div><div class="line">    <span class="comment"># 如果调用时没有给各类别样本的个数、就将计算好的信息熵储存下来</span></div><div class="line">    <span class="keyword">if</span> ent <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        self._ent_cache = _ent_cache</div><div class="line">    <span class="keyword">return</span> _ent_cache</div><div class="line"></div><div class="line"><span class="comment"># 定义计算基尼系数的函数，和计算信息熵的函数很类似、所以略去注释</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">gini</span><span class="params">(self, p=None)</span>:</span></div><div class="line">    <span class="keyword">if</span> self._gini_cache <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> p <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">return</span> self._gini_cache</div><div class="line">    <span class="keyword">if</span> p <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        p = self._counters</div><div class="line">    _gini_cache = <span class="number">1</span> - np.sum((p / len(self._y)) ** <span class="number">2</span>)</div><div class="line">    <span class="keyword">if</span> p <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        self._gini_cache = _gini_cache</div><div class="line">    <span class="keyword">return</span> _gini_cache</div></pre></td></tr></table></figure>
+<p>然后就需要定义计算<script type="math/tex">H(y|A)</script>和<script type="math/tex">\text{Gini}(y|A)</script>的函数。从算法公式可以看出它们具有形式一致性，所以我们可以把它们的实现整合在一起：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义计算和的函数</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">con_chaos</span><span class="params">(self, idx, criterion=<span class="string">"ent"</span>, features=None)</span>:</span></div><div class="line">    <span class="comment"># 根据不同的准则、调用不同的方法</span></div><div class="line">    <span class="keyword">if</span> criterion == <span class="string">"ent"</span>:</div><div class="line">        _method = <span class="keyword">lambda</span> cluster: cluster.ent()</div><div class="line">    <span class="keyword">elif</span> criterion == <span class="string">"gini"</span>:</div><div class="line">        _method = <span class="keyword">lambda</span> cluster: cluster.gini()</div><div class="line">    <span class="comment"># 根据输入获取相应维度的向量</span></div><div class="line">    data = self._x[idx]</div><div class="line">    <span class="comment"># 如果调用时没有给该维度的取值空间features、就调用set方法获得该取值空间</span></div><div class="line">    <span class="comment"># 由于调用set方法比较耗时，在决策树实现时应努力将features传入</span></div><div class="line">    <span class="keyword">if</span> features <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        features = set(data)</div><div class="line">    <span class="comment"># 获得该维度特征各取值所对应的数据的下标</span></div><div class="line">    <span class="comment"># 用self._con_chaos_cache记录下相应结果以加速后面定义的相关函数</span></div><div class="line">    tmp_labels = [data == feature <span class="keyword">for</span> feature <span class="keyword">in</span> features]</div><div class="line">    self._con_chaos_cache = [np.sum(_label) <span class="keyword">for</span> _label <span class="keyword">in</span> tmp_labels]</div><div class="line">    <span class="comment"># 利用下标获取相应的类别向量</span></div><div class="line">    label_lst = [self._y[label] <span class="keyword">for</span> label <span class="keyword">in</span> tmp_labels]</div><div class="line">    rs, chaos_lst = <span class="number">0</span>, []</div><div class="line">    <span class="comment"># 遍历各下标和对应的类别向量</span></div><div class="line">    <span class="keyword">for</span> data_label, tar_label <span class="keyword">in</span> zip(tmp_labels, label_lst):</div><div class="line">        <span class="comment"># 获取相应的数据</span></div><div class="line">        tmp_data = self._x.T[data_label]</div><div class="line">        <span class="comment"># 根据相应数据、类别向量和样本权重计算出不确定性</span></div><div class="line">        <span class="keyword">if</span> self._sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            _chaos = _method(Cluster(tmp_data, tar_label, base=self._base))</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _new_weights = self._sample_weight[data_label]</div><div class="line">            _chaos = _method(Cluster(tmp_data, tar_label, _new_weights / np.sum(</div><div class="line">                _new_weights), base=self._base))</div><div class="line">        <span class="comment"># 依概率加权，同时把各个初始条件不确定性记录下来</span></div><div class="line">        rs += len(tmp_data) / len(data) * _chaos</div><div class="line">        chaos_lst.append(_chaos)</div><div class="line">    <span class="keyword">return</span> rs, chaos_lst</div></pre></td></tr></table></figure>
+<p><strong><em>注意：如果仅仅是为了获得总的条件不确定性、是不用将划分后数据的各个部分的条件不确定记录下来的；之所以我们把它记录下来、是因为在决策树生成的过程里会用到这个中间变量。我们会在后面讲解决策树结构时进行相应的说明</em></strong></p>
+<p>最后需要定义计算信息增益的函数。我们将会实现涉及过的三种定义方法，而且由于它们同样具有形式一致性、所以它们的实现同样可以整合在一起：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义计算信息增益的函数，参数get_chaos_lst用于控制输出</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">info_gain</span><span class="params">(self, idx, criterion=<span class="string">"ent"</span>, get_chaos_lst=False, features=None)</span>:</span></div><div class="line">    <span class="comment"># 根据不同的准则、获取相应的“条件不确定性”</span></div><div class="line">    <span class="keyword">if</span> criterion <span class="keyword">in</span> (<span class="string">"ent"</span>, <span class="string">"ratio"</span>):</div><div class="line">        _con_chaos, _chaos_lst = self.con_chaos(idx, <span class="string">"ent"</span>, features)</div><div class="line">        _gain = self.ent() - _con_chaos</div><div class="line">        <span class="keyword">if</span> criterion == <span class="string">"ratio"</span>:</div><div class="line">            _gain /= self.ent(self._con_chaos_cache)</div><div class="line">    <span class="keyword">elif</span> criterion == <span class="string">"gini"</span>:</div><div class="line">        _con_chaos, _chaos_lst = self.con_chaos(idx, <span class="string">"gini"</span>, features)</div><div class="line">        _gain = self.gini() - _con_chaos</div><div class="line">    <span class="keyword">return</span> (_gain, _chaos_lst) <span class="keyword">if</span> get_chaos_lst <span class="keyword">else</span> _gain</div></pre></td></tr></table></figure>
+<p>考虑到二类问题的特殊性，我们需要定义专门处理二类问题的、计算信息增益相关的函数。它们大部分和以上定义的函数没有区别、代码也有大量重复，只是它会多传进一个代表二分标准的参数。为简洁，我们略去上文已经给出过的注释</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义计算二类问题条件不确定性的函数</span></div><div class="line"><span class="comment"># 参数tar即是二分标准，参数continuous则告诉我们该维度的特征是否连续</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">bin_con_chaos</span><span class="params">(self, idx, tar, criterion=<span class="string">"gini"</span>, continuous=False)</span>:</span></div><div class="line">    <span class="keyword">if</span> criterion == <span class="string">"ent"</span>:</div><div class="line">        _method = <span class="keyword">lambda</span> cluster: cluster.ent()</div><div class="line">    <span class="keyword">elif</span> criterion == <span class="string">"gini"</span>:</div><div class="line">        _method = <span class="keyword">lambda</span> cluster: cluster.gini()</div><div class="line">    data = self._x[idx]</div><div class="line">    <span class="comment"># 根据二分标准划分数据，注意要分离散和连续两种情况讨论</span></div><div class="line">    tar = data == tar <span class="keyword">if</span> <span class="keyword">not</span> continuous <span class="keyword">else</span> data &lt; tar</div><div class="line">    tmp_labels = [tar, ~tar]</div><div class="line">    self._con_chaos_cache = [np.sum(_label) <span class="keyword">for</span> _label <span class="keyword">in</span> tmp_labels]</div><div class="line">    label_lst = [self._y[label] <span class="keyword">for</span> label <span class="keyword">in</span> tmp_labels]</div><div class="line">    rs, chaos_lst = <span class="number">0</span>, []</div><div class="line">    <span class="keyword">for</span> data_label, tar_label <span class="keyword">in</span> zip(tmp_labels, label_lst):</div><div class="line">        tmp_data = self._x.T[data_label]</div><div class="line">        <span class="keyword">if</span> self._sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            _chaos = _method(Cluster(tmp_data, tar_label, base=self._base))</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _new_weights = self._sample_weight[data_label]</div><div class="line">            _chaos = _method(Cluster(tmp_data, tar_label, _new_weights / np.sum(</div><div class="line">                _new_weights), base=self._base))</div><div class="line">        rs += len(tmp_data) / len(data) * _chaos</div><div class="line">        chaos_lst.append(_chaos)</div><div class="line">    <span class="keyword">return</span> rs, chaos_lst</div></pre></td></tr></table></figure>
+<p>定义计算二类问题信息增益的函数时，只需将之前定义过的、计算信息增益的函数中计算条件不确定性的函数替换成计算二类问题条件不确定性的函数即可</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/c_CvDTree/Cluster.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
+&lt;p&gt;由于决策树的生成算法中会用到各种定义下的信息量的计算，所以我们应该先把这些计算信息量相关的算法实现出来。注意到这些算法同样是在不断地进行计数工作，所以我们同样需要尽量尝试利用好上一章讲述过的 bincount 方法。由于我们是在决策树模型中调用这些算法的，所以数据预处理应该交由决策树来做、这里就只需要专注于算法本身。值得一提的是，这一套算法不仅能够应用在决策树中，在遇到任何其它需要计算信息量的场合时都能够进行应用&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>决策树的生成算法</title>
+    <link href="http://www.carefree0910.com/posts/c6faa205/"/>
+    <id>http://www.carefree0910.com/posts/c6faa205/</id>
+    <published>2017-04-22T12:11:18.000Z</published>
+    <updated>2017-04-23T02:58:26.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>虽然我们之前已经用了许多文字来描述决策树、但可能还是显得过于抽象。为了能有直观的认知，在此援引维基百科上一张很好的图来进行说明：</p>
+<img src="/posts/c6faa205/p1.png" alt="p1.png" title="">
+<p>这张图基本蕴含了决策树中所有的关键结构，下面我们分开来分析它们</p>
+<a id="more"></a>
+<h1 id="决策树的相关术语"><a href="#决策树的相关术语" class="headerlink" title="决策树的相关术语"></a>决策树的相关术语</h1><p>首先是之前分析过的、“划分标准”这个概念。在上图中，被菱形橙色方框框起来的就是作为划分标准的特征，被长方形橙色方框框起来的就是对应特征的各个取值</p>
+<p>然后是“节点”（Node）的概念。如果读者有学过数据结构，那么想必在提起“树”（Tree）的同时会自然而然地联想到 Node。考虑到可能有读者没有学过相关知识，这里就简要说一些相关的定义。决策树，顾名思义，确实是一个 Tree 模型。在上图中，我们可以直观地把整张图想象成一棵 Tree、把被黑色边框框起来的部分理解为一个 Node，这些 Node 是 Tree 的组成部分、Tree 本身可以协助 Node 之间的数据传输和参数调用。最上方的 Node 酷似整棵树的根，我们一般称其为“根节点”（Root）；用黑色方框（亦即四个角是直角而不是圆弧）框起来的 Node 是整棵树“生长的终点”、酷似树的叶子，我们一般称其为“叶节点”（Leaf）。比如，第三排的所有 Node 都是叶节点</p>
+<p>通常来说，我们还会称一个非叶节点有一些“下属的叶节点”。比如，所有的叶节点都是根节点下属的叶节点，第三排左数第一、第二个叶节点是第二排左数第一个 Node 下属的叶节点</p>
+<p>决策树中的叶节点还有一个有趣的特性：每个叶节点都对应着原样本空间的一个子空间，这些叶节点对应的子空间彼此不会相交、且并起来的话就会恰好构成完整的样本空间。换句话说、决策树的行为可以概括为如下两步：</p>
+<ul>
+<li>将样本空间划分为若干个互不相交的子空间</li>
+<li>给每个子空间贴一个类别标签</li>
+</ul>
+<p>此外、我们在上图中还可以看到许多箭头，这些箭头代表着树的“生长方向”。我们一般习惯称箭头的起点是终点的“父节点”（parent）、终点是起点的“子节点”（child）；而当子节点只有两个时，通常把他们称作“左子节点”和“右子节点”。比如说，根节点是第二排所有 Node 的父节点，第二排所有 Node 都是根节点的子节点；第三排左数第一、第二个 Node 是第二排左数第一个 Node 的左、右子节点</p>
+<p>对决策树有一个直观认知后，我们关心的就是怎样去生成这么一个结构了</p>
+<h1 id="决策树的生成算法"><a href="#决策树的生成算法" class="headerlink" title="决策树的生成算法"></a>决策树的生成算法</h1><p>决策树的生成算法发展至今已经有许多变种，想要全面介绍它们不是短短一篇文章所能做到的。本文拟介绍其中三个上一节有所提及的、相对而言比较基本的算法：ID3、C4.5 和 CART。它们本身存在着某种递进关系：</p>
+<ul>
+<li>ID3 算法可说是“最朴素”的决策树算法，它给出了对离散型数据分类的解决方案</li>
+<li>C4.5 算法在其上进一步发展、给出了对混合型数据分类的解决方案</li>
+<li>CART 算法则更进一步、给出了对数据回归的解决方案</li>
+</ul>
+<p>虽说它们的功能越来越强大，但正如第一小节所言、它们的核心思想都是一致的：算法通过不断划分数据集来生成决策树，其中每一步的划分能够使当前的信息增益达到最大</p>
+<p>值得一提的是，该核心思想的背后其实也有着机器学习的一些普适性的思想。我们可以这样来看待决策树：模型的损失就是数据集的不确定性，模型的算法就是最小化该不确定性；同时，和许多其它模型一样，想要从整个参数空间中选出模型的最优参数是个 NP 完全问题，所以我们（和许多其它算法一样）采用启发式的方法、近似求解这个最优化问题。具体而言，我们每次会选取一个局部最优解（每次选取一个特征对数据集进行划分使得信息增益最大化）、并把这些局部解合成最终解（合成一个划分规则的序列）</p>
+<p>可以这样直观地去想一个决策树的生成过程：</p>
+<ul>
+<li>向根节点输入数据</li>
+<li>根据信息增益的度量、选择数据的某个特征来把数据划分成（互不相交的）好几份并分别喂给一个新 Node</li>
+<li>如果分完数据后发现：<ul>
+<li>某份数据的不确定较小、亦即其中某一类别的样本已经占了大多数，此时就不再对这份数据继续进行划分、将对应的 Node 转化为叶节点</li>
+<li>某份数据的不确定性仍然较大，那么这份数据就要继续分割下去（转第 2 步）</li>
+</ul>
+</li>
+</ul>
+<p><strong><em>注意：虽然划分的规则是根据数据定出的，但是划分本身其实是针对整个输入空间进行划分的</em></strong></p>
+<p>从上述过程可知，决策树的生成过程就是根据某个度量从数据集中训练出一系列的划分规则、使得这些规则能够在数据集有好的表现。事实上，上文说的3种不同算法在分类问题上的区别亦仅表现在度量信息增益和划分数据的方法的不同上</p>
+<h2 id="ID3（Interactive-Dichotomizer-3）"><a href="#ID3（Interactive-Dichotomizer-3）" class="headerlink" title="ID3（Interactive Dichotomizer-3）"></a>ID3（Interactive Dichotomizer-3）</h2><p>ID3 可以译为“交互式二分法”，虽说这个名字里面带了个“二分”，但该方法完全适用于“多分”的情况。它选择互信息作为信息增益的度量、针对离散型数据进行划分。其算法叙述如下：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
+<li><strong>过程</strong>：<ol>
+<li>将数据集<script type="math/tex">D</script>喂给一个 Node</li>
+<li>若<script type="math/tex">D</script>中的所有样本同属于类别<script type="math/tex">c_{k}</script>，则该 Node 不再继续生成、并将其类别标记为<script type="math/tex">c_{k}</script>类</li>
+<li>若<script type="math/tex">x_{i}</script>已经是 0 维向量、亦即已没有可选特征，则将此时<script type="math/tex">D</script>中样本个数最多的类别<script type="math/tex">c_{k}</script>作为该 Node 的类别</li>
+<li>否则，按照互信息定义的信息增益：  <script type="math/tex; mode=display">
+g\left( y,x^{\left( j \right)} \right) = H\left( y \right) - H(y|x^{\left( j \right)})</script>来计算第 j 维特征的信息增益，然后选择使得信息增益最大的特征<script type="math/tex">x^{\left( j^{*} \right)}</script>作为划分标准，亦即：  <script type="math/tex; mode=display">
+j^{*} = \arg{\max_{j}{g\left( y,x^{\left( j \right)} \right)}}</script></li>
+<li>若<script type="math/tex">x^{\left( j^{*} \right)}</script>满足停止条件、则不再继续生成并则将此时<script type="math/tex">D</script>中样本个数最多的类别<script type="math/tex">c_{k}</script>作为类别标记</li>
+<li>否则，依<script type="math/tex">x^{\left( j^{*} \right)}</script>的所有可能取值<script type="math/tex">\{ a_{1},\ldots,a_{m}\}</script>将数据集<script type="math/tex">D</script>划分为<script type="math/tex">{\{ D}_{1},\ldots,D_{m}\}</script>、使得：  <script type="math/tex; mode=display">
+{(x}_{i},y_{i}) \in D_{j} \Leftrightarrow x_{i}^{\left( j^{*} \right)} = a_{j},\forall i = 1,\ldots,N</script>同时，将<script type="math/tex">x_{1},\ldots,x_{N}</script>的第<script type="math/tex">j^{*}</script>维去掉、使它们成为<script type="math/tex">n - 1</script>维的特征向量</li>
+<li>对每个<script type="math/tex">D_{j}</script>从 2.1 开始调用算法</li>
+</ol>
+</li>
+<li><strong>输出</strong>：原始数据对应的 Node（亦即根节点）</li>
+</ol>
+<p>其中算法第 2.5 步的“停止条件”（也可称为“预剪枝”；有关剪枝的讨论会放在<a href="/posts/1a7aa546/" title="决策树的剪枝算法">决策树的剪枝算法</a>）有许多种提法，常用的是如下两种：</p>
+<ul>
+<li>若选择<script type="math/tex">x^{\left( j^{*} \right)}</script>作为特征时信息增益<script type="math/tex">g(y,x^{\left( j^{*} \right)})</script>仍然很小（通常会传入一个参数<script type="math/tex">\epsilon</script>作为阈值）、则停止</li>
+<li>事先把数据集分为训练集与测试集（交叉验证的思想），若由训练集得到的<script type="math/tex">x^{\left( j^{*} \right)}</script>并不能使得决策树在测试集上的错误率更小、则停止</li>
+</ul>
+<p>这两种停止条件的提法通用于 C4.5 和 CART，后文将不再赘述。同时，正如本章一开始有所提及的、决策树会在许多地方应用到递归的思想，上述算法中的第 2.6 步正是经典的递归</p>
+<p>我们可以对气球数据集 1.0 过一遍 ID3 算法以加深理解。由算法可知，因为每个 Node 的信息熵是确定的、所以选择互信息最大的特征等价于选择条件熵最小的特征，是故我们只需要在每个 Node 上计算各个可选特征的条件熵。易知在根节点上：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+H\left( 不爆炸\middle| 颜色\right) &= - p_{11}\log p_{11} - p_{12}\log p_{12} = 1 \\
+
+H\left( 不爆炸\middle| 大小\right) &= - p_{21}\log p_{21} - p_{22}\log p_{22} \approx 0.65 \\
+
+H\left( 不爆炸\middle| 人员\right) &= - p_{31}\log p_{31} - p_{32}\log p_{32} \approx 0.92 \\
+
+H\left( 不爆炸\middle| 动作\right) &= - p_{41}\log p_{41} - p_{42}\log p_{42} \approx 0.65
+\end{align}</script><p>其中</p>
+<script type="math/tex; mode=display">p_{11} \triangleq p\left( 不爆炸\middle| 黄色\right) = \frac{1}{2},\ \ p_{12} \triangleq p\left( 不爆炸\middle| 紫色\right) = \frac{1}{2}</script><script type="math/tex; mode=display">p_{21} \triangleq p\left( 不爆炸\middle| 小\right) = \frac{5}{6},\ \ p_{22} \triangleq p\left( 不爆炸\middle| 大\right) = \frac{1}{6}</script><script type="math/tex; mode=display">p_{31} \triangleq p\left( 不爆炸\middle| 成人\right) = \frac{1}{3},\ \ p_{32} \triangleq p\left( 不爆炸\middle| 小孩\right) = \frac{2}{3}</script><script type="math/tex; mode=display">p_{41} \triangleq p\left( 不爆炸\middle| 手打\right) = \frac{5}{6},\ \ p_{42} \triangleq p\left( 不爆炸\middle| 脚踩\right) = \frac{1}{6}</script><p>且易知</p>
+<script type="math/tex; mode=display">H\left( 不爆炸\middle| A \right) = H\left( 爆炸\middle| A \right),\ \ \forall A \in \{ 颜色, 大小, 人员, 动作\}</script><p>从而可知应选测试动作或者气球大小作为根节点的划分标准。不妨选择气球大小作为划分标准，此时的决策树如下图所示（图片是使用 ProcessOn 在线绘制而成的）：</p>
+<img src="/posts/c6faa205/p2.png" alt="p2.png" title="">
+<p>图中 Node A 和 Node B 所对应的数据集分别如下面两张表所示：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>测试人员</th>
+<th>测试动作</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>成人</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>测试人员</th>
+<th>测试动作</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用手打</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>注意此时气球大小已经不是可选特征了。我们接下来要分别对 Node A 和 Node B 调用 ID3 算法，计算过程和根节点上的计算过程大同小异。以此类推、最终我们可以得到如下图所示的决策树：</p>
+<img src="/posts/c6faa205/p3.png" alt="p3.png" title="">
+<p>可知该决策树在气球数据集 1.0 上的正确率为 100%、且它做的决策都很符合直观</p>
+<h2 id="C4-5"><a href="#C4-5" class="headerlink" title="C4.5"></a>C4.5</h2><p>C4.5 使用信息增益比作为信息增益的度量，从而缓解了 ID3 算法会倾向于选择 m 比较大的特征<script type="math/tex">A</script>作为划分依据这个问题；也正因如此，C4.5 算法可以处理 ID3 算法比较难处理的混合型数据。我们先来看看它在离散型数据上的算法（仅展示和 ID3 算法中不同的部分）：</p>
+<h3 id="算法-2-4-步"><a href="#算法-2-4-步" class="headerlink" title="算法 2.4 步"></a>算法 2.4 步</h3><p>否则，按照信息增益比定义的信息增益：</p>
+<script type="math/tex; mode=display">
+g_{R}\left( y,x^{\left( j \right)} \right) = \frac{g(y,x^{\left( j \right)})}{H_{x^{\left( j \right)}}(y)}</script><p>来计算第 j 维特征的信息增益，然后选择使得信息增益最大的特征<script type="math/tex">x^{\left( j^{*} \right)}</script>作为划分标准，亦即：</p>
+<script type="math/tex; mode=display">
+j^{*} = \arg{\max_{j}{g_{R}\left( y,x^{\left( j \right)} \right)}}</script><p><strong><em>注意：C4.5 算法虽然不会倾向于选择 m 比较大的特征、但有可能会倾向于选择 m 比较小的特征。针对这个问题，Quinlan 在 1993 年提出了这么一个启发式的方法：先选出互信息比平均互信息要高的特征、然后从这些特征中选出信息增益比最高的</em></strong></p>
+<p>混合型数据的处理方法大同小异，本书拟介绍一种常用且符合直观的、同时亦是 C4.5 所采用的方法：使用二类问题的解决方案处理连续型特征。具体而言，当二类问题和决策树结合起来时，在连续的情况下、我们通常可以把它转述为：</p>
+<script type="math/tex; mode=display">
+Y_{1} = \left\{ y:y^{A} < a_{1} \right\},Y_{2} = \{ y:y^{A} \geq a_{1}\}</script><p>相对应的，我们同样可以用处理二类问题的思想来处理离散型特征，此时：</p>
+<script type="math/tex; mode=display">
+A \in \left\{ a_{1},a_{2} \right\};\ \ Y_{1} = \left\{ y:y^{A} = a_{1} \right\},\ Y_{2} = \{ y:y^{A} = a_{2}\}</script><p>更进一步、我们通常会将它表示为：</p>
+<script type="math/tex; mode=display">
+Y_{1} = \left\{ y:y^{A} = a_{1} \right\},Y_{2} = \{ y:y^{A} \neq a_{1}\}</script><p>我们通常称以上各式中的<script type="math/tex">a_{1}</script>为“二分标准”。一般而言，如何处理连续型特征这个问题会归结于如何选择“二分标准”这个问题。一个比较容易想到的做法是：</p>
+<ul>
+<li>若在当前数据集中有 m 个取值，不妨假设它们为<script type="math/tex">u_1,...,u_m</script>；不失一般性、再不妨假设它们满足<script type="math/tex">u_1<...<u_m</script>（若不然，进行一次排序操作即可），那么依次选择<script type="math/tex">v_1,...,v_p</script>作为二分标准并决出最好的一个，其中<script type="math/tex">v_1,...,v_p</script>构成等差数列、且:  <script type="math/tex; mode=display">
+v_{1} = u_{1},v_{p} = u_{m}</script>p 的选取则视情况而定，一般而言会取 p 反比于“深度”。这意味着当数据越分越细时、对特征的划分会越分越粗，从直观上来说这有益于防止过拟合</li>
+</ul>
+<p>但这样可能会产生许多“冗余”的二分标准。试想如果这些取值满足：</p>
+<script type="math/tex; mode=display">
+u_{1} = 0,u_{2} = 100,u_{3} = 101,u_{4} = 102,\ldots</script><p>那么我们就会在<script type="math/tex">u_{1}</script>和<script type="math/tex">u_{2}</script>之间尝试大量的划分标准、但显然这些划分标准算出来的结果都是一样的。为了处理类似于这种不合理的情况，C4.5 采用如下做法：</p>
+<ul>
+<li>依次选择<script type="math/tex">v_{1} = \frac{u_{1} + u_{2}}{2},\ldots,v_{m - 1} = \frac{u_{m - 1} + u_{m}}{2}</script>作为二分标准、计算它们的信息增益比、从而决出最好的二分标准来划分数据</li>
+</ul>
+<p>在这之上还有另一种可行的做法：</p>
+<ul>
+<li>设<script type="math/tex">u_1,...,u_m</script>所对应的类别是<script type="math/tex">y_1,...,y_m</script>，那么在<script type="math/tex">v_1,...,v_{m-1}</script>中只选取使得：  <script type="math/tex; mode=display">
+y_{i} \neq y_{i + 1},\ \ (i = 1,\ldots,m - 1)</script>的<script type="math/tex">v_i</script>作为二分标准、计算它们的信息增益比、从而决出最好的二分标准来划分数据</li>
+</ul>
+<p>这种做法在某些情况下会表现得更好、但在某些情况下也会显得不合理。鉴于此，本书会采用更稳定的上一种做法来进行实现</p>
+<p><strong><em>注意：从以上讨论可知，我们完全可以把 ID3 算法推广成可以处理连续型特征的算法。只不过如果数据集是混合型数据集的话、ID3 就会倾向于选择离散型特征作为划分标准而已。如果数据集的所有特征都是连续型特征、那么 ID3 和 C4.5 之间孰优孰劣是难有定论的</em></strong></p>
+<p>这里需要特别指出的是、C4.5 也是有一个比较糟糕的性质的：由信息增益比的定义可知，如果是二分的话、它会倾向于把数据集分成很不均匀的两份；因为此时<script type="math/tex">H_{A}(y)</script>将非常小、导致<script type="math/tex">g_{R}(y,A)</script>很大（即使<script type="math/tex">g(y,A)</script>比较小）。举个例子：如果当前划分标准为连续特征、那么 C4.5 可能会倾向于直接选择<script type="math/tex">v_{1},v_{2},v_{3}</script>等作为二分标准</p>
+<p>之所以说该性质比较糟糕、是因为它将直接导致如下结果：当 C4.5 进行二叉分枝时、它可能总会直接分出一个比较小的 Node 作为叶节点、然后剩下一个大的 Node 继续进行生成。这种行为会导致决策树倾向于往深处发展、从而导致很容易产生过拟合现象，这并不是我们期望的结果</p>
+<h2 id="CART"><a href="#CART" class="headerlink" title="CART"></a>CART</h2><p>CART 的全称是 Classification and Regression Tree（“分类与回归树”）。顾名思义，它既可做分类亦可做回归。囿于篇幅，本书会介绍分类问题的算法和实现、对于回归问题则只叙述算法，感兴趣的观众老爷们可以尝试触类旁通地实现它</p>
+<p>CART 算法一般会使用基尼增益作为信息增益的度量（当然也可以使用互信息和信息增益比作为度量，需要视具体场合而定），其一大特色就是它假设了最终生成的决策树为二叉树、亦即它在处理离散型特征时也会通过决出二分标准来划分数据：</p>
+<h3 id="算法-2-4-步-1"><a href="#算法-2-4-步-1" class="headerlink" title="算法 2.4 步"></a>算法 2.4 步</h3><p>否则，不妨设<script type="math/tex">x^{\left( j \right)}</script>在当前数据集中有<script type="math/tex">S_{j}</script>个取值<script type="math/tex">u_{1}^{\left( j \right)},\ldots,u_{S_{j}}^{\left( j \right)}</script>且它们满足<script type="math/tex">u_{1}^{\left( j \right)} < \ldots < u_{S_{j}}^{\left( j \right)}</script>，则：</p>
+<ul>
+<li>若<script type="math/tex">x^{\left( j \right)}</script>是离散型的，则依次选取<script type="math/tex">u_{1}^{\left( j \right)},\ldots,u_{S_{j}}^{\left( j \right)}</script>作为二分标准<script type="math/tex">a_{p}</script>，此时：  <script type="math/tex; mode=display">
+A_{jp} = \{ x^{\left( j \right)} = a_{p},x^{\left( j \right)} \neq a_{p}\}</script></li>
+<li>若<script type="math/tex">x^{\left( j \right)}</script>是连续型的，则依次选取<script type="math/tex">\frac{u_{1}^{\left( j \right)} + u_{2}^{\left( j \right)}}{2},\ldots,\frac{u_{S_{j} - 1}^{\left( j \right)} + u_{S_{j}}^{\left( j \right)}}{2}</script>作为二分标准<script type="math/tex">a_{p}</script>，此时：  <script type="math/tex; mode=display">
+A_{jp} = \{ x^{\left( j \right)} < a_{p},x^{\left( j \right)} \geq a_{p}\}</script>按照基尼系数定义的信息增益：  <script type="math/tex; mode=display">
+g_{\text{Gini}}\left( y,A_{jp} \right) = \text{Gini}\left( y \right) - \text{Gini}(y|A_{jp})</script>来计算第 j 维特征在这些二分标准下的信息增益，然后选择使得信息增益最大的特征<script type="math/tex">x^{\left( j^{*} \right)}</script>和相应的二分标准<script type="math/tex">u_{p^{*}}^{\left( j^{*} \right)}</script>作为划分标准，亦即：  <script type="math/tex; mode=display">
+{(j}^{*},p^{*}) = \arg{\max_{j,p}{g_{\text{Gini}}\left( y,A_{jp} \right)}}</script></li>
+</ul>
+<p>从分类问题到回归问题不是一个不平凡的问题，它们的区别仅在于：回归问题除了特征是连续型的以外、“类别”也是连续型的，此时我们一般把“类别向量”改称为“输出向量”。正如前文所提及，决策树可以转化为最小化损失的问题。我们之前讨论的分类问题中的损失都是数据的不确定性，而在回归问题中、一种常见的做法就是将损失定义为平方损失：</p>
+<script type="math/tex; mode=display">
+L(D) = \sum_{i = 1}^{N}{I\left( y_{i} \neq f\left( x_{i} \right) \right)\left\lbrack y_{i} - f\left( x_{i} \right) \right\rbrack^{2}}</script><p>这里的<script type="math/tex">I</script>是示性函数，<script type="math/tex">f</script>是我们的模型、<script type="math/tex">f(x_{i})</script>是<script type="math/tex">x_{i}</script>在我们模型下的预测输出、<script type="math/tex">y_{i}</script>是真实输出。平方损失其实就是我们熟悉的“（欧式）距离”（预测向量和输出向量之间的距离），我们会在许多分类、回归问题中见到它的身影。在损失为平方损失时，一般称此时生成的回归决策树为最小二乘回归树</p>
+<p>在分类问题中决策树是一个划分规则的序列、在回归问题中也差不多。具体而言，假设该序列一共会将输入空间划分为<script type="math/tex">R_{1},\ldots,R_{M}</script>（这 M 个子空间彼此不相交）、那么：</p>
+<ul>
+<li>对于分类问题，模型可表示为：  <script type="math/tex; mode=display">
+f\left( x_{i} \right) = \sum_{m = 1}^{M}{y_{m}I(x_{i} \in R_{m})}</script></li>
+<li>对于回归问题，模型可表示为：  <script type="math/tex; mode=display">
+f\left( x_{i} \right) = \sum_{m = 1}^{M}{c_{m}I\left( x_{i} \in R_{m} \right)}</script>这里<script type="math/tex">c_{m} = \arg{\min_{c}{L_{m}\left( c \right)}} \triangleq \arg{\min_{c}{\sum_{\left( x_{i},y_{i} \right) \in R_{m}}^{}\left( y_{i} - c \right)^{2}}}</script>。那么由一阶条件：  <script type="math/tex; mode=display">
+\frac{\partial L_{m}\left( c \right)}{\partial c} = 0 \Leftrightarrow - 2\sum_{\left( x_{i},y_{i} \right) \in R_{m}}^{}\left( y_{i} - c_{m} \right) = 0</script>可解得<script type="math/tex">c_{m} = \text{avg}\left( y_{i}|(x_{i},y_{i}) \in R_{m} \right) \triangleq \frac{1}{\left| R_{m} \right|}\sum_{\left( x_{i},y_{i} \right) \in R_{m}}^{}y_{i}</script></li>
+</ul>
+<p>最小二乘回归树的算法和 CART 做分类时的算法几乎完全一样，区别只在于：</p>
+<ul>
+<li>解决分类问题时，我们会在特征和二分标准选好后，通过求解：  <script type="math/tex; mode=display">
+{(j}^{*},p^{*}) = \arg{\max_{j,p}{g_{\text{Gini}}\left( y,A_{jp} \right)}}</script>来选取划分标准</li>
+<li>解决回归问题时，我们会在特征和二分标准选好后，通过求解：  <script type="math/tex; mode=display">
+\left( j^{*},p^{*} \right) = \arg{\min_{j,p}{\lbrack\sum_{x_{i} < p}^{}{\left( y_{i} - c_{jp}^{\left( 1 \right)} \right)^{2} + \sum_{x_{i} \geq p}^{}\left( y_{i} - c_{jp}^{\left( 2 \right)} \right)^{2}}\rbrack}}</script>来选取划分标准，其中<script type="math/tex">c_{jp}^{\left( 1 \right)} = \text{avg}(y_{i}|x_{i} < p)</script>、<script type="math/tex">c_{jp}^{\left( 2 \right)} = \text{avg}(y_{i}|x_{i} \geq p)</script>，p（切分点）的选取则视情况而定（可以模仿分类问题中二分标准的选取方法）</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;虽然我们之前已经用了许多文字来描述决策树、但可能还是显得过于抽象。为了能有直观的认知，在此援引维基百科上一张很好的图来进行说明：&lt;/p&gt;
+&lt;img src=&quot;/posts/c6faa205/p1.png&quot; alt=&quot;p1.png&quot; title=&quot;&quot;&gt;
+&lt;p&gt;这张图基本蕴含了决策树中所有的关键结构，下面我们分开来分析它们&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+    
+      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>数据的信息</title>
+    <link href="http://www.carefree0910.com/posts/2ce87ace/"/>
+    <id>http://www.carefree0910.com/posts/2ce87ace/</id>
+    <published>2017-04-22T11:29:24.000Z</published>
+    <updated>2017-04-23T02:54:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野</p>
+<a id="more"></a>
+<h1 id="信息论简介"><a href="#信息论简介" class="headerlink" title="信息论简介"></a>信息论简介</h1><p><strong>（注：本节有许多内容节选、修改、总结自维基百科）</strong></p>
+<p>被誉为信息论创始人的是克劳德·艾尔伍德·香农（Claude Elwood Shannon，1916.4.30－2001.2.26），他是美国数学家、电子工程师和密码学家，是密歇根大学学士、麻省理工学院博士。他在 1948 年发表的划时代的论文——“通信的数学原理”奠定了现代信息论的基础</p>
+<p>信息论（Information Theory）涉及的领域相当多，包括但不限于信息的量化、存储和通信、统计推断、自然语言处理、密码学等等。信息论的主要内容可以类比人类最广泛的交流手段——语言来阐述。一种简洁的语言（以英语为例）通常有如下两个重要特点：</p>
+<ul>
+<li>最常用的一些词汇（比如“a”、“the”、“I”）应该要比相对而言不太常用的词（比如“Python”、“Machine”、“Learning”）要短一些</li>
+<li>如果句子的某一部分被漏听或者由于噪声干扰（比如身处闹市）而被误听，听者应该仍然可以抓住句子的大概意思</li>
+</ul>
+<p>其中第二点被称作为“鲁棒性（Robustness）”。如果把电子通信系统比作一种语言的话，这种鲁棒性（Robustness）不可或缺。信息论的基本研究课题是信源编码和信道编码（通俗一点来讲就是怎么发出信息和怎么传递信息），将鲁棒性引入通信正是通过其中的信道编码来完成的，由此可见信息论的重要性</p>
+<p>注意这些内容同消息的重要性之间是毫不相干的。例如，像“你好；再见”这样的话语和像“救命”这样的紧急请求，在说起来或写起来所花的时间是差不多的，然而明显后者更重要也更有意义。信息论却不会考虑一段消息的重要性或内在意义，因为这些属于信息的质量的问题而不是信息量和可读性方面上的问题，后者只是由概率这一因素单独决定的</p>
+<p>既然我们我们关注的是信息量，我们就需要有一个度量方法。决策树生成算法背后的思想正是利用该度量方法来衡量一种“数据划分”的优劣、从而生成一个“判定序列”。具体而言，它会不断地寻找数据的划分方法、使得在该划分下我们能够获得的信息量最大（更详细的叙述会在后文给出）</p>
+<h1 id="不确定性"><a href="#不确定性" class="headerlink" title="不确定性"></a>不确定性</h1><p>在决策树的生成中，获得的信息量的度量方法是从反方向来定义的：若一种划分能使数据的“不确定性”减少得越多、就意味着该划分能获得越多信息。这是很符合直观的，关键问题就在于应该如何度量数据的不确定性（或说不纯度，Impurity）。常见的度量标准有两个：信息熵（Entropy）和基尼系数（Gini Index），接下来我们就说说它们的定义和性质</p>
+<h2 id="信息熵"><a href="#信息熵" class="headerlink" title="信息熵"></a>信息熵</h2><p>先来看看它的公式：</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = - \sum_{k = 1}^{K}{p_{k}\log p_{k}}</script><p>对于具体的、随机变量<script type="math/tex">y</script>生成的数据集<script type="math/tex">D = \{ y_{1},\ldots,y_{N}\}</script>而言，在实际操作中通常会利用经验熵来估计真正的信息熵：</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = H\left( D \right) = - \sum_{k = 1}^{K}{\frac{|C_{k}|}{|D|}\log\frac{|C_{k}|}{|D|}}</script><p>这里假设随机变量<script type="math/tex">y</script>的取值空间为<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script>，<script type="math/tex">p_{k}</script>表示<script type="math/tex">y</script>取<script type="math/tex">c_{k}</script>的概率：<script type="math/tex">p_{k} = p(y = c_{k})</script>；<script type="math/tex">|C_{k}|</script>代表由随机变量<script type="math/tex">y</script>中类别为<script type="math/tex">c_{k}</script>的样本的个数、<script type="math/tex">|D|</script>代表<script type="math/tex">D</script>的总样本个数（亦即<script type="math/tex">\left| D \right| = N</script>）。可以看到，经验公式背后的思想其实就是“频率估计概率”</p>
+<p>通常来说，公式中对数的底会取为2、此时信息熵<script type="math/tex">H(y)</script>的单位叫作比特（bit）；如果把底取为<script type="math/tex">e</script>（亦即取自然对数）的话，<script type="math/tex">H(y)</script>的单位就称作纳特（nat）</p>
+<p>接下来说明为何上式能够度量数据的不确定性。可以证明（详细推导可参见<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>），当：</p>
+<script type="math/tex; mode=display">
+p_{1} = p_{2} = \ldots = p_{K} = \frac{1}{K}</script><p>时，<script type="math/tex">H(y)</script>达到最大值<script type="math/tex">- \log\frac{1}{K}</script>、亦即<script type="math/tex">\log K</script>。由于<script type="math/tex">p_{k} = p(y = c_{k})</script>，上式即意味着随机变量<script type="math/tex">y</script>取每一个类的概率都是一样的、亦即<script type="math/tex">y</script>完全没有规律可循，想要预测它的取值只能靠运气。换句话说，由<script type="math/tex">y</script>生成出来的数据<script type="math/tex">\{ y_{1},\ldots,y_{N}\}</script>的不确定性是在取值空间为<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script>、样本数为 N 的数据中最大的（想象预测 N 次正 K 面体骰子的结果）</p>
+<p>我们的目的是想让<script type="math/tex">y</script>的不确定性减小、亦即想让<script type="math/tex">y</script>变得有规律以方便我们预测。稍微严谨地来说，就是<script type="math/tex">y</script>取某个类的概率特别大、取其它类的概率都特别小。极端的例子自然就是存在某个<script type="math/tex">k^{*}</script>、使得<script type="math/tex">p\left( {y = c}_{k^{*}} \right) = 1</script>、<script type="math/tex">p\left( y = c_{k} \right) = 0,\forall k \neq k^{*}</script>、亦即<script type="math/tex">y</script>生成的样本总属于<script type="math/tex">c_{k^{*}}</script>类。带入<script type="math/tex">H(y)</script>的定义式，可以发现此时<script type="math/tex">H\left( y \right) = 0</script>、亦即<script type="math/tex">y</script>生成的样本没有不确定性</p>
+<p><strong><em>注意：由于<script type="math/tex">p\log p \rightarrow 0\ (p \rightarrow 0)</script>、所以认为<script type="math/tex">0\log 0 = 0</script></em></strong></p>
+<p>特殊的情况就是二类问题、亦即<script type="math/tex">K = 2</script>的情况。先不妨设<script type="math/tex">y</script>只取 0、1 二值，再设：</p>
+<script type="math/tex; mode=display">
+p\left( y = 0 \right) = p,\ \ p\left( y = 1 \right) = 1 - p,\ \ 0 \leq p \leq 1</script><p>那么此时的信息熵<script type="math/tex">H(y)</script>即为：</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = - \operatorname{plog}p - \left( 1 - p \right)\log{(1 - p)}</script><p>由此可得<script type="math/tex">H(y)</script>随<script type="math/tex">p</script>变化的函数曲线。底为 2 时函数图像如下图所示：</p>
+<img src="/posts/2ce87ace/p1.png" alt="p1.png" title="">
+<p>如前文所述，在<script type="math/tex">p = 0.5</script>时<script type="math/tex">H(y)</script>取得最大值 1。底为<script type="math/tex">e</script>时函数图像则如下图所示：</p>
+<img src="/posts/2ce87ace/p2.png" alt="p2.png" title="">
+<p>虽然最大值仍在<script type="math/tex">p = 0.5</script>时取得，但是此时<script type="math/tex">H(y)</script>仅有 0.693（<script type="math/tex">\ln 2</script>）左右</p>
+<p>如果对上述二类问题稍作推广：<script type="math/tex">y \in \{ Y_{1},Y_{2}\}</script>、其中<script type="math/tex">Y_{1}</script>、<script type="math/tex">Y_{2}</script>都是一个集合，那么此时信息熵的定义式即为：</p>
+<script type="math/tex; mode=display">
+H\left( y \right) = - p\left( y \in Y_{1} \right)\log{p\left( y \in Y_{1} \right)} - p\left( y \in Y_{2} \right)\log{p(y \in Y_{2})}</script><p>且易知：</p>
+<script type="math/tex; mode=display">
+p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>如无特殊说明，今后谈及二类问题时讨论的范围都包括推广后的二类问题</p>
+<p>以上的叙述说明了，<script type="math/tex">y</script>越乱意味着<script type="math/tex">H(y)</script>越大、<script type="math/tex">y</script>越有规律意味着<script type="math/tex">H(y)</script>越小，亦即<script type="math/tex">H(y)</script>确实可以作为不确定性的度量标准</p>
+<h2 id="基尼系数"><a href="#基尼系数" class="headerlink" title="基尼系数"></a>基尼系数</h2><p>基尼系数的定义会更简洁一些：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \right) = \sum_{k = 1}^{K}{p_{k}(1 - p_{k})} = 1 - \sum_{k = 1}^{K}p_{k}^{2}</script><p>同样可以利用经验基尼系数来进行估计：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \right) = \text{Gini}\left( D \right) = 1 - \sum_{k = 1}^{K}\left( \frac{\left| C_{k} \right|}{\left| D \right|} \right)^{2}</script><p>以及同样可以证明，当</p>
+<script type="math/tex; mode=display">
+p_{1} = p_{2} = \ldots = p_{K} = \frac{1}{K}</script><p>时，<script type="math/tex">\text{Gini}(y)</script>取得最大值<script type="math/tex">1 - \frac{1}{K}</script>；当存在<script type="math/tex">k^{*}</script>使得<script type="math/tex">p_{k^{*}} = 1</script>时、<script type="math/tex">\text{Gini}\left( y \right) = 0</script>。特别地、当<script type="math/tex">K = 2</script>时，可以导出：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \right) = 2p(1 - p)</script><p>此时<script type="math/tex">\text{Gini}(y)</script>的函数图像如下图所示：</p>
+<img src="/posts/2ce87ace/p3.png" alt="p3.png" title="">
+<p>虽然最大值仍在<script type="math/tex">p = 0.5</script>时取得，但是此时<script type="math/tex">\text{Gini}(y)</script>仅有 0.5。我们同样可以对二类问题进行推广、此时有：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \right) = 1 - p^{2}\left( y \in Y_{1} \right) - p^{2}(y \in Y_{2})</script><p>且</p>
+<script type="math/tex; mode=display">
+p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>以上的叙述说明了<script type="math/tex">\text{Gini}(y)</script>也可以用来度量不确定性</p>
+<h1 id="信息的增益"><a href="#信息的增益" class="headerlink" title="信息的增益"></a>信息的增益</h1><p>在定义完不确定性的度量标准之后，我们就可以看看什么叫“获得信息”、亦即信息的增益了。从直观上来说，信息的增益是针对随机变量<script type="math/tex">y</script>和描述该变量的特征来定义的，此时数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script>，其中<script type="math/tex">x_{i} = \left( x_{i}^{\left( 1 \right)},\ldots,x_{i}^{\left( n \right)} \right)^{T}</script>是描述<script type="math/tex">y_{i}</script>的特征向量、n 则是特征个数。我们可以先研究单一特征的情况（<script type="math/tex">n = 1</script>）：不妨设该特征叫<script type="math/tex">A</script>、数据集<script type="math/tex">D = \{\left( A_{1},y_{1} \right),\ldots,(A_{N},y_{N})\}</script>；此时所谓信息的增益，反映的就是特征<script type="math/tex">A</script>所能给我们带来的关于<script type="math/tex">y</script>的“信息量”的大小</p>
+<p>可以引入条件熵<script type="math/tex">H(y|A)</script>的概念来定义信息的增益，它同样有着比较好的直观：</p>
+<ul>
+<li>所谓条件熵，就是根据特征<script type="math/tex">A</script>的不同取值<script type="math/tex">\{ a_{1},\ldots,a_{m}\}</script>对<script type="math/tex">y</script>进行限制后，先对这些被限制的<script type="math/tex">y</script>分别计算信息熵、再把这些信息熵（一共有 m 个）根据特征取值本身的概率加权求和、从而得到总的条件熵。换句话说，条件熵是由被<script type="math/tex">A</script>不同取值限制的各个部分的<script type="math/tex">y</script>的不确定性以取值本身的概率作为权重加总得到的</li>
+</ul>
+<p>所以，条件熵<script type="math/tex">H(y|A)</script>越小、意味着<script type="math/tex">y</script>被<script type="math/tex">A</script>限制后的总的不确定性越小、从而意味着<script type="math/tex">A</script>更能够帮助我们做出决策</p>
+<p>接下来就是数学定义：</p>
+<script type="math/tex; mode=display">
+H\left( y \middle| A \right) = \sum_{j = 1}^{m}{p\left( A = a_{j} \right)H(y|A = a_{j})}</script><p>其中</p>
+<script type="math/tex; mode=display">
+H\left( y \middle| A = a_{j} \right) = - \sum_{k = 1}^{K}{p\left( y = c_{k} \middle| A = a_{j} \right)\log{p(y = c_{k}|A = a_{j})}}</script><p>同样可以用经验条件熵来估计真正的条件熵：</p>
+<script type="math/tex; mode=display">
+H\left( y \middle| A \right) = H\left( y \middle| D \right) = \sum_{j = 1}^{m}{\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}{\frac{|D_{jk}|}{|D_{j}|}\log\frac{|D_{jk}|}{|D_{j}|}}}</script><p>这里的<script type="math/tex">D_{j}</script>表示在<script type="math/tex">A = a_{j}</script>限制下的数据集。通常可以记<script type="math/tex">D_{j}</script>中的样本<script type="math/tex">y_{i}</script>满足<script type="math/tex">y_{i}^{A} = a_{j}</script>，亦即：</p>
+<script type="math/tex; mode=display">
+y_{i}^{A} = a_{j} \Leftrightarrow \left( A_{i},y_{i} \right) \in Y_{j} \Leftrightarrow A_{i} = a_{j}</script><p>而公式中的<script type="math/tex">|D_{jk}|</script>则代表着<script type="math/tex">D_{j}</script>中第 k 类样本的个数。</p>
+<p>从条件熵的直观含义，信息的增益就可以自然地定义为：</p>
+<script type="math/tex; mode=display">
+g\left( y,A \right) = H\left( y \right) - H(y|A)</script><p>这里的<script type="math/tex">g(y,A)</script>常被称为互信息（Mutual Information），决策树中的 ID3 算法即是利用它来作为特征选取的标准的（相关定义会在后文给出）。但是，如果简单地以<script type="math/tex">g(y,A)</script>作为标准的话，会存在偏向于选择取值较多的特征、也就是 m 比较大的特征的问题。我们仍然可以从直观上去理解为什么会偏向于选取 m 较大的特征以及为什么这样做是不尽合理的：</p>
+<ul>
+<li>我们希望得到的决策树应该是比较深（又不会太深）的决策树，从而它可以基于多个方面而不是片面地根据某些特征来判断</li>
+<li>如果单纯以<script type="math/tex">g(y,A)</script>作为标准，由于<script type="math/tex">g(y,A)</script>的直观意义是<script type="math/tex">y</script>被<script type="math/tex">A</script>划分后不确定性的减少量，可想而知，当<script type="math/tex">A</script>的取值很多时，<script type="math/tex">y</script>会被<script type="math/tex">A</script>划分成很多份、于是其不确定性自然会减少很多、从而 ID3 算法会倾向于选择<script type="math/tex">A</script>作为划分依据。但如果这样做的话，可以想象、我们最终得到的决策树将会是一颗很胖很矮的决策树，这并不是我们想要的</li>
+</ul>
+<p>为解决该问题、我们可以给 m 一个惩罚，由此我们可以得到信息增益比（Information Gain Ratio）的概念，该概念对应着 C4.5 算法：</p>
+<script type="math/tex; mode=display">
+g_{R}(y,A) = \frac{g(y,A)}{H_{A}(y)}</script><p>其中<script type="math/tex">H_{A}(y)</script>是<script type="math/tex">y</script>关于<script type="math/tex">A</script>的熵，它的定义为：</p>
+<script type="math/tex; mode=display">
+H_{A}\left( y \right) = - \sum_{j = 1}^{m}{p\left( y^{A} = a_{j} \right)\log{p(y^{A} = a_{j})}}</script><p>同样可以用经验熵来进行估计：</p>
+<script type="math/tex; mode=display">
+H_{A}\left( y \right) = H_{A}\left( D \right) = - \sum_{j = 1}^{m}{\frac{\left| D_{j} \right|}{\left| D \right|}\log\frac{\left| D_{j} \right|}{\left| D \right|}}</script><p>该定义式和信息熵的定义式很像，它们的性质也有相通之处</p>
+<p>需要指出的是，只需要类比上述的过程、我们同样可以使用基尼系数来定义信息的增益。具体而言，我们可以先定义条件基尼系数：</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \middle| A \right) = \sum_{j = 1}^{m}{p\left( A = a_{j} \right)\text{Gini}(y|A = a_{j})}</script><p>其中</p>
+<script type="math/tex; mode=display">
+\text{Gini}\left( y \middle| A = a_{j} \right) = 1 - \sum_{k = 1}^{K}{p^{2}\left( y = c_{k} \middle| A = a_{j} \right)}</script><p>同样可以用经验条件基尼系数来进行估计：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\text{Gini}\left( y \middle| A \right) = \text{Gini}(y|D) &= \sum_{j = 1}^{m}{\frac{\left| D_{i} \right|}{\left| D \right|}\left\lbrack 1 - \sum_{k = 1}^{K}\left( \frac{\left| D_{jk} \right|}{\left| D_{j} \right|} \right)^{2} \right\rbrack} \\
+
+&= 1 - \sum_{j = 1}^{m}\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}\left( \frac{\left| D_{jk} \right|}{\left| D_{j} \right|} \right)^{2}
+\end{align}</script><p>信息的增益则自然地定义为（不妨称之为“基尼增益”）：</p>
+<script type="math/tex; mode=display">
+g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\left( y \middle| A \right)</script><p>决策树算法中的 CART 算法通常会应用这种定义</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>决策树综述</title>
+    <link href="http://www.carefree0910.com/posts/dd35ec8b/"/>
+    <id>http://www.carefree0910.com/posts/dd35ec8b/</id>
+    <published>2017-04-22T11:09:59.000Z</published>
+    <updated>2017-04-22T11:35:05.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>上个系列讲的朴素贝叶斯模型的理论基础大部分是数理统计和概率论相关的东西，可能从直观上不太好理解。这一章我们会讲解一种可以说是从直观上最好理解的模型——决策树。决策树是听上去比较厉害且又相对简单的模型，虽然它用到的数学知识确实不怎么多、但是在实现它的过程中可能可以获得对编程本身更深的理解，尤其是对递归的利用这一块可能会有更深的体会</p>
+<p>以下是目录：</p>
+<ul>
+<li><a href="/posts/2ce87ace/" title="数据的信息">数据的信息</a></li>
+<li><a href="/posts/c6faa205/" title="决策树的生成算法">决策树的生成算法</a></li>
+<li><a href="/posts/e0705aab/" title="信息量计算的实现">信息量计算的实现</a></li>
+<li><a href="/posts/41abb98b/" title="节点结构的实现">节点结构的实现</a></li>
+<li><a href="/posts/b07c81ec/" title="树结构的实现">树结构的实现</a></li>
+<li><a href="/posts/1a7aa546/" title="决策树的剪枝算法">决策树的剪枝算法</a></li>
+<li><a href="/posts/602f7125/" title="剪枝算法的实现">剪枝算法的实现</a></li>
+<li><a href="/posts/c12a819/" title="评估与可视化">评估与可视化</a></li>
+<li><a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></li>
+<li><a href="/posts/88953f51/" title="“决策树”小结">“决策树”小结</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;上个系列讲的朴素贝叶斯模型的理论基础大部分是数理统计和概率论相关的东西，可能从直观上不太好理解。这一章我们会讲解一种可以说是从直观上最好理解的模型——决策树。决策树是听上去比较厉害且又相对简单的模型，虽然它用到的数学知识确实不怎么多、但是在实现它的过程中可能可以获得对编程本
+    
+    </summary>
+    
+      <category term="决策树" scheme="http://www.carefree0910.com/categories/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    
+    
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+    
+      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
+    
+  </entry>
   
   <entry>
     <title>“朴素贝叶斯”小结</title>
@@ -555,7 +1590,7 @@ y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)<
     <link href="http://www.carefree0910.com/posts/ea9b7d09/"/>
     <id>http://www.carefree0910.com/posts/ea9b7d09/</id>
     <published>2017-04-20T04:15:21.000Z</published>
-    <updated>2017-04-20T13:53:26.000Z</updated>
+    <updated>2017-04-22T12:53:28.000Z</updated>
     
     <content type="html"><![CDATA[<p>首先要叙述朴素贝叶斯算法的基本假设：</p>
 <ul>
@@ -603,18 +1638,18 @@ I\left( y_{i} \neq f\left( x_{i} \right) \right) = \left\{ \begin{matrix}
 1,\ if\ y_{i} \neq f\left( x_{i} \right) \\
 0,if\ y_{i} \neq f\left( x_{i} \right) \\
 \end{matrix} \right.\</script><p>从上述定义出发、可以利用<a href="/posts/d007d6bc/" title="上一篇文章">上一篇文章</a>中讲解的两种参数估计方法导出离散型朴素贝叶斯的算法（详见<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>）：</p>
-<ul>
-<li>输入：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
-<li>过程（利用 ML 估计导出模型的具体参数）：<ul>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
+<li><strong>过程</strong>（利用 ML 估计导出模型的具体参数）：<ol>
 <li>计算先验概率<script type="math/tex">p(y = c_{k})</script>的极大似然估计：  <script type="math/tex; mode=display">
 \hat{p}\left( y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}{N},\ k = 1,2,\ldots,K</script></li>
 <li>计算条件概率<script type="math/tex">p(X^{\left( j \right)} = a_{jl}|y = c_{k})</script>的极大似然估计（设每一个单独输入的 n 维向量<script type="math/tex">x_{i}</script>的第 j 维特征<script type="math/tex">x^{\left( j \right)}</script>可能的取值集合为<script type="math/tex">\{ a_{j1},\ldots,a_{jS_{j}}\}</script>）：  <script type="math/tex; mode=display">
 \hat{p}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I(x_{i}^{\left( j \right)} = a_{jl},y_{i} = c_{k})}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}</script></li>
-</ul>
+</ol>
 </li>
-<li>输出（利用 MAP 估计进行决策）：朴素贝叶斯模型，能够估计数据<script type="math/tex">x^{*} = \left( {x^{*}}^{\left( 1 \right)},\ldots,{x^{*}}^{\left( n \right)} \right)^{T}</script>的类别：  <script type="math/tex; mode=display">
+<li><strong>输出</strong>（利用 MAP 估计进行决策）：朴素贝叶斯模型，能够估计数据<script type="math/tex">x^{*} = \left( {x^{*}}^{\left( 1 \right)},\ldots,{x^{*}}^{\left( n \right)} \right)^{T}</script>的类别：  <script type="math/tex; mode=display">
 y = f(x^{*}) = \arg{\max_{c_k}{\hat{p}\left( y = c_{k} \right)\prod_{j = 1}^{n}{\hat{p}(X^{\left( j \right)} = {x^{*}}^{\left( j \right)}|y = c_{k})}}}</script></li>
-</ul>
+</ol>
 <p>由上述算法可以清晰地梳理出朴素贝叶斯算法背后的数学思想：</p>
 <ul>
 <li>使用极大似然估计导出模型的具体参数（先验概率、条件概率）</li>
@@ -994,384 +2029,6 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
     
     
       <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>朴素贝叶斯综述</title>
-    <link href="http://www.carefree0910.com/posts/1607712a/"/>
-    <id>http://www.carefree0910.com/posts/1607712a/</id>
-    <published>2017-04-20T02:38:05.000Z</published>
-    <updated>2017-04-20T13:05:59.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>朴素贝叶斯（Naive Bayes）是贝叶斯分类器的一种，而后者是一个相当宽泛的定义，它背后的数学理论根基是相当出名的贝叶斯决策论（Bayesian Decision Theory）。贝叶斯决策论和传统的统计学理论有着区别，其中最不可调和的就是它们各自关于概率的定义。因此，使用了贝叶斯决策论作为基石的贝叶斯分类器，在各个机器学习算法所导出的分类器中也算是比较标新立异的存在</p>
-<p>由于朴素贝叶斯这一块能够扯到的理论还是相当多的，我们会把内容分成数学理论部分与程序实现部分，观众老爷们可以按需阅读 ( σ’ω’)σ</p>
-<p>以下是目录：</p>
-<ul>
-<li><a href="/posts/a0e8b2e/" title="贝叶斯决策论">贝叶斯决策论</a></li>
-<li><a href="/posts/d007d6bc/" title="参数估计">参数估计</a></li>
-<li><a href="/posts/ea9b7d09/" title="朴素贝叶斯算法">朴素贝叶斯算法</a></li>
-<li><a href="/posts/fa51e28/" title="框架的实现">框架的实现</a></li>
-<li><a href="/posts/74647589/" title="MultinomialNB 的实现">MultinomialNB 的实现</a></li>
-<li><a href="/posts/c836ba35/" title="GaussianNB 的实现">GaussianNB 的实现</a></li>
-<li><a href="/posts/7c13f69c/" title="MergedNB 的实现">MergedNB 的实现</a></li>
-<li><a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>
-</li>
-</ul>
-<a id="more"></a>
-<h1 id="涉及到的理论"><a href="#涉及到的理论" class="headerlink" title="涉及到的理论"></a>涉及到的理论</h1><p>首先无法避开的自然就是贝叶斯决策论了，然而我本人对其可以说只有一个入门级别的理解、所以相应的说明更多只能起到一种抛砖引玉的作用</p>
-<p>然后是参数估计，这一部分是比较基础的知识，但真要做起来还是相当繁琐的</p>
-<p>至于其余的贝叶斯分类器，为了将重点放在朴素贝叶斯，我们仅会在最后进行一些简要的介绍，相关的实现和更深层次的推导等等则不会进行说明<del>（主要是我也不咋懂）</del></p>
-<h1 id="程序实现的大体思路"><a href="#程序实现的大体思路" class="headerlink" title="程序实现的大体思路"></a>程序实现的大体思路</h1><ul>
-<li>离散型朴素贝叶斯的实现围绕着 Numpy 中的<code>bincount</code>方法展开</li>
-<li>连续型朴素贝叶斯的关键在于极大似然估计</li>
-<li>混合型朴素贝叶斯则是以上两者的各种结合</li>
-</ul>
-<h1 id="程序运行的结果预览"><a href="#程序运行的结果预览" class="headerlink" title="程序运行的结果预览"></a>程序运行的结果预览</h1><p>本来要说的话、朴素贝叶斯是很难让人直观地看出来它干了什么的，不过<del>聪明而机智的</del>我想出了一个方法：把中间产生的那些条件概率可视化出来不就可以<del>蒙混过关</del>了！</p>
-<p>于是我们的朴素贝叶斯模型可以生成类似于这样的图：</p>
-<img src="/posts/1607712a/p1.png" alt="离散型朴素贝叶斯的可视化" title="离散型朴素贝叶斯的可视化">
-<img src="/posts/1607712a/p2.png" alt="连续型朴素贝叶斯的可视化" title="连续型朴素贝叶斯的可视化">
-<p><strong><em>注意：这些图是分开生成的，是我用画图软件<del>（很傻地）</del>很辛苦地把它们拼在一起的</em></strong></p>
-<p>以上 16 张图（离散型特征 9 张、连续型特征 7 张）对应着一个有 16 个特征的、UCI 上的“银行业务数据集”，完整的原始数据集可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/bank1.0.txt" target="_blank" rel="external">这里</a></p>
-<p>然后我们实现的朴素贝叶斯模型的最大特点就是：无需对数据进行太多预处理。还是以银行业务数据集为例，它每个样本大概长下面这样：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">58, management, married, tertiary, no, 2143, yes, no, unknown, 5, may, 261, 1, -1, 0, unknown</div></pre></td></tr></table></figure>
-<p>我们可以直接把它输进模型而无需做其它多余的工作。当然、这是建立在我们自己写一套数值化数据的方法的基础上的，关于这个数值化数据的实现可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py#L189" target="_blank" rel="external">这里</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;朴素贝叶斯（Naive Bayes）是贝叶斯分类器的一种，而后者是一个相当宽泛的定义，它背后的数学理论根基是相当出名的贝叶斯决策论（Bayesian Decision Theory）。贝叶斯决策论和传统的统计学理论有着区别，其中最不可调和的就是它们各自关于概率的定义。因此，使用了贝叶斯决策论作为基石的贝叶斯分类器，在各个机器学习算法所导出的分类器中也算是比较标新立异的存在&lt;/p&gt;
-&lt;p&gt;由于朴素贝叶斯这一块能够扯到的理论还是相当多的，我们会把内容分成数学理论部分与程序实现部分，观众老爷们可以按需阅读 ( σ’ω’)σ&lt;/p&gt;
-&lt;p&gt;以下是目录：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;/posts/a0e8b2e/&quot; title=&quot;贝叶斯决策论&quot;&gt;贝叶斯决策论&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/posts/d007d6bc/&quot; title=&quot;参数估计&quot;&gt;参数估计&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/posts/ea9b7d09/&quot; title=&quot;朴素贝叶斯算法&quot;&gt;朴素贝叶斯算法&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/posts/fa51e28/&quot; title=&quot;框架的实现&quot;&gt;框架的实现&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/posts/74647589/&quot; title=&quot;MultinomialNB 的实现&quot;&gt;MultinomialNB 的实现&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/posts/c836ba35/&quot; title=&quot;GaussianNB 的实现&quot;&gt;GaussianNB 的实现&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/posts/7c13f69c/&quot; title=&quot;MergedNB 的实现&quot;&gt;MergedNB 的实现&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;/posts/e312d61a/&quot; title=&quot;推导与推广&quot;&gt;推导与推广&lt;/a&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
-    
-      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>“绪论”小结</title>
-    <link href="http://www.carefree0910.com/posts/c939f06b/"/>
-    <id>http://www.carefree0910.com/posts/c939f06b/</id>
-    <published>2017-04-20T01:48:45.000Z</published>
-    <updated>2017-04-20T02:02:14.000Z</updated>
-    
-    <content type="html"><![CDATA[<ul>
-<li>与传统的计算机程序不同，机器学习是面向数据的算法、能够从数据中获得信息。它符合新时代脑力劳动代替体力劳动的趋势，是富有生命力的领域</li>
-<li>Python 是一门优异的语言，代码清晰可读、功能广泛强大。其最大弱点——速度问题也可以通过很多不太困难的方法弥补</li>
-<li>虽说机器学习算法很多，但通常而言、进行机器学习的过程会包含以下三步：<ul>
-<li>获取与处理数据</li>
-<li>选择与训练模型</li>
-<li>评估与可视化结果</li>
-</ul>
-</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;ul&gt;
-&lt;li&gt;与传统的计算机程序不同，机器学习是面向数据的算法、能够从数据中获得信息。它符合新时代脑力劳动代替体力劳动的趋势，是富有生命力的领域&lt;/li&gt;
-&lt;li&gt;Python 是一门优异的语言，代码清晰可读、功能广泛强大。其最大弱点——速度问题也可以通过很多不太困难的方法弥
-    
-    </summary>
-    
-      <category term="绪论" scheme="http://www.carefree0910.com/categories/%E7%BB%AA%E8%AE%BA/"/>
-    
-    
-      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>第一个机器学习样例</title>
-    <link href="http://www.carefree0910.com/posts/372587d5/"/>
-    <id>http://www.carefree0910.com/posts/372587d5/</id>
-    <published>2017-04-20T01:03:45.000Z</published>
-    <updated>2017-04-20T13:53:24.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/a_FirstExample/Regression.py" target="_blank" rel="external">这里</a>）</p>
-<p>作为“绪论”的总结，我们来运用 Python 解决一个实际问题以对机器学习有具体的感受吧。由于该样例只是为了提供直观，我们就拿比较有名的一个小问题来进行阐述。俗话云：“麻雀虽小，五脏俱全”，我们完全可以通过这个样例来对机器学习的一般性步骤进行一个大致的认知</p>
-<p>该问题来自 Coursera 上斯坦福大学机器学习课程（which is 我的入坑课程），其叙述如下：现有包含 47 个房子的面积和价格，需要建立一个模型对新的房价进行预测。稍微翻译一下问题，可以得知：</p>
-<ul>
-<li>输入数据只有一维、亦即房子的面积</li>
-<li>目标数据也只有一维、亦即房子的价格</li>
-<li>我们需要做的、就是根据已知的房子的面积和价格的关系进行机器学习</li>
-</ul>
-<p>下面我们就来一步步地进行操作</p>
-<a id="more"></a>
-<h1 id="获取与处理数据"><a href="#获取与处理数据" class="headerlink" title="获取与处理数据"></a>获取与处理数据</h1><p>原始数据集的前 10 个样本如下表所示，这里房子面积和房子价格的单位可以随意定夺、因为它们不会对结果造成影响：</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>房子面积</th>
-<th>房子价格</th>
-<th>房子面积</th>
-<th>房子价格</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2104</td>
-<td>399900</td>
-<td>1600</td>
-<td>329900</td>
-</tr>
-<tr>
-<td>2400</td>
-<td>369000</td>
-<td>1416</td>
-<td>232000</td>
-</tr>
-<tr>
-<td>3000</td>
-<td>539900</td>
-<td>1985</td>
-<td>299900</td>
-</tr>
-<tr>
-<td>1534</td>
-<td>314900</td>
-<td>1427</td>
-<td>198999</td>
-</tr>
-<tr>
-<td>1380</td>
-<td>212000</td>
-<td>1494</td>
-<td>242500</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>完整的数据集可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/prices.txt" target="_blank" rel="external">这里</a>。虽然该数据集比较简单，但可以看到其中的数字都相当大。保留它原始形式确实有可能是有必要的，但一般而言、我们应该对它做简单的处理以期望能够降低问题的复杂度。在这个例子里，我们采取常用的、将输入数据标准化的做法，其数学公式为：</p>
-<script type="math/tex; mode=display">
-X = \frac{X - \bar X}{std(X)}</script><p>其中<script type="math/tex">\bar X</script>表示<script type="math/tex">X</script>（房子面积）的均值、<script type="math/tex">std(X)</script>表示<script type="math/tex">X</script>的标准差（Standard Deviation）。代码实现则如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入需要用到的库</span></div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line"></div><div class="line"><span class="comment"># 定义存储输入数据（x）和目标数据（y）的数组</span></div><div class="line">x, y = [], []</div><div class="line"><span class="comment"># 遍历数据集，变量 sample 对应的正是一个个样本</span></div><div class="line"><span class="keyword">for</span> sample <span class="keyword">in</span> open(<span class="string">"../_Data/prices.txt"</span>, <span class="string">"r"</span>):</div><div class="line">    <span class="comment"># 由于数据是用逗号隔开的，所以调用 Python 中的 split 方法并将逗号作为参数传入</span></div><div class="line">    _x, _y = sample.split(<span class="string">","</span>)</div><div class="line">    <span class="comment"># 将字符串数据转化为浮点数</span></div><div class="line">    x.append(float(_x))</div><div class="line">    y.append(float(_y))</div><div class="line"><span class="comment"># 读取完数据后，将它们转化为 Numpy 数组以方便进一步的处理</span></div><div class="line">x, y = np.array(x), np.array(y)</div><div class="line"><span class="comment"># 标准化</span></div><div class="line">x = (x - x.mean()) / x.std()</div><div class="line"><span class="comment"># 将原始数据以散点图的形式画出</span></div><div class="line">plt.figure()</div><div class="line">plt.scatter(x, y, c=<span class="string">"g"</span>, s=<span class="number">20</span>)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
-<p>上面这段代码的运行结果如下图所示：</p>
-<img src="/posts/372587d5/p1.png" alt="预处理后的数据散点图" title="预处理后的数据散点图">
-<p>这里横轴是标准化后的房子面积，纵轴是房子价格。以上我们已经比较好地完成了机器学习任务的第一步：数据预处理</p>
-<h1 id="选择与训练模型"><a href="#选择与训练模型" class="headerlink" title="选择与训练模型"></a>选择与训练模型</h1><p>在弄好数据之后、下一步就要开始选择相应的学习方法和模型了。幸运的是，通过可视化原始数据，我们可以非常直观地感受到：我们很有可能通过线性回归（Linear Regression）中的多项式拟合来得到一个不错的结果。其模型的数学表达式如下：</p>
-<p><strong><em>注意：用多项式拟合散点只是线性回归的很小的一部分、但是它的直观意义比较明显。考虑到问题比较简单、我们才选用了多项式拟合。线性回归的详细讨论超出了本书的范围，这里不做赘述</em></strong></p>
-<script type="math/tex; mode=display">
-f(x|p;n)=p_0x^n+p_1x^{n-1}+...+p_{n-1}x+p_n
-
-L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/tex">f(x|p;n)</script>就是我们的模型，<code>p</code>、<code>n</code>都是模型的参数，其中<code>p</code>是多项式<code>f</code>的各个系数、<code>n</code>是多项式的次数。<script type="math/tex">L(p;n)</script>则是模型的损失函数，这里我们采用了常见的平方损失函数、也就是所谓的欧氏距离（或说向量的二范数）。<code>x</code>、<code>y</code>则分别是输入向量和目标向量；在我们这个样例中，<code>x</code>、<code>y</code>这两个向量都是 47 维的向量，分别由 47 个不同的房子面积、房子价格所构成</p>
-<p>在确定好模型后，我们就可以开始编写代码来进行训练了。对于大多数机器学习算法，所谓的训练正是最小化某个损失函数的过程，我们这个多项式拟合的模型也不例外：我们的目的就是让上面定义的<script type="math/tex">L(p;n)</script>最小。在数理统计领域里面有专门的理论研究这种回归问题，其中比较有名的正规方程更是直接给出了一个简单的解的通式。不过由于有 Numpy 的存在，这个训练过程甚至变得还要更加简单一些：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 在(-2,4)这个区间上取 100 个点作为画图的基础</span></div><div class="line">x0 = np.linspace(<span class="number">-2</span>, <span class="number">4</span>, <span class="number">100</span>)</div><div class="line"></div><div class="line"><span class="comment"># 利用 Numpy 的函数定义训练并返回多项式回归模型的函数</span></div><div class="line"><span class="comment"># deg 参数代表着模型参数中的 n、亦即模型中多项式的次数</span></div><div class="line"><span class="comment"># 返回的模型能够根据输入的 x（默认是 x0）、返回相对应的预测的 y</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_model</span><span class="params">(deg)</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">lambda</span> input_x=x0: np.polyval(np.polyfit(x, y, deg), input_x)</div></pre></td></tr></table></figure>
-<p>这里需要解释 Numpy 里面带的两个函数：<code>polyfit</code>和<code>polyval</code>的用法：</p>
-<ul>
-<li><code>polyfit(x, y, deg)</code>：该函数会返回使得上述（注：该公式中的<code>x</code>和<code>y</code>就是输入的<code>x</code>和<code>y</code>）<script type="math/tex">L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script>最小的参数<code>p</code>、亦即多项式的各项系数。换句话说，该函数就是模型的训练函数</li>
-<li><code>polyval(p, x)</code>：根据多项式的各项系数<code>p</code>和多项式中<code>x</code>的值、返回多项式的值<code>y</code></li>
-</ul>
-<h1 id="评估与可视化结果"><a href="#评估与可视化结果" class="headerlink" title="评估与可视化结果"></a>评估与可视化结果</h1><p>模型做好后、我们就要尝试判断各种参数下模型的好坏了。为简洁，我们采用<script type="math/tex">n=1,4,10</script>这三组参数进行评估。由于我们训练的目的是最小化损失函数，所以用损失函数来衡量模型的好坏似乎是一个合理的做法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 根据参数 n、输入的 x、y 返回相对应的损失</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_cost</span><span class="params">(deg, input_x, input_y)</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="number">0.5</span> * ((get_model(deg)(input_x) - input_y) ** <span class="number">2</span>).sum()</div><div class="line"></div><div class="line"><span class="comment"># 定义测试参数集并根据它进行各种实验</span></div><div class="line">test_set = (<span class="number">1</span>, <span class="number">4</span>, <span class="number">10</span>)</div><div class="line"><span class="keyword">for</span> d <span class="keyword">in</span> test_set:</div><div class="line">    <span class="comment"># 输出相应的损失</span></div><div class="line">    print(get_cost(d, x, y))</div></pre></td></tr></table></figure>
-<p>所得的结果是：当<script type="math/tex">n=1,4,10</script>时，损失的头两个数字分别为 96、94 和 75。这么看来似乎是<script type="math/tex">n=10</script>优于<script type="math/tex">n=4</script>而<script type="math/tex">n=1</script>最差；但从上面那张图可以看出，似乎直接选择<script type="math/tex">n=1</script>作为模型的参数才是最好的选择。这里的矛盾的来源正是前文所提到过的过拟合情况</p>
-<p>那么怎么最直观地了解是否出现过拟合了呢？当然还是画图了：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 画出相应的图像</span></div><div class="line">plt.scatter(x, y, c=<span class="string">"g"</span>, s=<span class="number">20</span>)</div><div class="line"><span class="keyword">for</span> d <span class="keyword">in</span> test_set:</div><div class="line">    plt.plot(x0, get_model(d)(), label=<span class="string">"degree = &#123;&#125;"</span>.format(d))</div><div class="line">plt.xlim(<span class="number">-2</span>, <span class="number">4</span>)</div><div class="line"><span class="comment"># 将横轴、纵轴的范围分别限制在(-2,4)、(10^5,8 * 10^5)</span></div><div class="line">plt.ylim(<span class="number">1e5</span>, <span class="number">8e5</span>)</div><div class="line"><span class="comment"># 调用 legend 方法使曲线对应的 label 正确显示</span></div><div class="line">plt.legend()</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
-<p>上面这段代码的运行结果如下图所示：</p>
-<img src="/posts/372587d5/p2.png" alt="线性回归的可视化" title="线性回归的可视化">
-<p>其中，蓝线、绿线、红线分别代表<script type="math/tex">n=1</script>、<script type="math/tex">n=4</script>、<script type="math/tex">n=10</script>的情况（上图的右上角亦有说明）。可以看出，从<script type="math/tex">n=4</script>开始模型就已经开始出现过拟合现象了，到<script type="math/tex">n=10</script>时模型已经变得非常不合理</p>
-<p>至此，可以说这个问题就已经基本解决了。在这个样例里面，除了交叉验证、我们涵盖了机器学习中的大部分主要步骤（之所以没有进行交叉验证是因为数据太少了……）。代码部分加起来总共 40~50 行，应该算是一个比较合适的长度。希望大家能够通过这个样例对机器学习有个大概的理解、也希望它能引起大家对机器学习的兴趣</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/a_FirstExample/Regression.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
-&lt;p&gt;作为“绪论”的总结，我们来运用 Python 解决一个实际问题以对机器学习有具体的感受吧。由于该样例只是为了提供直观，我们就拿比较有名的一个小问题来进行阐述。俗话云：“麻雀虽小，五脏俱全”，我们完全可以通过这个样例来对机器学习的一般性步骤进行一个大致的认知&lt;/p&gt;
-&lt;p&gt;该问题来自 Coursera 上斯坦福大学机器学习课程（which is 我的入坑课程），其叙述如下：现有包含 47 个房子的面积和价格，需要建立一个模型对新的房价进行预测。稍微翻译一下问题，可以得知：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;输入数据只有一维、亦即房子的面积&lt;/li&gt;
-&lt;li&gt;目标数据也只有一维、亦即房子的价格&lt;/li&gt;
-&lt;li&gt;我们需要做的、就是根据已知的房子的面积和价格的关系进行机器学习&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;下面我们就来一步步地进行操作&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="绪论" scheme="http://www.carefree0910.com/categories/%E7%BB%AA%E8%AE%BA/"/>
-    
-    
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>人生苦短，我用 Python</title>
-    <link href="http://www.carefree0910.com/posts/698a0893/"/>
-    <id>http://www.carefree0910.com/posts/698a0893/</id>
-    <published>2017-04-20T00:51:16.000Z</published>
-    <updated>2017-04-20T02:03:18.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>上一篇文章大概地介绍了一下机器学习的各种概念，这一篇文章我们则会主要讲讲脚本语言 Python 相关的一些东西。本文题目是在 Python 界流传甚广的“谚语”，它讲述了 Python 强大的功能与易于上手的特性</p>
-<a id="more"></a>
-<h1 id="为何选择-Python"><a href="#为何选择-Python" class="headerlink" title="为何选择 Python"></a>为何选择 Python</h1><p>援引开源运动的领袖人物 Eric Raymond 的说法：“Python 语言非常干净，设计优雅，具有出色的模块化特性。其最出色的地方在于，它鼓励清晰易读的代码，特别适合以渐进开发的方式构造项目”。Python 的可读性使得即使是刚学不久的人也看懂大部分的代码，Python 庞大的社区和大量的开发文档更是使得初学者能够快速地实现许许多多令人惊叹的功能。对于 Python 的程序，人们甚至有时会戏称其为“可执行的伪代码（executable pseudo-code）”以突显它的清晰性和可读性</p>
-<p>Python 的强大是毋庸置疑的，上文提到的 Eric Raymond 甚至称其“过于强大了”。与之相对应的、就是 Python 的速度比较慢。然而比起 Python 开发环境提供的海量高级数据结构（如列表、元组、字典、集合等）和数之不尽的第三方库、再加上高速的 CPU 和近代发展起来的 GPU 编程，速度的问题就显得没那么尖锐。况且 Python 还能通过各种途径来使用 C / C++ 代码来编写核心代码，其强大的“胶水”功能使其速度（在程序员能力允许的情况下）和纯粹的 C / C++ 相比已经相去不远。一个典型的例子、也是我们会在本书常常运用到的、就是 Python 中 Numpy 这个第三方库。编写它的语言正是底层语言（C 和 Fortran），其支持向量、矩阵操作的特性和优异的速度使得 Python 在科学计算这一领域大放异彩</p>
-<p><strong><em>注意：Python 及本博客会用到的两个非常优异的第三方库——Numpy 和 Tensorflow 的用法摘要我们会开单独的章节进行说明</em></strong></p>
-<h1 id="Python-在机器学习领域的优势"><a href="#Python-在机器学习领域的优势" class="headerlink" title="Python 在机器学习领域的优势"></a>Python 在机器学习领域的优势</h1><p>虽然在上一小节叙述了 Python 的种种好处，但不可否认的是，确实存在诸如 MATLAB 和 Mathematica 这样的高级程序语言、它们对机器学习的支持也不错，MATLAB 甚至还自带许多机器学习的应用。但是作为一个问心无愧的程序员，我们还是需要提倡支持正版、而 MATLAB 的正版软件需要数千美金。与之相对，由于 Python 是开源项目，几乎所有必要的组件都是完全免费的</p>
-<p>之前也提到过 Python 的速度问题，但是更快更底层的语言、比如 C 和 C++，若使用它们来学习机器学习的话、会不可避免地引发这么一个问题：即使是实现一个非常简单的功能、也需要进行大量的编写和 debug 的过程；在这期间，程序员很有可能忘掉学习机器学习的初衷而迷失在代码的海洋中。笔者曾经尝试过将 Python 上的神经网络框架移植到 C++ 上，这之间的折腾至今难忘</p>
-<p>此外，笔者认为、使用 Python 来学习机器学习是和“不要过早优化”这句编程界金句有着异曲同工之妙的。Python（几乎）唯一的缺陷——速度，在初期进行快速检验算法、思想正误及开发工作时，其实基本不是重要问题。这之中的道理是平凡的：如果解决问题的思想存在问题，那么即使拼命去提高程序的运行效率、也只能使问题越来越大而已。这种时候，先使用 Python 进行快速实现、有必要时再用底层代码重写核心代码，从各方面来说都是一个更好的选择</p>
-<p><del>（有没有觉得这个人真能扯）</del></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;上一篇文章大概地介绍了一下机器学习的各种概念，这一篇文章我们则会主要讲讲脚本语言 Python 相关的一些东西。本文题目是在 Python 界流传甚广的“谚语”，它讲述了 Python 强大的功能与易于上手的特性&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="绪论" scheme="http://www.carefree0910.com/categories/%E7%BB%AA%E8%AE%BA/"/>
-    
-    
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>机器学习综述</title>
-    <link href="http://www.carefree0910.com/posts/a0837b26/"/>
-    <id>http://www.carefree0910.com/posts/a0837b26/</id>
-    <published>2017-04-19T15:28:56.000Z</published>
-    <updated>2017-04-20T07:26:39.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>“机器学习”在最近虽可能不至于到人尽皆知的程度、却也是非常火热的词汇。机器学习是英文单词“Machine Learning”（简称ML）的直译，从字面上便说明了这门技术是让机器进行“学习”的技术。然而我们知道机器终究是死的，所谓的“学习”归根结底亦只是人类“赋予”机器的一系列运算。这个“赋予”的过程可以有很多种实现，而 Python 正是其中相对容易上手、同时性能又相当不错的一门语言。作为综述，我们只打算谈谈机器学习相关的一些比较宽泛的知识，介绍与说明为何要使用 Python 来作为机器学习的工具的工作则交给下一篇文章来做。而在最后，我们会提供一个简短易懂的、具有实际意义的例子来给大家提供一个直观的感受</p>
-<p>由于所涉及到的东西都比较基础，有相应知识背景的观众老爷大可不必看“绪论”这一分类下的文章 ( σ’ω’)σ</p>
-<a id="more"></a>
-<h1 id="什么是机器学习？"><a href="#什么是机器学习？" class="headerlink" title="什么是机器学习？"></a>什么是机器学习？</h1><p>正如前面所说，由于近期的各种最新成果、使得“机器学习”成为了非常热门的词汇。机器学习在各种邻域的优异表现（围棋界的Master是其中最具代表性的存在），使得各行各业的人们都或多或少对机器学习产生了兴趣与敬畏。然而与此同时，对机器学习有所误解的群体也日益壮大；他们或将机器学习想得过于神秘、或将它想得过于万能。然而事实上，清晨的一句“今天天气真好”、朋友之间的寒暄“你刚刚是去吃饭了吧”、考试过后的感叹“复习了那么久终有收获”……这些日常生活中随处可见的话语，其背后却已蕴含了“学习”的思想——它们都是利用以往的经验、对未知的新情况做出的有效的决策。而把这个决策的过程交给计算机来做、可以说就是“机器学习”的一个最浅白的定义</p>
-<p>我们或许可以先说说机器学习与以往的计算机工作样式有什么不同。传统的计算机如果想要得到某个结果、需要人类赋予它一串实打实的指令，然后计算机就根据这串指令一步步地执行下去。这个过程中的因果关系非常明确，只要人类的理解不出偏差、运行结果是可以准确预测的。但是在机器学习中，这一传统样式被打破了：计算机确实仍然需要人类赋予它一串指令，但这串指令往往不能直接得到结果；相反，它是一串赋予了机器“学习能力”的指令。在此基础上，计算机需要进一步地接受“数据”并根据之前人类赋予它的“学习能力”从中“学习”出最终的结果，这个结果往往是无法仅仅通过直接编程得出的。是故这里就导出了稍微深一点的机器学习的定义：它是一种让计算机利用数据而非指令来进行各种工作的方法。在这背后，最关键的就是“统计”的思想，它所推崇的“相关而非因果”的概念是机器学习的理论根基。在此基础上，机器学习可以说是计算机使用输入给它的数据、利用人类赋予它的算法得到某种模型的过程，其最终的目的则是使用该模型、预测未来未知数据的信息</p>
-<p>既然提到了统计，那么一定的数学理论就不可或缺。相关的、比较简短的定义会在第四章给出（PAC框架），这里我们就先只叙述一下机器学习在统计理论下的、比较深刻的本质：它追求的是合理的假设空间（Hypothesis Space）的选取和模型的泛化（Generalization）能力。该句中出现了一些专用术语，详细的定义会在介绍术语时提及，这里我们提供一个直观：</p>
-<ul>
-<li>所谓假设空间，就是我们的模型在数学上的“适用场合”</li>
-<li>所谓的泛化能力，就是我们的模型在未知数据上的表现</li>
-</ul>
-<p><strong><em>注意：上述本质严格来说应该是 PAC Learning 的本质；在其余的理论框架下、机器学习是可以具有不同的内核的</em></strong></p>
-<p>从上面的讨论可以看出，机器学习和人类思考的过程有或多或少的类似。事实上，我们在第六、第七章讲的神经网络（Neural Network，简称 NN）和卷积神经网络（Convolutional Neural Network，简称 CNN）背后确实有着相应的神经科学的理论背景。然而与此同时我们需要知道的是，机器学习并非是一个“会学习的机器人”和“具有学习的人造人”之类的，这一点从上面诸多讨论也可以明晰（惭愧的是，我在第一次听到“机器学习”四个字时，脑海中浮现的正是一个“聪明的机器人”的图像，甚至还幻想过它和人类一起生活的场景）。相反的，它是被人类利用的、用于发掘数据背后信息的工具</p>
-<p>当然，现在也不乏“危险的人工智能”的说法，霍金大概是其中的“标杆”，这位伟大的英国理论物理学家甚至警告说“人工智能的发展可能意味着人类的灭亡”。孰好孰坏果然还是见仁见智，但可以肯定的是：本书所介绍的内容绝不至于导致世界的毁灭，大家大可轻松愉快地进行接下来的阅读 ( σ’ω’)σ</p>
-<h1 id="机器学习常用术语"><a href="#机器学习常用术语" class="headerlink" title="机器学习常用术语"></a>机器学习常用术语</h1><p>机器学习领域有着许多非常基本的术语，这些术语在外人听来可能相当高深莫测、它们事实上也可能拥有非常复杂的数学背景，但我们需要知道：它们往往也拥有着相对浅显平凡的直观理解（上一小节的假设空间和泛化能力就是两个例子）。本小节会对这些常用的基本术语进行说明与解释，它们背后的数学理论会有所阐述、但不会涉及到过于本质的东西</p>
-<p>正如前文反复强调的，数据在机器学习中发挥着不可或缺的作用；而用于描述数据的术语有好几个，它们是需要被牢牢记住的：</p>
-<ul>
-<li>“数据集”（Data Set）：就是数据的集合的意思。其中，每一条单独的数据被称为“样本”（Sample）。若没有进行特殊说明，本书都会假设数据集中样本之间在各种意义下相互独立。事实上，除了某些特殊的模型（如隐马尔可夫模型和条件随机场），该假设在大多数场景下都是相当合理的</li>
-<li>对于每个样本，它通常具有一些“属性”（Attribute）或说“特征”（Feature），特征所具体取的值就被称为“特征值”（Feature Value）</li>
-<li>特征和样本所张成的空间被称为“特征空间”（Feature Space）和“样本空间”（Sample Space），可以把它们简单地理解为特征和样本“可能存在的空间”。</li>
-<li>相对应的，我们有“标签空间”（Label Space），它描述了模型的输出“可能存在的空间”；当模型是分类器时、我们通常会称之为“类别空间”</li>
-</ul>
-<p>其中、数据集又可以分为以下三类：</p>
-<ul>
-<li>训练集（Training Set）；顾名思义、它是总的数据集中用来训练我们模型的部分。虽说将所有数据集都拿来当做训练集也无不可，不过为了提高及合理评估模型的泛化能力、我们通常只会取数据集中的一部分来当训练集</li>
-<li>测试集（Test Set）；顾名思义、它是用来测试、评估模型泛化能力的部分。测试集不会用在模型的训练部分；换句话说，测试集相对于模型而言是“未知”的、所以拿它来评估模型的泛化能力是相当合理的</li>
-<li>交叉验证集（Cross-Validation Set，简称 CV Set）；这是比较特殊的一部分数据，它是用来调整模型具体参数的</li>
-</ul>
-<p><strong><em>注意：需要指出的是，获取数据集这个过程是不平凡的；尤其是当今“大数据”如日中天的情景下，诸如“得数据者得天下”的说法也不算诳语。在此我推荐一个非常著名的、含有大量真实数据集的网站——<a href="http://archive.ics.uci.edu/ml/datasets.html" target="_blank" rel="external">UCI</a>，接下来的篇章中也常常会用到其中一些合适的数据集来评估我们自己实现的模型</em></strong></p>
-<p>我们可以通过具体的例子来理解上述概念。比如、我们假设小明是一个在北京读了一年书的学生，某天他想通过宿舍窗外的风景（能见度、温度、湿度、路人戴口罩的情况等）来判断当天的雾霾情况并据此决定是否戴口罩。此时，他过去一年的经验就是他拥有的数据集，过去一年中每一天的情况就是一个样本。“能见度”、“温度”、“湿度”、“路人戴口罩的情况”就是四个特征，而（能见度）“低”、（温度）“低”、（湿度）“高”、（路人戴口罩的）“多”就是相对应的特征值。现在小明想了想、决定在脑中建立一个模型来帮自己做决策，该模型将利用过去一年的数据集来对如今的情况作出“是否戴口罩”的决策。此时小明可以用过去一年中 8 个月的数据量来做训练集、2 个月的量来做测试集、2 个月的量来做交叉验证集，那么小明就需要不断地思考（训练模型）：</p>
-<ul>
-<li>用训练集训练出的模型是怎样的？</li>
-<li>该模型在交叉验证集上的表现怎么样？<ul>
-<li>如果足够好了，那么思考结束（得到最终模型）</li>
-<li>如果不够好，那么根据模型在交叉验证集上的表现、重新思考（调整模型参数）</li>
-</ul>
-</li>
-</ul>
-<p>最后，小明可能会在测试集上评估一下自己刚刚思考后得到的模型的性能、然后根据这个性能和模型作出的“是否戴口罩”的决策来综合考虑自己到底戴不戴口罩<br>接下来说明一下上一小节中提到过的重要概念：假设空间与泛化能力。泛化能力的含义在上文也有说明，为强调、这里再叙述一遍：</p>
-<ul>
-<li>泛化能力针对的其实是学习方法，它用于衡量该学习方法学习到的模型在整个样本空间上的表现</li>
-</ul>
-<p>这一点当然是十分重要的，因为我们拿来训练我们模型的数据终究只是样本空间的一个很小的采样，如果只是过分专注于它们的话、就会出现所谓的“过拟合”（Over Fitting）的情况。当然，如果过分罔顾训练数据，又会出现“欠拟合”（Under Fitting）。我们可以用一张图来直观感受过拟合和欠拟合（如下图所示，左为欠拟合、右为过拟合）：</p>
-<img src="/posts/a0837b26/p1.png" alt="欠拟合与过拟合" title="欠拟合与过拟合">
-<p>所以我们需要“张弛有度”、找到最好的那个平衡点。统计学习中的结构风险最小化（Structural Risk Minimization、简称 SRM）就是研究这个的，它和传统的经验风险最小化（Empirical Risk Minimization、简称 ERM）相比，注重于对风险上界的最小化、而不是单纯使经验风险最小化。它有一个原则：在使得风险上界最小的函数子集中、挑选出使得经验风险最小的函数。而这个函数子集，正是我们之前提到过的假设空间</p>
-<p><strong><em>注意：所谓经验风险，可以理解为训练数据集上的风险。相对应的，ERM 则可以理解为只注重训练数据集的学习方法，它的理论基础是经验风险在某种足够合理的数学意义上一致收敛于期望风险、亦即所谓的“真正的”风险</em></strong></p>
-<p>关于 SRM 和 ERM 的详细讨论会涉及到诸如 VC 维和正则化的概念，这里不进行详细展开、但我们需要有这么一个直观：为了使我们学习方法训练出的模型泛化能力足够好，我们需要对我们的模型做出一定的“限制”、而这个“限制”就表现在假设空间的选取上。一个非常普遍的做法是对模型的复杂度做出一定的惩罚、从而使模型趋于精简。这与所谓的“奥卡姆剃刀原理”<del>（奥卡姆：我的剃刀还能再战 500 年）</del>不谋而合：“如无必要，勿增实体”“切勿浪费较多的东西去做，用较少的东西、同样可以做好事情”</p>
-<p>相比起通过选取合适的假设空间来规避过拟合，进行交叉验证（Cross Validation）则可以让我们知道过拟合的程度、从而帮助我们选择合适的模型。常见的交叉验证有三种：</p>
-<ul>
-<li>S-fold Cross Validation：中文可翻译成S折交叉验证，它是应用最多的一种方法。其方法大致如下：<ul>
-<li>将数据分成 S 份：<script type="math/tex">D=\{ D_1,D_2,...,D_S\}</script>、一共作 S 次试验</li>
-<li>在第 i 次试验中，使用作为<script type="math/tex">D-D_i</script>训练集、<script type="math/tex">D_i</script>作为测试集对模型进行训练、评测</li>
-<li>最终选择平均测试误差最小的模型</li>
-</ul>
-</li>
-<li>留一交叉验证（Leave-one-out Cross Validation）：这是S折交叉验证的特殊情况，此时 <script type="math/tex">S=N</script></li>
-<li>简易交叉验证：这种实现起来最简单、也是本书（在进行交叉验证时）所采用的方法。它简单地将数据进行随机分组、最后达到训练集约占原数据的 70% 的程度（这个比率可以视情况改变），选择模型时使用测试误差作为标准</li>
-</ul>
-<h1 id="机器学习的重要性"><a href="#机器学习的重要性" class="headerlink" title="机器学习的重要性"></a>机器学习的重要性</h1><p>道理说了不少，但到底为什么要学机器学习、机器学习的重要性又在哪里呢？事实上，回顾历史我们可以发现，人类的发展通常伴随着简单体力劳动向复杂脑力劳动的过渡。过去的工作基本都有着明确的定义，告诉你这一步怎么做、下一步再怎么做。而如今这一类的工作已是越来越少，取而代之的是更为宽泛模糊的、概念性的东西，比如说“将本季度的产品推向最合适的市场，在最大化期望利润的同时、尽量做到风险最小化”这种需求。想要做好这样的任务，我们需要获取相应的数据；虽说网络的存在让我们能够得到数之不尽的数据，然而从这些数据中获得信息与知识却不是一项平凡的工作。我们当然可以人工地、仔细地逐项甄选，但这样显然就又回到了最初的原点。机器学习这门技术，可以说正因此应运而生</p>
-<p>单单抽象地说一大堆空话可能会让人头晕脑胀，我们就举一举机器学习具体的应用范围吧，从中大概能够比较直观地看出机器学习的强大与重要。<br>发展到如今，机器学习的“爪牙”可谓已经伸展到了各个角落、包括但不限于：</p>
-<ul>
-<li>机器视觉、也就是最近机器学习里很火热的深度学习的一种应用</li>
-<li>语音识别、也就是微软 Cortana 背后的核心技术</li>
-<li>数据挖掘、也就是耳熟能详的大数据相关的领域</li>
-<li>统计学习、也就是本书讲解的主要范围之一，有许许多多著名的算法（比如支持向量机 SVM）都源于统计学习（但是统计学习还是和机器学习有着区别；简单地说，统计学习偏数学而机器学习偏实践）</li>
-</ul>
-<p>机器学习还能够进行模式识别、自然语言处理等等，之前提过的围棋界的 Master 和最新人工智能在德州扑克上的表现亦无不呈现着机器学习强大的潜力。一言以蔽之，机器学习是当今的热点，虽说不能保证它的热度能 100% 地一直延续下去，至少本人认为、它能在相当长的一段时间内保持强大的生命力</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;“机器学习”在最近虽可能不至于到人尽皆知的程度、却也是非常火热的词汇。机器学习是英文单词“Machine Learning”（简称ML）的直译，从字面上便说明了这门技术是让机器进行“学习”的技术。然而我们知道机器终究是死的，所谓的“学习”归根结底亦只是人类“赋予”机器的一系列运算。这个“赋予”的过程可以有很多种实现，而 Python 正是其中相对容易上手、同时性能又相当不错的一门语言。作为综述，我们只打算谈谈机器学习相关的一些比较宽泛的知识，介绍与说明为何要使用 Python 来作为机器学习的工具的工作则交给下一篇文章来做。而在最后，我们会提供一个简短易懂的、具有实际意义的例子来给大家提供一个直观的感受&lt;/p&gt;
-&lt;p&gt;由于所涉及到的东西都比较基础，有相应知识背景的观众老爷大可不必看“绪论”这一分类下的文章 ( σ’ω’)σ&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="绪论" scheme="http://www.carefree0910.com/categories/%E7%BB%AA%E8%AE%BA/"/>
-    
-    
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>PyML</title>
-    <link href="http://www.carefree0910.com/posts/4f2fecf/"/>
-    <id>http://www.carefree0910.com/posts/4f2fecf/</id>
-    <published>2017-04-19T12:13:19.000Z</published>
-    <updated>2017-04-21T15:22:31.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>其实要说搭博客的想法的话，在相当久之前就已经有了。然而由于种种原因<del>（懒）</del>，导致一直搁置至今</p>
-<p>不过搭一个相对好看的博客比我想象的要难不少，我在经历了打算从头搭建<script type="math/tex">\rightarrow</script>打算使用 WordPress<script type="math/tex">\rightarrow</script>打算使用 Jekyll 这三个阶段后，最终还是选择了 Hexo + Next 主题这一个组合</p>
-<h1 id="主旨"><a href="#主旨" class="headerlink" title="主旨"></a>主旨</h1><p>虽然我大言不惭地将站点命名为了“Python 与机器学习”，但其实该博客更像是针对我的个人 repo——<a href="https://github.com/carefree0910/MachineLearning" target="_blank" rel="external">MachineLearning</a> 的一个文档（另一个文档为我的个人<a href="https://zhuanlan.zhihu.com/carefree0910-pyml" target="_blank" rel="external">知乎专栏</a>）。这里所说的文档不仅包括了代码的实现思路、调用方法，还包括了背后的理论基础等等。不过囿于本人学识尚浅，许多地方可能都会有错漏，届时希望大家能不吝指出 ( σ’ω’)σ</p>
-<h1 id="内容"><a href="#内容" class="headerlink" title="内容"></a>内容</h1><p>由于我也在<del>苦逼</del>绝赞学习中，所以内容会不断更新；特别是在当前这种几乎一个星期就出一个新技术的时代，“啃老本”这种想法几乎是不可行的<del>（说得好像你有老本似的）</del></p>
-<p>截止至 2017-4-19、本博客的内容包括：</p>
-<ul>
-<li><a href="/posts/a0837b26/" title="Python 与机器学习绪论（Introduction）">Python 与机器学习绪论（Introduction）</a></li>
-<li><a href="/posts/1607712a/" title="朴素贝叶斯（Naive Bayes）">朴素贝叶斯（Naive Bayes）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/c_CvDTree" target="_blank" rel="external">决策树（Decision Tree）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/d_Ensemble" target="_blank" rel="external">集成学习（Ensemble Learning）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/e_SVM" target="_blank" rel="external">支持向量机（Support Vector Machine）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/f_NN" target="_blank" rel="external">神经网络（Neural Network）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/g_CNN" target="_blank" rel="external">卷积神经网络（Convolutional Neural Network）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/_Dist" target="_blank" rel="external">具体的应用实例（Applications）</a></li>
-</ul>
-<p>对于有相应博客的内容，链接会导向相应的综述，否则会导向相应的源代码</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;其实要说搭博客的想法的话，在相当久之前就已经有了。然而由于种种原因&lt;del&gt;（懒）&lt;/del&gt;，导致一直搁置至今&lt;/p&gt;
-&lt;p&gt;不过搭一个相对好看的博客比我想象的要难不少，我在经历了打算从头搭建&lt;script type=&quot;math/tex&quot;&gt;\rightarrow&lt;/scr
-    
-    </summary>
-    
-    
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
-    
-      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
     
   </entry>
   

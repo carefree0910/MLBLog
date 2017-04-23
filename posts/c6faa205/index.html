@@ -1,0 +1,1240 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数学,算法," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="虽然我们之前已经用了许多文字来描述决策树、但可能还是显得过于抽象。为了能有直观的认知，在此援引维基百科上一张很好的图来进行说明：  这张图基本蕴含了决策树中所有的关键结构，下面我们分开来分析它们">
+<meta name="keywords" content="数学,算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树的生成算法">
+<meta property="og:url" content="http://www.carefree0910.com/posts/c6faa205/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="虽然我们之前已经用了许多文字来描述决策树、但可能还是显得过于抽象。为了能有直观的认知，在此援引维基百科上一张很好的图来进行说明：  这张图基本蕴含了决策树中所有的关键结构，下面我们分开来分析它们">
+<meta property="og:image" content="http://www.carefree0910.com/posts/c6faa205/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/c6faa205/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/c6faa205/p3.png">
+<meta property="og:updated_time" content="2017-04-23T02:58:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="决策树的生成算法">
+<meta name="twitter:description" content="虽然我们之前已经用了许多文字来描述决策树、但可能还是显得过于抽象。为了能有直观的认知，在此援引维基百科上一张很好的图来进行说明：  这张图基本蕴含了决策树中所有的关键结构，下面我们分开来分析它们">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/c6faa205/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/c6faa205/"/>
+
+
+
+
+
+  <title> 决策树的生成算法 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/c6faa205/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                决策树的生成算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-22T20:11:18+08:00">
+                2017-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/决策树/" itemprop="url" rel="index">
+                    <span itemprop="name">决策树</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>虽然我们之前已经用了许多文字来描述决策树、但可能还是显得过于抽象。为了能有直观的认知，在此援引维基百科上一张很好的图来进行说明：</p>
+<img src="/posts/c6faa205/p1.png" alt="p1.png" title="">
+<p>这张图基本蕴含了决策树中所有的关键结构，下面我们分开来分析它们</p>
+<a id="more"></a>
+<h1 id="决策树的相关术语"><a href="#决策树的相关术语" class="headerlink" title="决策树的相关术语"></a>决策树的相关术语</h1><p>首先是之前分析过的、“划分标准”这个概念。在上图中，被菱形橙色方框框起来的就是作为划分标准的特征，被长方形橙色方框框起来的就是对应特征的各个取值</p>
+<p>然后是“节点”（Node）的概念。如果读者有学过数据结构，那么想必在提起“树”（Tree）的同时会自然而然地联想到 Node。考虑到可能有读者没有学过相关知识，这里就简要说一些相关的定义。决策树，顾名思义，确实是一个 Tree 模型。在上图中，我们可以直观地把整张图想象成一棵 Tree、把被黑色边框框起来的部分理解为一个 Node，这些 Node 是 Tree 的组成部分、Tree 本身可以协助 Node 之间的数据传输和参数调用。最上方的 Node 酷似整棵树的根，我们一般称其为“根节点”（Root）；用黑色方框（亦即四个角是直角而不是圆弧）框起来的 Node 是整棵树“生长的终点”、酷似树的叶子，我们一般称其为“叶节点”（Leaf）。比如，第三排的所有 Node 都是叶节点</p>
+<p>通常来说，我们还会称一个非叶节点有一些“下属的叶节点”。比如，所有的叶节点都是根节点下属的叶节点，第三排左数第一、第二个叶节点是第二排左数第一个 Node 下属的叶节点</p>
+<p>决策树中的叶节点还有一个有趣的特性：每个叶节点都对应着原样本空间的一个子空间，这些叶节点对应的子空间彼此不会相交、且并起来的话就会恰好构成完整的样本空间。换句话说、决策树的行为可以概括为如下两步：</p>
+<ul>
+<li>将样本空间划分为若干个互不相交的子空间</li>
+<li>给每个子空间贴一个类别标签</li>
+</ul>
+<p>此外、我们在上图中还可以看到许多箭头，这些箭头代表着树的“生长方向”。我们一般习惯称箭头的起点是终点的“父节点”（parent）、终点是起点的“子节点”（child）；而当子节点只有两个时，通常把他们称作“左子节点”和“右子节点”。比如说，根节点是第二排所有 Node 的父节点，第二排所有 Node 都是根节点的子节点；第三排左数第一、第二个 Node 是第二排左数第一个 Node 的左、右子节点</p>
+<p>对决策树有一个直观认知后，我们关心的就是怎样去生成这么一个结构了</p>
+<h1 id="决策树的生成算法"><a href="#决策树的生成算法" class="headerlink" title="决策树的生成算法"></a>决策树的生成算法</h1><p>决策树的生成算法发展至今已经有许多变种，想要全面介绍它们不是短短一篇文章所能做到的。本文拟介绍其中三个上一节有所提及的、相对而言比较基本的算法：ID3、C4.5 和 CART。它们本身存在着某种递进关系：</p>
+<ul>
+<li>ID3 算法可说是“最朴素”的决策树算法，它给出了对离散型数据分类的解决方案</li>
+<li>C4.5 算法在其上进一步发展、给出了对混合型数据分类的解决方案</li>
+<li>CART 算法则更进一步、给出了对数据回归的解决方案</li>
+</ul>
+<p>虽说它们的功能越来越强大，但正如第一小节所言、它们的核心思想都是一致的：算法通过不断划分数据集来生成决策树，其中每一步的划分能够使当前的信息增益达到最大</p>
+<p>值得一提的是，该核心思想的背后其实也有着机器学习的一些普适性的思想。我们可以这样来看待决策树：模型的损失就是数据集的不确定性，模型的算法就是最小化该不确定性；同时，和许多其它模型一样，想要从整个参数空间中选出模型的最优参数是个 NP 完全问题，所以我们（和许多其它算法一样）采用启发式的方法、近似求解这个最优化问题。具体而言，我们每次会选取一个局部最优解（每次选取一个特征对数据集进行划分使得信息增益最大化）、并把这些局部解合成最终解（合成一个划分规则的序列）</p>
+<p>可以这样直观地去想一个决策树的生成过程：</p>
+<ul>
+<li>向根节点输入数据</li>
+<li>根据信息增益的度量、选择数据的某个特征来把数据划分成（互不相交的）好几份并分别喂给一个新 Node</li>
+<li>如果分完数据后发现：<ul>
+<li>某份数据的不确定较小、亦即其中某一类别的样本已经占了大多数，此时就不再对这份数据继续进行划分、将对应的 Node 转化为叶节点</li>
+<li>某份数据的不确定性仍然较大，那么这份数据就要继续分割下去（转第 2 步）</li>
+</ul>
+</li>
+</ul>
+<p><strong><em>注意：虽然划分的规则是根据数据定出的，但是划分本身其实是针对整个输入空间进行划分的</em></strong></p>
+<p>从上述过程可知，决策树的生成过程就是根据某个度量从数据集中训练出一系列的划分规则、使得这些规则能够在数据集有好的表现。事实上，上文说的3种不同算法在分类问题上的区别亦仅表现在度量信息增益和划分数据的方法的不同上</p>
+<h2 id="ID3（Interactive-Dichotomizer-3）"><a href="#ID3（Interactive-Dichotomizer-3）" class="headerlink" title="ID3（Interactive Dichotomizer-3）"></a>ID3（Interactive Dichotomizer-3）</h2><p>ID3 可以译为“交互式二分法”，虽说这个名字里面带了个“二分”，但该方法完全适用于“多分”的情况。它选择互信息作为信息增益的度量、针对离散型数据进行划分。其算法叙述如下：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
+<li><strong>过程</strong>：<ol>
+<li>将数据集<script type="math/tex">D</script>喂给一个 Node</li>
+<li>若<script type="math/tex">D</script>中的所有样本同属于类别<script type="math/tex">c_{k}</script>，则该 Node 不再继续生成、并将其类别标记为<script type="math/tex">c_{k}</script>类</li>
+<li>若<script type="math/tex">x_{i}</script>已经是 0 维向量、亦即已没有可选特征，则将此时<script type="math/tex">D</script>中样本个数最多的类别<script type="math/tex">c_{k}</script>作为该 Node 的类别</li>
+<li>否则，按照互信息定义的信息增益：  <script type="math/tex; mode=display">
+g\left( y,x^{\left( j \right)} \right) = H\left( y \right) - H(y|x^{\left( j \right)})</script>来计算第 j 维特征的信息增益，然后选择使得信息增益最大的特征<script type="math/tex">x^{\left( j^{*} \right)}</script>作为划分标准，亦即：  <script type="math/tex; mode=display">
+j^{*} = \arg{\max_{j}{g\left( y,x^{\left( j \right)} \right)}}</script></li>
+<li>若<script type="math/tex">x^{\left( j^{*} \right)}</script>满足停止条件、则不再继续生成并则将此时<script type="math/tex">D</script>中样本个数最多的类别<script type="math/tex">c_{k}</script>作为类别标记</li>
+<li>否则，依<script type="math/tex">x^{\left( j^{*} \right)}</script>的所有可能取值<script type="math/tex">\{ a_{1},\ldots,a_{m}\}</script>将数据集<script type="math/tex">D</script>划分为<script type="math/tex">{\{ D}_{1},\ldots,D_{m}\}</script>、使得：  <script type="math/tex; mode=display">
+{(x}_{i},y_{i}) \in D_{j} \Leftrightarrow x_{i}^{\left( j^{*} \right)} = a_{j},\forall i = 1,\ldots,N</script>同时，将<script type="math/tex">x_{1},\ldots,x_{N}</script>的第<script type="math/tex">j^{*}</script>维去掉、使它们成为<script type="math/tex">n - 1</script>维的特征向量</li>
+<li>对每个<script type="math/tex">D_{j}</script>从 2.1 开始调用算法</li>
+</ol>
+</li>
+<li><strong>输出</strong>：原始数据对应的 Node（亦即根节点）</li>
+</ol>
+<p>其中算法第 2.5 步的“停止条件”（也可称为“预剪枝”；有关剪枝的讨论会放在<a href="/posts/1a7aa546/" title="决策树的剪枝算法">决策树的剪枝算法</a>）有许多种提法，常用的是如下两种：</p>
+<ul>
+<li>若选择<script type="math/tex">x^{\left( j^{*} \right)}</script>作为特征时信息增益<script type="math/tex">g(y,x^{\left( j^{*} \right)})</script>仍然很小（通常会传入一个参数<script type="math/tex">\epsilon</script>作为阈值）、则停止</li>
+<li>事先把数据集分为训练集与测试集（交叉验证的思想），若由训练集得到的<script type="math/tex">x^{\left( j^{*} \right)}</script>并不能使得决策树在测试集上的错误率更小、则停止</li>
+</ul>
+<p>这两种停止条件的提法通用于 C4.5 和 CART，后文将不再赘述。同时，正如本章一开始有所提及的、决策树会在许多地方应用到递归的思想，上述算法中的第 2.6 步正是经典的递归</p>
+<p>我们可以对气球数据集 1.0 过一遍 ID3 算法以加深理解。由算法可知，因为每个 Node 的信息熵是确定的、所以选择互信息最大的特征等价于选择条件熵最小的特征，是故我们只需要在每个 Node 上计算各个可选特征的条件熵。易知在根节点上：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+H\left( 不爆炸\middle| 颜色\right) &= - p_{11}\log p_{11} - p_{12}\log p_{12} = 1 \\
+
+H\left( 不爆炸\middle| 大小\right) &= - p_{21}\log p_{21} - p_{22}\log p_{22} \approx 0.65 \\
+
+H\left( 不爆炸\middle| 人员\right) &= - p_{31}\log p_{31} - p_{32}\log p_{32} \approx 0.92 \\
+
+H\left( 不爆炸\middle| 动作\right) &= - p_{41}\log p_{41} - p_{42}\log p_{42} \approx 0.65
+\end{align}</script><p>其中</p>
+<script type="math/tex; mode=display">p_{11} \triangleq p\left( 不爆炸\middle| 黄色\right) = \frac{1}{2},\ \ p_{12} \triangleq p\left( 不爆炸\middle| 紫色\right) = \frac{1}{2}</script><script type="math/tex; mode=display">p_{21} \triangleq p\left( 不爆炸\middle| 小\right) = \frac{5}{6},\ \ p_{22} \triangleq p\left( 不爆炸\middle| 大\right) = \frac{1}{6}</script><script type="math/tex; mode=display">p_{31} \triangleq p\left( 不爆炸\middle| 成人\right) = \frac{1}{3},\ \ p_{32} \triangleq p\left( 不爆炸\middle| 小孩\right) = \frac{2}{3}</script><script type="math/tex; mode=display">p_{41} \triangleq p\left( 不爆炸\middle| 手打\right) = \frac{5}{6},\ \ p_{42} \triangleq p\left( 不爆炸\middle| 脚踩\right) = \frac{1}{6}</script><p>且易知</p>
+<script type="math/tex; mode=display">H\left( 不爆炸\middle| A \right) = H\left( 爆炸\middle| A \right),\ \ \forall A \in \{ 颜色, 大小, 人员, 动作\}</script><p>从而可知应选测试动作或者气球大小作为根节点的划分标准。不妨选择气球大小作为划分标准，此时的决策树如下图所示（图片是使用 ProcessOn 在线绘制而成的）：</p>
+<img src="/posts/c6faa205/p2.png" alt="p2.png" title="">
+<p>图中 Node A 和 Node B 所对应的数据集分别如下面两张表所示：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>测试人员</th>
+<th>测试动作</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>成人</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>测试人员</th>
+<th>测试动作</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用手打</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>注意此时气球大小已经不是可选特征了。我们接下来要分别对 Node A 和 Node B 调用 ID3 算法，计算过程和根节点上的计算过程大同小异。以此类推、最终我们可以得到如下图所示的决策树：</p>
+<img src="/posts/c6faa205/p3.png" alt="p3.png" title="">
+<p>可知该决策树在气球数据集 1.0 上的正确率为 100%、且它做的决策都很符合直观</p>
+<h2 id="C4-5"><a href="#C4-5" class="headerlink" title="C4.5"></a>C4.5</h2><p>C4.5 使用信息增益比作为信息增益的度量，从而缓解了 ID3 算法会倾向于选择 m 比较大的特征<script type="math/tex">A</script>作为划分依据这个问题；也正因如此，C4.5 算法可以处理 ID3 算法比较难处理的混合型数据。我们先来看看它在离散型数据上的算法（仅展示和 ID3 算法中不同的部分）：</p>
+<h3 id="算法-2-4-步"><a href="#算法-2-4-步" class="headerlink" title="算法 2.4 步"></a>算法 2.4 步</h3><p>否则，按照信息增益比定义的信息增益：</p>
+<script type="math/tex; mode=display">
+g_{R}\left( y,x^{\left( j \right)} \right) = \frac{g(y,x^{\left( j \right)})}{H_{x^{\left( j \right)}}(y)}</script><p>来计算第 j 维特征的信息增益，然后选择使得信息增益最大的特征<script type="math/tex">x^{\left( j^{*} \right)}</script>作为划分标准，亦即：</p>
+<script type="math/tex; mode=display">
+j^{*} = \arg{\max_{j}{g_{R}\left( y,x^{\left( j \right)} \right)}}</script><p><strong><em>注意：C4.5 算法虽然不会倾向于选择 m 比较大的特征、但有可能会倾向于选择 m 比较小的特征。针对这个问题，Quinlan 在 1993 年提出了这么一个启发式的方法：先选出互信息比平均互信息要高的特征、然后从这些特征中选出信息增益比最高的</em></strong></p>
+<p>混合型数据的处理方法大同小异，本书拟介绍一种常用且符合直观的、同时亦是 C4.5 所采用的方法：使用二类问题的解决方案处理连续型特征。具体而言，当二类问题和决策树结合起来时，在连续的情况下、我们通常可以把它转述为：</p>
+<script type="math/tex; mode=display">
+Y_{1} = \left\{ y:y^{A} < a_{1} \right\},Y_{2} = \{ y:y^{A} \geq a_{1}\}</script><p>相对应的，我们同样可以用处理二类问题的思想来处理离散型特征，此时：</p>
+<script type="math/tex; mode=display">
+A \in \left\{ a_{1},a_{2} \right\};\ \ Y_{1} = \left\{ y:y^{A} = a_{1} \right\},\ Y_{2} = \{ y:y^{A} = a_{2}\}</script><p>更进一步、我们通常会将它表示为：</p>
+<script type="math/tex; mode=display">
+Y_{1} = \left\{ y:y^{A} = a_{1} \right\},Y_{2} = \{ y:y^{A} \neq a_{1}\}</script><p>我们通常称以上各式中的<script type="math/tex">a_{1}</script>为“二分标准”。一般而言，如何处理连续型特征这个问题会归结于如何选择“二分标准”这个问题。一个比较容易想到的做法是：</p>
+<ul>
+<li>若在当前数据集中有 m 个取值，不妨假设它们为<script type="math/tex">u_1,...,u_m</script>；不失一般性、再不妨假设它们满足<script type="math/tex">u_1<...<u_m</script>（若不然，进行一次排序操作即可），那么依次选择<script type="math/tex">v_1,...,v_p</script>作为二分标准并决出最好的一个，其中<script type="math/tex">v_1,...,v_p</script>构成等差数列、且:  <script type="math/tex; mode=display">
+v_{1} = u_{1},v_{p} = u_{m}</script>p 的选取则视情况而定，一般而言会取 p 反比于“深度”。这意味着当数据越分越细时、对特征的划分会越分越粗，从直观上来说这有益于防止过拟合</li>
+</ul>
+<p>但这样可能会产生许多“冗余”的二分标准。试想如果这些取值满足：</p>
+<script type="math/tex; mode=display">
+u_{1} = 0,u_{2} = 100,u_{3} = 101,u_{4} = 102,\ldots</script><p>那么我们就会在<script type="math/tex">u_{1}</script>和<script type="math/tex">u_{2}</script>之间尝试大量的划分标准、但显然这些划分标准算出来的结果都是一样的。为了处理类似于这种不合理的情况，C4.5 采用如下做法：</p>
+<ul>
+<li>依次选择<script type="math/tex">v_{1} = \frac{u_{1} + u_{2}}{2},\ldots,v_{m - 1} = \frac{u_{m - 1} + u_{m}}{2}</script>作为二分标准、计算它们的信息增益比、从而决出最好的二分标准来划分数据</li>
+</ul>
+<p>在这之上还有另一种可行的做法：</p>
+<ul>
+<li>设<script type="math/tex">u_1,...,u_m</script>所对应的类别是<script type="math/tex">y_1,...,y_m</script>，那么在<script type="math/tex">v_1,...,v_{m-1}</script>中只选取使得：  <script type="math/tex; mode=display">
+y_{i} \neq y_{i + 1},\ \ (i = 1,\ldots,m - 1)</script>的<script type="math/tex">v_i</script>作为二分标准、计算它们的信息增益比、从而决出最好的二分标准来划分数据</li>
+</ul>
+<p>这种做法在某些情况下会表现得更好、但在某些情况下也会显得不合理。鉴于此，本书会采用更稳定的上一种做法来进行实现</p>
+<p><strong><em>注意：从以上讨论可知，我们完全可以把 ID3 算法推广成可以处理连续型特征的算法。只不过如果数据集是混合型数据集的话、ID3 就会倾向于选择离散型特征作为划分标准而已。如果数据集的所有特征都是连续型特征、那么 ID3 和 C4.5 之间孰优孰劣是难有定论的</em></strong></p>
+<p>这里需要特别指出的是、C4.5 也是有一个比较糟糕的性质的：由信息增益比的定义可知，如果是二分的话、它会倾向于把数据集分成很不均匀的两份；因为此时<script type="math/tex">H_{A}(y)</script>将非常小、导致<script type="math/tex">g_{R}(y,A)</script>很大（即使<script type="math/tex">g(y,A)</script>比较小）。举个例子：如果当前划分标准为连续特征、那么 C4.5 可能会倾向于直接选择<script type="math/tex">v_{1},v_{2},v_{3}</script>等作为二分标准</p>
+<p>之所以说该性质比较糟糕、是因为它将直接导致如下结果：当 C4.5 进行二叉分枝时、它可能总会直接分出一个比较小的 Node 作为叶节点、然后剩下一个大的 Node 继续进行生成。这种行为会导致决策树倾向于往深处发展、从而导致很容易产生过拟合现象，这并不是我们期望的结果</p>
+<h2 id="CART"><a href="#CART" class="headerlink" title="CART"></a>CART</h2><p>CART 的全称是 Classification and Regression Tree（“分类与回归树”）。顾名思义，它既可做分类亦可做回归。囿于篇幅，本书会介绍分类问题的算法和实现、对于回归问题则只叙述算法，感兴趣的观众老爷们可以尝试触类旁通地实现它</p>
+<p>CART 算法一般会使用基尼增益作为信息增益的度量（当然也可以使用互信息和信息增益比作为度量，需要视具体场合而定），其一大特色就是它假设了最终生成的决策树为二叉树、亦即它在处理离散型特征时也会通过决出二分标准来划分数据：</p>
+<h3 id="算法-2-4-步-1"><a href="#算法-2-4-步-1" class="headerlink" title="算法 2.4 步"></a>算法 2.4 步</h3><p>否则，不妨设<script type="math/tex">x^{\left( j \right)}</script>在当前数据集中有<script type="math/tex">S_{j}</script>个取值<script type="math/tex">u_{1}^{\left( j \right)},\ldots,u_{S_{j}}^{\left( j \right)}</script>且它们满足<script type="math/tex">u_{1}^{\left( j \right)} < \ldots < u_{S_{j}}^{\left( j \right)}</script>，则：</p>
+<ul>
+<li>若<script type="math/tex">x^{\left( j \right)}</script>是离散型的，则依次选取<script type="math/tex">u_{1}^{\left( j \right)},\ldots,u_{S_{j}}^{\left( j \right)}</script>作为二分标准<script type="math/tex">a_{p}</script>，此时：  <script type="math/tex; mode=display">
+A_{jp} = \{ x^{\left( j \right)} = a_{p},x^{\left( j \right)} \neq a_{p}\}</script></li>
+<li>若<script type="math/tex">x^{\left( j \right)}</script>是连续型的，则依次选取<script type="math/tex">\frac{u_{1}^{\left( j \right)} + u_{2}^{\left( j \right)}}{2},\ldots,\frac{u_{S_{j} - 1}^{\left( j \right)} + u_{S_{j}}^{\left( j \right)}}{2}</script>作为二分标准<script type="math/tex">a_{p}</script>，此时：  <script type="math/tex; mode=display">
+A_{jp} = \{ x^{\left( j \right)} < a_{p},x^{\left( j \right)} \geq a_{p}\}</script>按照基尼系数定义的信息增益：  <script type="math/tex; mode=display">
+g_{\text{Gini}}\left( y,A_{jp} \right) = \text{Gini}\left( y \right) - \text{Gini}(y|A_{jp})</script>来计算第 j 维特征在这些二分标准下的信息增益，然后选择使得信息增益最大的特征<script type="math/tex">x^{\left( j^{*} \right)}</script>和相应的二分标准<script type="math/tex">u_{p^{*}}^{\left( j^{*} \right)}</script>作为划分标准，亦即：  <script type="math/tex; mode=display">
+{(j}^{*},p^{*}) = \arg{\max_{j,p}{g_{\text{Gini}}\left( y,A_{jp} \right)}}</script></li>
+</ul>
+<p>从分类问题到回归问题不是一个不平凡的问题，它们的区别仅在于：回归问题除了特征是连续型的以外、“类别”也是连续型的，此时我们一般把“类别向量”改称为“输出向量”。正如前文所提及，决策树可以转化为最小化损失的问题。我们之前讨论的分类问题中的损失都是数据的不确定性，而在回归问题中、一种常见的做法就是将损失定义为平方损失：</p>
+<script type="math/tex; mode=display">
+L(D) = \sum_{i = 1}^{N}{I\left( y_{i} \neq f\left( x_{i} \right) \right)\left\lbrack y_{i} - f\left( x_{i} \right) \right\rbrack^{2}}</script><p>这里的<script type="math/tex">I</script>是示性函数，<script type="math/tex">f</script>是我们的模型、<script type="math/tex">f(x_{i})</script>是<script type="math/tex">x_{i}</script>在我们模型下的预测输出、<script type="math/tex">y_{i}</script>是真实输出。平方损失其实就是我们熟悉的“（欧式）距离”（预测向量和输出向量之间的距离），我们会在许多分类、回归问题中见到它的身影。在损失为平方损失时，一般称此时生成的回归决策树为最小二乘回归树</p>
+<p>在分类问题中决策树是一个划分规则的序列、在回归问题中也差不多。具体而言，假设该序列一共会将输入空间划分为<script type="math/tex">R_{1},\ldots,R_{M}</script>（这 M 个子空间彼此不相交）、那么：</p>
+<ul>
+<li>对于分类问题，模型可表示为：  <script type="math/tex; mode=display">
+f\left( x_{i} \right) = \sum_{m = 1}^{M}{y_{m}I(x_{i} \in R_{m})}</script></li>
+<li>对于回归问题，模型可表示为：  <script type="math/tex; mode=display">
+f\left( x_{i} \right) = \sum_{m = 1}^{M}{c_{m}I\left( x_{i} \in R_{m} \right)}</script>这里<script type="math/tex">c_{m} = \arg{\min_{c}{L_{m}\left( c \right)}} \triangleq \arg{\min_{c}{\sum_{\left( x_{i},y_{i} \right) \in R_{m}}^{}\left( y_{i} - c \right)^{2}}}</script>。那么由一阶条件：  <script type="math/tex; mode=display">
+\frac{\partial L_{m}\left( c \right)}{\partial c} = 0 \Leftrightarrow - 2\sum_{\left( x_{i},y_{i} \right) \in R_{m}}^{}\left( y_{i} - c_{m} \right) = 0</script>可解得<script type="math/tex">c_{m} = \text{avg}\left( y_{i}|(x_{i},y_{i}) \in R_{m} \right) \triangleq \frac{1}{\left| R_{m} \right|}\sum_{\left( x_{i},y_{i} \right) \in R_{m}}^{}y_{i}</script></li>
+</ul>
+<p>最小二乘回归树的算法和 CART 做分类时的算法几乎完全一样，区别只在于：</p>
+<ul>
+<li>解决分类问题时，我们会在特征和二分标准选好后，通过求解：  <script type="math/tex; mode=display">
+{(j}^{*},p^{*}) = \arg{\max_{j,p}{g_{\text{Gini}}\left( y,A_{jp} \right)}}</script>来选取划分标准</li>
+<li>解决回归问题时，我们会在特征和二分标准选好后，通过求解：  <script type="math/tex; mode=display">
+\left( j^{*},p^{*} \right) = \arg{\min_{j,p}{\lbrack\sum_{x_{i} < p}^{}{\left( y_{i} - c_{jp}^{\left( 1 \right)} \right)^{2} + \sum_{x_{i} \geq p}^{}\left( y_{i} - c_{jp}^{\left( 2 \right)} \right)^{2}}\rbrack}}</script>来选取划分标准，其中<script type="math/tex">c_{jp}^{\left( 1 \right)} = \text{avg}(y_{i}|x_{i} < p)</script>、<script type="math/tex">c_{jp}^{\left( 2 \right)} = \text{avg}(y_{i}|x_{i} \geq p)</script>，p（切分点）的选取则视情况而定（可以模仿分类问题中二分标准的选取方法）</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/2ce87ace/" rel="prev" title="数据的信息">
+                <i class="fa fa-chevron-left"></i> 数据的信息
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/e0705aab/" rel="next" title="信息量计算的实现">
+                信息量计算的实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#决策树的相关术语"><span class="nav-number">1.</span> <span class="nav-text">决策树的相关术语</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#决策树的生成算法"><span class="nav-number">2.</span> <span class="nav-text">决策树的生成算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ID3（Interactive-Dichotomizer-3）"><span class="nav-number">2.1.</span> <span class="nav-text">ID3（Interactive Dichotomizer-3）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C4-5"><span class="nav-number">2.2.</span> <span class="nav-text">C4.5</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法-2-4-步"><span class="nav-number">2.2.1.</span> <span class="nav-text">算法 2.4 步</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CART"><span class="nav-number">2.3.</span> <span class="nav-text">CART</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法-2-4-步-1"><span class="nav-number">2.3.1.</span> <span class="nav-text">算法 2.4 步</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

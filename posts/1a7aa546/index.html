@@ -1,0 +1,1184 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数学,算法," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当">
+<meta name="keywords" content="数学,算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树的剪枝算法">
+<meta property="og:url" content="http://www.carefree0910.com/posts/1a7aa546/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当">
+<meta property="og:image" content="http://www.carefree0910.com/posts/1a7aa546/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/1a7aa546/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/1a7aa546/p3.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/1a7aa546/p4.png">
+<meta property="og:updated_time" content="2017-04-23T02:59:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="决策树的剪枝算法">
+<meta name="twitter:description" content="在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/1a7aa546/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/1a7aa546/"/>
+
+
+
+
+
+  <title> 决策树的剪枝算法 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/1a7aa546/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                决策树的剪枝算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-22T23:33:01+08:00">
+                2017-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/决策树/" itemprop="url" rel="index">
+                    <span itemprop="name">决策树</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当的“剪枝”、我们在上一节中也已经大量接触了这一概念。剪枝通常分为两类：“预剪枝（Pre-Pruning）”和“后剪枝（Post-Pruning）”，其中“预剪枝”的概念在生成算法中已有定义，彼时我们采取的说法是“停止条件”；而一般提起剪枝时指的都是“后剪枝”，它是指在决策树生成完毕后再对其进行修剪、把多余的节点剪掉。换句话说，后剪枝是从全局出发、通过某种标准对一些 Node 进行局部剪枝，这样就能减少决策树中 Node 的数目、从而有效地降低模型复杂度</p>
+<a id="more"></a>
+<p>是故问题的关键在于如何定出局部剪枝的标准。通常来说我们有两种做法：</p>
+<ul>
+<li>应用交叉验证的思想，若局部剪枝能够使得模型在测试集上的错误率降低、则进行局部剪枝（预剪枝中也应用了类似的思想）</li>
+<li>应用正则化的思想、综合考虑不确定性和模型复杂度来定出一个新的损失（此前我们的损失只考虑了不确定性），用该损失作为一个 Node 是否进行局部剪枝的标准</li>
+</ul>
+<p>第二种做法又涉及到另一个关键问题：如何定量分析决策树中一个 Node 的复杂度？一个直观且合理的方法是：直接使用该 Node 下属叶节点的个数作为复杂度。基于此、第二种做法的数学描述就是：</p>
+<ul>
+<li>定义新损失（<script type="math/tex">T</script>代表一个 Node）  <script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = C\left( T \right) + \alpha\left| T \right|</script>其中，<script type="math/tex">C\left( T \right)</script>即是该 Node 和不确定性相关的损失、<script type="math/tex">|T|</script>则是该 Node 下属叶节点的个数。不妨设第 t 个叶节点含有<script type="math/tex">N_{t}</script>个样本且这<script type="math/tex">N_{t}</script>个样本的不确定性为<script type="math/tex">H_{t}(T)</script>，那么新损失一般可以直接定义为加权不确定性：  <script type="math/tex; mode=display">
+C\left( T \right) = \sum_{t = 1}^{\left| T \right|}{N_{t}H_{t}(T)}</script></li>
+</ul>
+<p>我们会采取这种做法来进行实现。需要指出的是，在这种做法下、仍然可以分支出两种不同的算法：</p>
+<ul>
+<li>直接比较一个 Node 局部剪枝前的损失<script type="math/tex">C_{\alpha}(T)</script>和局部剪枝后的损失<script type="math/tex">C_{\alpha}(t)</script>的大小，若：  <script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) \geq C_{\alpha}(t)</script></li>
+<li>获取一系列的剪枝阈值：<script type="math/tex">0 = \alpha_{0} < \alpha_{1} < \ldots < \alpha_{p} < + \infty</script>，在每个剪枝阈值<script type="math/tex">\alpha_{i}</script>上对相应的 Node 进行局部剪枝并将局部剪枝后得到的决策树<script type="math/tex">T_{i}</script>储存在一个列表中。在<script type="math/tex">\alpha_{p}</script>上我们会对根节点进行局部剪枝，此时剩下来的决策树<script type="math/tex">T_{p}</script>就只包含根节点这一个 Node。最后，通过交叉验证选出<script type="math/tex">T_{0},\ldots,T_{p}</script>中最好的决策树作为最终生成的决策树（注意其中的<script type="math/tex">T_{0}</script>即是没有剪过枝的原始树）</li>
+</ul>
+<p>第一种算法清晰易懂，第二种算法则稍显复杂；一般我们会在 ID3 和 C4.5 中应用第一种剪枝算法、在 CART 中应用第二种剪枝算法。上述这个第二种算法的说明可能有些过于简略、让人摸不着头脑；由于详细的算法叙述会在后文再次进行，所以这里只要有一个大概的直观感受即可，细节可以暂时按下、不必太过纠结</p>
+<h1 id="ID3、C4-5-的剪枝算法"><a href="#ID3、C4-5-的剪枝算法" class="headerlink" title="ID3、C4.5 的剪枝算法"></a>ID3、C4.5 的剪枝算法</h1><p>首先我们来看看第一种算法的详细叙述。虽说算法本身的思想很简单，但由于其中涉及到许多中间变量、所以我们采取类似于伪代码的形式来进行叙述：</p>
+<ol>
+<li><strong>输入</strong>：生成算法产生的原始决策树<script type="math/tex">T</script>，惩罚因子<script type="math/tex">\alpha</script></li>
+<li><strong>过程</strong>：<ol>
+<li>从下往上地获取<script type="math/tex">T</script>中所有 Node，存入列表<code>_tmp_nodes</code></li>
+<li>对<code>_tmp_nodes</code>中的所有 Node 计算损失，存入列表<code>_old</code></li>
+<li>计算<code>_tmp_nodes</code>中所有 Node 进行局部剪枝后的损失，存入列表<code>_new</code></li>
+<li>进入循环体：<ol>
+<li>若<code>_new</code>中所有损失都大于<code>_old</code>中对应的损失、则退出循环体</li>
+<li>否则，设 p 满足：  <script type="math/tex; mode=display">
+p = \arg{\min_{p}{\text{_new}\lbrack p\rbrack \leq \text{_old}\lbrack p\rbrack}}</script>则对<code>_tmp_nodes[p]</code>进行局部剪枝</li>
+<li>在完成局部剪枝后，更新<code>_old</code>、<code>_new</code>、<code>_tmp_nodes</code>等变量。具体而言，我们无需重新计算它们、只需更新“被影响到的” Node 所对应的位置的值即可</li>
+</ol>
+</li>
+<li>最后调用<code>self.reduce_nodes</code>方法、将被剪掉的 Node 从<code>nodes</code>中除去</li>
+</ol>
+</li>
+<li><strong>输出</strong>：修剪过后的决策树<script type="math/tex">T_{\alpha}</script></li>
+</ol>
+<p>我们可以在我们之前用气球数据集 1.0 根据 ID3 算法生成的决策树上过一遍剪枝算法以加深理解。由于算法顺序是从下往上、所以我们先考察最右下方的 Node（该 Node 的划分标准是“测试人员”），该 Node 所包含的数据集如下表所示：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>测试人员</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>不爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>从而：</p>
+<ul>
+<li>局部剪枝前、该 Node 的损失为：  <script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = C\left( T \right) + \alpha\left| T \right| = 0 + 2\alpha = 2\alpha</script></li>
+<li>局部剪枝后、该 Node 的损失为：  <script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) = C\left( t \right) + \alpha\left| t \right| = C\left( t \right) + \alpha</script>其中  <script type="math/tex; mode=display">
+C\left( t \right) = N_{t}H_{t} = 2 \times \left( - \frac{1}{2}\log\frac{1}{2} - \frac{1}{2}\log\frac{1}{2} \right) = 2</script>故  <script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) = 2 + \alpha</script></li>
+</ul>
+<p>回忆生成算法的实现，我们彼时将<script type="math/tex">\alpha</script>定义为了<script type="math/tex">\alpha = \frac{特征个数}{2}</script>（注意：这只是<script type="math/tex">\alpha</script>的一种朴素的定义方法，很难说它有什么合理性、只能说它从直观上有一定道理；如果想让模型表现更好、需要结合具体的问题来分析<script type="math/tex">\alpha</script>应该取何值）。由于气球数据集 1.0 一共有四个特征、所以此时<script type="math/tex">\alpha = 2</script>；结合各个公式、我们发现：</p>
+<script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) = 2\alpha = 4 = 2 + \alpha = C_{\alpha}(t)</script><p>所以我们应该对该 Node 进行局部剪枝。局部剪枝后的决策树如下图所示：</p>
+<img src="/posts/1a7aa546/p1.png" alt="p1.png" title="">
+<p><strong><em>注意：进行局部剪枝后，由于该 Node 中样本只有两个、且一个样本类别为“不爆炸”一个为“爆炸”，所以给该 Node 标注为“不爆炸”、“爆炸”甚至以 50%的概率标注为“不爆炸”等做法都是合理的。为简洁，我们如上图中所做的一般、将其标注为“爆炸”</em></strong></p>
+<p>然后我们需要考察最左下方的 Node（该 Node 的划分标准也是“测试人员”），易知计算过程和上述的没有区别。对其进行局部剪枝后的决策树如下图所示：</p>
+<img src="/posts/1a7aa546/p2.png" alt="p2.png" title="">
+<p>然后我们需要考察右下方的 Node（该 Node 的划分标准是“动作”），该 Node 所包含的数据集如下表所示：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>测试人员</th>
+<th>测试动作</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用手打</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用手打</td>
+<td>不爆炸</td>
+</tr>
+<tr>
+<td>  黄色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>成人</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+<tr>
+<td>  紫色</td>
+<td>小孩</td>
+<td>用脚踩</td>
+<td>爆炸</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>从而：</p>
+<ul>
+<li><p>局部剪枝前、该 Node 的损失为：  </p>
+<script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = C\left( T \right) + \alpha\left| T \right| = C\left( T \right) + 2\alpha</script><p>其中  </p>
+<script type="math/tex; mode=display">
+\begin{align}
+C\left( T \right) = N_{}H_{} + N_{}H_{} \\
+
+= 2 \times \left( - \frac{1}{2}\log\frac{1}{2} - \frac{1}{2}\log\frac{1}{2} \right) + 4 \times 0 = 2
+\end{align}</script><p>故  </p>
+<script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = 2 + 2\alpha</script></li>
+<li>局部剪枝后、该 Node 的损失为：  <script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) = C\left( t \right) + \alpha\left| t \right| = C\left( t \right) + \alpha</script>其中  <script type="math/tex; mode=display">
+C\left( t \right) = N_{t}H_{t} = 6 \times \left( - \frac{1}{6}\log\frac{1}{6} - \frac{5}{6}\log\frac{5}{6} \right) \approx 3.9</script>故  <script type="math/tex; mode=display">
+C_{\alpha}\left( t \right) \approx 3.9 + \alpha</script></li>
+</ul>
+<p>将<script type="math/tex">\alpha = 2</script>代入、知：</p>
+<script type="math/tex; mode=display">
+C_{\alpha}\left( T \right) = 2 + 2\alpha = 6 > 5.9 = 3.9 + \alpha \approx C_{\alpha}(t)</script><p>故应该对该 Node 进行局部剪枝。局部剪枝后的决策树如下图所示：</p>
+<img src="/posts/1a7aa546/p3.png" alt="p3.png" title="">
+<p>然后我们需要考察左下方的 Node（该 Node 的划分标准也是“动作”），易知计算过程和上述的没有区别。对其进行局部剪枝后的决策树如下图所示：</p>
+<img src="/posts/1a7aa546/p4.png" alt="p4.png" title="">
+<p>通过计算易知不应对根节点进行局部剪枝、所以上图所示的决策树即是当<script type="math/tex">\alpha = 2</script>时最终修剪出来的决策树</p>
+<h1 id="CART-剪枝"><a href="#CART-剪枝" class="headerlink" title="CART 剪枝"></a>CART 剪枝</h1><p>第二种剪枝算法（CART 剪枝）中的许多定义可能还不是很清晰，所以我们先对相关概念进行详细一点的直观说明：</p>
+<p>首先需要指出的是：关于第二种算法中出现的一系列的阈值，它们的含义其实和第一种算法中的<script type="math/tex">\alpha</script>一样、都是模型复杂度的“惩罚因子”；不同的是，第一种算法的<script type="math/tex">\alpha</script>是人为给定的、第二种算法中一系列的阈值则是算法生成出来的。其中，<script type="math/tex">\alpha_{0} = 0</script>意味着算法初始不对模型复杂度进行惩罚、此时最优树即是原始树<script type="math/tex">T_{0}</script>。然后我们设想<script type="math/tex">\alpha</script>缓慢增大、亦即缓慢增大对模型复杂度的惩罚，那么到某个阈值<script type="math/tex">\alpha_{1}</script>时，对决策树中某个 Node 进行局部剪枝就是一个更好的选择。我们将该 Node 进行局部剪枝后的决策树<script type="math/tex">T_{1}</script>存进一个列表中、然后继续缓慢增加惩罚因子<script type="math/tex">\alpha</script>，继而到某个阈值<script type="math/tex">\alpha_{2}</script>后、对某个 Node 进行局部剪枝就又会是一个更好的选择……以此类推，直到<script type="math/tex">\alpha</script>变成一个充分大的数<script type="math/tex">\alpha_{p}</script>后、只保留根节点这一个 Node 会是最好的选择，此时就终止算法并通过交叉验证从<script type="math/tex">T_{0},\ldots,T_{p}</script>中选出最好的<script type="math/tex">T_{p^{*}}</script>作为修剪后的决策树。</p>
+<p>那么这个相对比较复杂的算法有什么优异之处呢？可以证明：在 CART 剪枝里得到的决策树<script type="math/tex">T_{0},\ldots,T_{p}</script>中，对<script type="math/tex">\forall i = 0,\ldots,p</script>、<script type="math/tex">T_{i}</script>都是当惩罚因子<script type="math/tex">\alpha \in \lbrack\alpha_{i},\alpha_{i + 1})</script>时的最优决策树。这条性质保证了 CART 算法最终通过交叉验证选出来的决策树<script type="math/tex">T_{p^{*}}</script>具有一定的优良性。</p>
+<p>该算法的详细叙述则如下：</p>
+<ol>
+<li><strong>输入</strong>：在训练集上调用生成算法所产生的原始决策树<script type="math/tex">T</script>，交叉验证集</li>
+<li>过程：<ol>
+<li>从下往上地获取<script type="math/tex">T</script>中所有 Node，存入列表<code>_tmp_nodes</code></li>
+<li>对<code>_tmp_nodes</code>中的所有 Node 计算阈值，存入列表<code>_thresholds</code>；其中，第 t 个 Node 的阈值<script type="math/tex">\alpha_{t}</script>应满足：  <script type="math/tex; mode=display">
+C\left( T_{t} \right) + \alpha_{t}\left| T_{t} \right| = C_{\alpha_{t}}\left( T_{t} \right) = C_{\alpha_{t}}\left( t \right) = C\left( t \right) + \alpha_{t}</script>其中<script type="math/tex">C(t)</script>即是第 t 个 Node 自身数据的不确定性；换言之，<script type="math/tex">C_{\alpha_{t}}(T_{t})</script>代表着第 t 个 Node 进行局部剪枝前的新损失、<script type="math/tex">C_{\alpha_{t}}(t)</script>代表着局部剪枝后的新损失。由上式可求出：  <script type="math/tex; mode=display">
+\alpha_{t} = \frac{C\left( t \right) - C\left( T_{t} \right)}{\left| T_{t} \right| - 1}</script>此即阈值的计算公式</li>
+<li>进入循环体：<ol>
+<li>将当前决策树存入列表<code>self.roots</code></li>
+<li>若当前决策树中只剩根节点、则退出循环体</li>
+<li>否则，取 p 满足：  <script type="math/tex; mode=display">
+p = \arg{\min_{p}{\_\text{thresholds}}}</script>然后对<code>_tmp_nodes[p]</code>进行局部剪枝</li>
+<li>在完成局部剪枝后，更新<code>_thresholds</code>、<code>_tmp_nodes</code>等变量。具体而言，我们无需重新计算它们、只需更新“被影响到的” Node 所对应的位置的值即可</li>
+</ol>
+</li>
+<li>然后调用<code>self.reduce_nodes</code>方法、将被剪掉的 Node 从<code>nodes</code>中除去</li>
+<li>最后利用交叉验证、从<code>self.roots</code>中选出表现最好的决策树<script type="math/tex">T_{p^{*}}</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：修剪过后的决策树<script type="math/tex">T_{p^{*}}</script></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/b07c81ec/" rel="prev" title="树结构的实现">
+                <i class="fa fa-chevron-left"></i> 树结构的实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/602f7125/" rel="next" title="剪枝算法的实现">
+                剪枝算法的实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ID3、C4-5-的剪枝算法"><span class="nav-number">1.</span> <span class="nav-text">ID3、C4.5 的剪枝算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CART-剪枝"><span class="nav-number">2.</span> <span class="nav-text">CART 剪枝</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
