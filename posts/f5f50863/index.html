@@ -1,0 +1,1055 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="算法,Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="由前文的讨论可知，问题的关键主要在如下两点：  如何根据弱模型的表现更新训练集的权重 如何根据弱模型的表现决定弱模型的话语权  我们接下来就看看 AdaBoost 算法是怎样解决上述两个问题的。事实上，能够将这两个问题的解决方案有机地糅合在一起、正是 AdaBoost 的巧妙之处之一">
+<meta name="keywords" content="算法,Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AdaBoost 算法">
+<meta property="og:url" content="http://www.carefree0910.com/posts/f5f50863/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="由前文的讨论可知，问题的关键主要在如下两点：  如何根据弱模型的表现更新训练集的权重 如何根据弱模型的表现决定弱模型的话语权  我们接下来就看看 AdaBoost 算法是怎样解决上述两个问题的。事实上，能够将这两个问题的解决方案有机地糅合在一起、正是 AdaBoost 的巧妙之处之一">
+<meta property="og:image" content="http://www.carefree0910.com/posts/f5f50863/p1.png">
+<meta property="og:updated_time" content="2017-04-25T15:50:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AdaBoost 算法">
+<meta name="twitter:description" content="由前文的讨论可知，问题的关键主要在如下两点：  如何根据弱模型的表现更新训练集的权重 如何根据弱模型的表现决定弱模型的话语权  我们接下来就看看 AdaBoost 算法是怎样解决上述两个问题的。事实上，能够将这两个问题的解决方案有机地糅合在一起、正是 AdaBoost 的巧妙之处之一">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/f5f50863/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/f5f50863/"/>
+
+
+
+
+
+  <title> AdaBoost 算法 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/f5f50863/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                AdaBoost 算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T23:31:03+08:00">
+                2017-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/集成学习/" itemprop="url" rel="index">
+                    <span itemprop="name">集成学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>由前文的讨论可知，问题的关键主要在如下两点：</p>
+<ul>
+<li>如何根据弱模型的表现更新训练集的权重</li>
+<li>如何根据弱模型的表现决定弱模型的话语权</li>
+</ul>
+<p>我们接下来就看看 AdaBoost 算法是怎样解决上述两个问题的。事实上，能够将这两个问题的解决方案有机地糅合在一起、正是 AdaBoost 的巧妙之处之一</p>
+<a id="more"></a>
+<h1 id="AdaBoost-算法陈述"><a href="#AdaBoost-算法陈述" class="headerlink" title="AdaBoost 算法陈述"></a>AdaBoost 算法陈述</h1><p>不失一般性、我们以二类分类问题来进行讨论，易知此时我们的弱模型、强模型和最终模型为弱分类器、强分类器和最终分类器。再不妨假设我们现在有的是一个二类分类的训练数据集：</p>
+<script type="math/tex; mode=display">
+D = \{\left( x_{1},y_{1} \right),\left( x_{2},y_{2} \right),\ldots,(x_{n},\ y_{n})\}</script><p>其中，每个样本点都是由实例<script type="math/tex">x_{i}</script>和类别<script type="math/tex">y_{i}</script>组成、且：</p>
+<script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script><p>这里的<script type="math/tex">X</script>是样本空间、<script type="math/tex">Y</script>是类别空间。AdaBoost 会利用如下的步骤、从训练数据中训练出一系列的弱分类器、然后把这些弱分类器集成为一个强分类器：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集（包含 N 个数据）、弱学习算法及对应的弱分类器、迭代次数 M</li>
+<li><strong>过程</strong>：<ol>
+<li>初始化训练数据的权值分布  <script type="math/tex; mode=display">
+W_{0} = (w_{01},\ldots,w_{0N})</script></li>
+<li>对<script type="math/tex">k = 0,1,\ldots,\ M - 1</script>：<ol>
+<li>使用权值分布为<script type="math/tex">W_{k}</script>的训练数据集训练弱分类器  <script type="math/tex; mode=display">g_{k + 1}(x)$$：$$X \rightarrow \{ - 1,\  + 1\}</script></li>
+<li>计算<script type="math/tex">g_{k + 1}(x)</script>在训练数据集上的加权错误率  <script type="math/tex; mode=display">
+e_{k + 1} = \sum_{i = 1}^{N}{w_{\text{ki}}I(g_{k + 1}\left( x_{i} \right) \neq y_{i})}</script></li>
+<li>根据加权错误率计算<script type="math/tex">g_{k + 1}(x)</script>的“话语权”  <script type="math/tex; mode=display">
+\alpha_{k + 1} = \frac{1}{2}\ln\frac{1 - e_{k + 1}}{e_{k + 1}}</script></li>
+<li>根据<script type="math/tex">g_{k + 1}(x)</script>的表现更新训练数据集的权值分布：被<script type="math/tex">g_{k + 1}\left( x \right)</script>误分的样本（<script type="math/tex">y_{i}g_{k + 1}\left( x_{i} \right) < 0</script>的样本）要相对地（以<script type="math/tex">e^{\alpha_{k + 1}}</script>为比例地）增大其权重，反之则要（以<script type="math/tex">e^{- \alpha_{k + 1}}</script>为比例地）减少其权重  <script type="math/tex; mode=display">
+w_{k + 1,i} = \frac{w_{\text{ki}}}{Z_{k}} \cdot exp( - \alpha_{k + 1}y_{i}g_{k + 1}(x_{i}))</script><script type="math/tex; mode=display">
+W_{k + 1} = (w_{k + 1,1},\ldots,w_{k + 1,N})</script>这里的<script type="math/tex">Z_{k}</script>是规范化因子  <script type="math/tex; mode=display">
+Z_{k} = \sum_{i = 1}^{N}{w_{\text{ki}} \cdot exp( - \alpha_{k + 1}y_{i}g_{k + 1}(x_{i}))}</script>它的作用是将<script type="math/tex">W_{k + 1}</script>归一化成为一个概率分布</li>
+</ol>
+</li>
+<li>加权集成弱分类器  <script type="math/tex; mode=display">
+f\left( x \right) = \sum_{k = 1}^{M}{\alpha_{k}g_{k}(x)}</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：最终分类器<script type="math/tex">g(x)</script>  <script type="math/tex; mode=display">
+g\left( x \right) = sign\left( f\left( x \right) \right) = \text{sign}\left( \sum_{k = 1}^{M}{\alpha_{k}g_{k}\left( x \right)} \right)</script></li>
+</ol>
+<p><strong><em>注意：2.2.2 步骤得到的加权错误率如果足够小的话，可以考虑提前停止训练，但这样做往往不是最合理的选择（这点会在后文进行模型性能分析时进行较详细的说明）</em></strong></p>
+<p>我们在分配弱分类器的话语权时用到了一个公式：<script type="math/tex">\alpha_{k + 1} = \frac{1}{2}\ln\frac{1 - e_{k + 1}}{e_{k + 1}}</script>。在该公式中，话语权<script type="math/tex">\alpha_{k + 1}</script>会随着加权错误率<script type="math/tex">e_{k + 1} \in \lbrack 0,\ 1\rbrack</script>的增大而减小。它们之间的函数关系如下图所示：</p>
+<img src="/posts/f5f50863/p1.png" alt="p1.png" title="">
+<p>大多数情况我们训练出来的弱分类器的<script type="math/tex">e_{k} < 0.5</script>、对应着的是上图左半边的部分；不过即使我们的弱分类器非常差、以至于<script type="math/tex">e_{k} > 0.5</script>，由于此时<script type="math/tex">\alpha_{k} < 0</script>、亦即我们知道该分类器的表决应该反着来看、所以也不会出问题（有一种做法是如果训练到<script type="math/tex">e_{k} > 0.5</script>的话就停止训练，个人感觉也有道理）</p>
+<h1 id="弱模型的选择"><a href="#弱模型的选择" class="headerlink" title="弱模型的选择"></a>弱模型的选择</h1><p>看到这里，观众老爷们可能会产生这么一个疑问：如果我们不拘泥于对弱模型进行提升、转而对强模型或比较强的弱模型进行提升的话，会不会提升出更好的模型呢？从 Boosting 的思想来看、需要指出的是：用 Boosting 进行提升的弱模型的学习能力不宜太强，否则使用 Boosting 就没有太大的意义、甚至从原理上不太兼容。直观地说，Boosting 是为了让各个弱模型专注于“某一方面”、最后加权表决，如果使用了较强的弱模型，可能一个弱模型就包揽了好几方面，最后可能反而会模棱两可、起不到“提升”的效果。而且从迭代的角度来说，可以想象：如果使用较强弱模型的话，可能第一次产生的模型就已经达到“最优”、从而使得模型没有“提升空间”</p>
+<p><strong><em>注意：虽然笔者认为在 Boosting 中的弱模型就应该选择足够弱的模型，但确实亦有对强模型（如核 SVM）应用 Boosting 也很好的说法。详细而严谨的讨论会牵扯大量的数学理论、这里就不详细展开了</em></strong></p>
+<p>可能观众老爷们此时又会产生一个新的疑问：如果说 Boosting 中的弱模型不宜太强的话，是不是说 Bagging 中的个体模型也不宜太强呢？需要指出的是，虽然从理论上来说使用弱模型进行集成就已足以获得一个相当不错的最终模型，但使用较强的模型来进行集成从原理上是不太矛盾的。考虑到不同的场合，有时确实可以选用较强的模型来作为个体模型</p>
+<p>那么所谓的不太强的弱模型大概是个什么东西呢？一个比较直观的例子就是限制层数的决策树。极端的情况就是限定它只能有一层、亦即上一章我们提到过的“决策树桩”，对应的进行了提升后的模型就是相当有名的提升树（Boosting Tree），它被认为是统计学习中性能最好的方法之一、既可以用来做分类也可以拿来做回归，是个相当强力的模型</p>
+<h1 id="AdaBoost-的实现"><a href="#AdaBoost-的实现" class="headerlink" title="AdaBoost 的实现"></a>AdaBoost 的实现</h1><p>从第一节的算法讲解其实可以看出，虽然 AdaBoost 算法本身很不平凡，但它给出的步骤都是相当便于实现的，基本上一个步骤就对应着 Python 里面的一行代码。在实现的过程中，困难之处可能主要在于如何让实现出来的 AdaBoost 框架易于扩展并具有方便调用的接口，而不在于实现算法本身。同时，为了能够更好地理解 AdaBoost 算法，我们需要对其性能作一系列的分析</p>
+<p>由于 AdaBoost 是一个用于提升弱模型的算法，所以我们整体的实现思路大致是（不失一般性、我们先讨论二类分类问题）：</p>
+<ul>
+<li>搭建 AdaBoost 框架</li>
+<li>使用 sklearn 中的分类器对框架的正确性进行检验</li>
+<li>使用前两章实现的分类器进行对比实验</li>
+</ul>
+<p>所以我们要先把 AdaBoost 框架实现出来。为此，先来看 AdaBoost 框架的初始化步骤（其中<a href="https://github.com/carefree0910/MachineLearning/tree/master/_SKlearn" target="_blank" rel="external">_SKlearn</a>是我对 sklearn 中的模型做了一定程度的拓展后的模型包）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> math <span class="keyword">import</span> log</div><div class="line"><span class="comment"># 导入我们之前实现的朴素贝叶斯模型和决策树模型</span></div><div class="line"><span class="keyword">from</span> b_NaiveBayes.Vectorized.MultinomialNB <span class="keyword">import</span> MultinomialNB</div><div class="line"><span class="keyword">from</span> b_NaiveBayes.Vectorized.GaussianNB <span class="keyword">import</span> GaussianNB</div><div class="line"><span class="keyword">from</span> c_CvDTree.Tree <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span> _SKlearn.NaiveBayes <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span> _SKlearn.Tree <span class="keyword">import</span> *</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">AdaBoost</span>:</span></div><div class="line">    <span class="comment"># 弱分类器字典，如果想要测试新的弱分类器的话、只需将其加入该字典即可</span></div><div class="line">    _weak_clf = &#123;</div><div class="line">        <span class="string">"SKMNB"</span>: SKMultinomialNB,</div><div class="line">        <span class="string">"SKGNB"</span>: SKGaussianNB,</div><div class="line">        <span class="string">"SKTree"</span>: SKTree,</div><div class="line"></div><div class="line">        <span class="string">"MNB"</span>: MultinomialNB,</div><div class="line">        <span class="string">"GNB"</span>: GaussianNB,</div><div class="line">        <span class="string">"ID3"</span>: ID3Tree,</div><div class="line">        <span class="string">"C45"</span>: C45Tree,</div><div class="line">        <span class="string">"Cart"</span>: CartTree</div><div class="line">    &#125;</div><div class="line">    <span class="string">"""</span></div><div class="line">        AdaBoost框架的朴素实现</div><div class="line">        使用的弱分类器需要有如下两个方法：</div><div class="line">            1) 'fit'      方法，它需要支持输入样本权重</div><div class="line">            2) 'predict'  方法, 它用于返回预测的类别向量</div><div class="line">        初始化结构</div><div class="line">        self._clf：记录弱分类器名称的变量</div><div class="line">        self._clfs：记录弱分类器的列表</div><div class="line">        self._clfs_weights：记录弱分类器“话语权”的列表</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        self._clf, self._clfs, self._clfs_weights = <span class="string">""</span>, [], []</div></pre></td></tr></table></figure>
+<p>接下来就是训练和预测部分的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, sample_weight=None, clf=None, epoch=<span class="number">10</span>, eps=<span class="number">1e-12</span>, **kwargs)</span>:</span></div><div class="line">    <span class="comment"># 默认使用10个CART决策树桩作为弱分类器</span></div><div class="line">    <span class="keyword">if</span> clf <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">or</span> AdaBoost._weak_clf[clf] <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        clf = <span class="string">"Cart"</span></div><div class="line">        kwargs = &#123;<span class="string">"max_depth"</span>: <span class="number">1</span>&#125;</div><div class="line">    self._clf = clf</div><div class="line">    <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        sample_weight = np.ones(len(y)) / len(y)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        sample_weight = np.array(sample_weight)</div><div class="line">    <span class="comment"># AdaBoost算法的主循环，epoch为迭代次数</span></div><div class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">        <span class="comment"># 根据样本权重训练弱分类器</span></div><div class="line">        tmp_clf = AdaBoost._weak_clf[clf](**kwargs)</div><div class="line">        tmp_clf.fit(x, y, sample_weight)</div><div class="line">        <span class="comment"># 调用弱分类器的predict方法进行预测</span></div><div class="line">        y_pred = tmp_clf.predict(x)</div><div class="line">        <span class="comment"># 计算加权错误率；考虑到数值稳定性，在边值情况加了一个小的常数</span></div><div class="line">        em = min(max((y_pred != y).dot(self._sample_weight[:, <span class="keyword">None</span>])[<span class="number">0</span>], eps), <span class="number">1</span> - eps)</div><div class="line">        <span class="comment"># 计算该弱分类器的“话语权”</span></div><div class="line">        am = <span class="number">0.5</span> * log(<span class="number">1</span> / em - <span class="number">1</span>)</div><div class="line">        <span class="comment"># 更新样本权重并利用deepcopy将该弱分类器记录在列表中</span></div><div class="line">        sample_weight *= np.exp(-am * y * y_pred)</div><div class="line">        sample_weight /= np.sum(sample_weight)</div><div class="line">        self._clfs.append(deepcopy(tmp_clf))</div><div class="line">        self._clfs_weights.append(am)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x)</span>:</span></div><div class="line">    x = np.atleast_2d(x)</div><div class="line">    rs = np.zeros(len(x))</div><div class="line">    <span class="comment"># 根据各个弱分类器的“话语权”进行决策</span></div><div class="line">    <span class="keyword">for</span> clf, am <span class="keyword">in</span> zip(self._clfs, self._clfs_weights):</div><div class="line">        rs += am * clf.predict(x)</div><div class="line">    <span class="comment"># 将预测值大于0的判为类别1，小于0的判为类别-1</span></div><div class="line">    <span class="keyword">return</span> np.sign(rs)</div></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/c0a9c025/" rel="prev" title="随机森林算法">
+                <i class="fa fa-chevron-left"></i> 随机森林算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/fb0d2f02/" rel="next" title="集成模型的性能分析">
+                集成模型的性能分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AdaBoost-算法陈述"><span class="nav-number">1.</span> <span class="nav-text">AdaBoost 算法陈述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#弱模型的选择"><span class="nav-number">2.</span> <span class="nav-text">弱模型的选择</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AdaBoost-的实现"><span class="nav-number">3.</span> <span class="nav-text">AdaBoost 的实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

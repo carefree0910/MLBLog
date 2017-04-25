@@ -92,17 +92,17 @@
 
 
 
-<meta name="description" content="这一节会叙述琴生不等式（Jensen’s Inequality）及其一个简单的应用，为此我们需要知道凸函数的概念：  若函数f(x)对\forall p\in [0,1]、都满足：   pf\left( x_{1} \right) + \left( 1 - p \right)f\left( x_{2} \right) \leq f\left( px_{1} + \left( 1 - p \righ">
+<meta name="description" content="这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度">
 <meta name="keywords" content="数学">
 <meta property="og:type" content="article">
 <meta property="og:title" content="相关数学理论">
 <meta property="og:url" content="http://www.carefree0910.com/posts/613bbb2f/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
-<meta property="og:description" content="这一节会叙述琴生不等式（Jensen’s Inequality）及其一个简单的应用，为此我们需要知道凸函数的概念：  若函数f(x)对\forall p\in [0,1]、都满足：   pf\left( x_{1} \right) + \left( 1 - p \right)f\left( x_{2} \right) \leq f\left( px_{1} + \left( 1 - p \righ">
-<meta property="og:updated_time" content="2017-04-23T02:42:45.000Z">
+<meta property="og:description" content="这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度">
+<meta property="og:updated_time" content="2017-04-25T16:49:37.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="相关数学理论">
-<meta name="twitter:description" content="这一节会叙述琴生不等式（Jensen’s Inequality）及其一个简单的应用，为此我们需要知道凸函数的概念：  若函数f(x)对\forall p\in [0,1]、都满足：   pf\left( x_{1} \right) + \left( 1 - p \right)f\left( x_{2} \right) \leq f\left( px_{1} + \left( 1 - p \righ">
+<meta name="twitter:description" content="这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度">
 
 
 
@@ -345,8 +345,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-23T10:33:22+08:00">
-                2017-04-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-26T00:19:04+08:00">
+                2017-04-26
               </time>
             
 
@@ -368,8 +368,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/决策树/" itemprop="url" rel="index">
-                    <span itemprop="name">决策树</span>
+                  <a href="/categories/集成学习/" itemprop="url" rel="index">
+                    <span itemprop="name">集成学习</span>
                   </a>
                 </span>
 
@@ -403,41 +403,82 @@
       
 
       
-        <p>这一节会叙述琴生不等式（Jensen’s Inequality）及其一个简单的应用，为此我们需要知道凸函数的概念：</p>
-<ul>
-<li>若函数<script type="math/tex">f(x)</script>对<script type="math/tex">\forall p\in [0,1]</script>、都满足：  <script type="math/tex; mode=display">
-pf\left( x_{1} \right) + \left( 1 - p \right)f\left( x_{2} \right) \leq f\left( px_{1} + \left( 1 - p \right)x_{2} \right)</script>则称<script type="math/tex">f(x)</script>为凸函数（有时又叫上凸函数）</li>
-</ul>
-<p>琴生不等式是针对凸函数提出的，下面就具体说一下其内容与证明</p>
+        <p>这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度</p>
 <a id="more"></a>
-<h1 id="定理内容"><a href="#定理内容" class="headerlink" title="定理内容"></a>定理内容</h1><p>对于<script type="math/tex">\lbrack a,b\rbrack</script>上的凸函数，若</p>
+<h1 id="经验分布函数"><a href="#经验分布函数" class="headerlink" title="经验分布函数"></a>经验分布函数</h1><p>正如前文所说，经验分布函数的数学表达式为：</p>
 <script type="math/tex; mode=display">
-p_{1},...,p_{K} \in \left\lbrack 0,1 \right\rbrack,\ \ p_{1} + p_{2} + \ldots + p_{K} = 1</script><p>则有</p>
+F_{N}\left( x \right) = \frac{1}{N}\sum_{i = 1}^{N}{I_{\left( - \infty,x \right\rbrack}(x_{i})}</script><p>如果将<script type="math/tex">x_{1},\ldots,x_{N}</script>按从小到大的顺序排成<script type="math/tex">x_{(1)},\ldots,x_{\left( N \right)}</script>，我们通常称其中的<script type="math/tex">x_{\left( i \right)}</script>为第 i 个次序统计量。易知可以利用次序统计量将<script type="math/tex">F_{N}(x)</script>表示成更直观的形式：</p>
 <script type="math/tex; mode=display">
-\sum_{k = 1}^{K}{p_{i}f(x_{i})} \leq f(\sum_{k = 1}^{K}{p_{i}x_{i}})</script><p>接下来我们会利用它来证明等概率分布具有最大熵。注意到可以证明函数</p>
+F_{N}\left( x \right) = \left\{ \begin{matrix}
+0,\ \ &x < x_{\left( 1 \right)} \\
+\frac{i}{N},\ \ &x \in \left\lbrack x_{\left( i \right)},x_{\left( i + 1 \right)} \right)\ (i = 1,\ldots,N - 1) \\
+1,\ \ &x \geq x_{\left( N \right)} \\
+\end{matrix} \right.\</script><p>关于其优良性，前文所说的“频率估计概率”的严谨叙述其实就是强大数律：</p>
 <script type="math/tex; mode=display">
-\hat{H}\left( p \right) = - p\log p</script><p>是一个凸函数，于是熵的定义式可以写成</p>
+p\left( \lim_{N}{F_{N}\left( x \right) - F\left( x \right) = 0} \right) = 1\ (\forall x)</script><p>亦即</p>
 <script type="math/tex; mode=display">
-H\left( y \right) = - \sum_{k = 1}^{K}{p_{k}\log p_{k}} = \sum_{k = 1}^{K}{\hat{H}\left( p_{k} \right)}</script><p>从而</p>
+F_{N}(x) \xrightarrow{a.s.} F(x)</script><p>同时还有一个更强的结论（Glivenko-Cantelli 定理）：</p>
 <script type="math/tex; mode=display">
-\frac{1}{K}H\left( y \right) = \frac{1}{K}\sum_{k = 1}^{K}{\hat{H}(p_{k})} \leq \hat{H}\left( \sum_{k = 1}^{K}{\frac{1}{K}p_{k}} \right) = \hat{H}\left( \frac{1}{K} \right) = - \frac{1}{K}\log\frac{1}{K} = \frac{1}{K}\log K</script><p>亦即</p>
+p\left( \lim_{N}{\sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right| = 0} \right) = 1</script><p>亦即</p>
 <script type="math/tex; mode=display">
-H\left( y \right) \leq \log K</script><p>等式当且仅当</p>
+\left\| F_{N}\left( x \right) - F\left( x \right) \right\|_{\infty} \equiv \sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right|\xrightarrow{a.s.}0</script><p>其中，<script type="math/tex">\sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right|</script>就是著名的柯尔莫诺夫-斯米尔诺夫检验（Kolmogorov-Smirnov Statistic）。值得一提的是，用其它范数来代替这里的无穷范数有时也是合理的。比如说用二范数来代替时、对应的就是 Cramér-von Mises Criterion</p>
+<p>此外，我们还可以利用中心极限定理等来研究经验分布函数（比如与正态分布扯上关系等等），这里就不详细展开了。总之，经验分布函数的优良性是相当有保证的，与其本质类似的 Bootstrap 的优良性也因而有了保证。当然、Bootstrap 自己是有一套成熟理论的，不过如果就这点展开来叙述的话、多多少少会偏离了本系列文章的主旨，所以这里就仅通过讨论经验分布函数来间接地感受 Bootstrap 的优良性</p>
+<h1 id="AdaBoost-与前向分步加法模型"><a href="#AdaBoost-与前向分步加法模型" class="headerlink" title="AdaBoost 与前向分步加法模型"></a>AdaBoost 与前向分步加法模型</h1><p>本节主要用于推导如下定理：AdaBoost 分类模型可以等价为损失函数为指数函数的前向分步加法模型</p>
+<p>假设经过<script type="math/tex">k</script>轮迭代后、前项分布算法已经得到了加法模型<script type="math/tex">f_{k}(x)</script>，亦即：</p>
 <script type="math/tex; mode=display">
-p_{1} = p_{2} = \ldots = p_{K} = \frac{1}{K}</script><p>时取得</p>
-<h1 id="定理证明"><a href="#定理证明" class="headerlink" title="定理证明"></a>定理证明</h1><p>应用数学归纳法可以比较简单地完成证明：</p>
-<ul>
-<li>当时<script type="math/tex">K=2</script>、由凸函数定义直接证毕，此为奠基</li>
-<li>假设<script type="math/tex">K = n</script>时成立、考虑<script type="math/tex">K = n + 1</script>的情况，令  <script type="math/tex; mode=display">
-s_{n} = \sum_{k = 1}^{n}p_{k}</script>则  <script type="math/tex; mode=display">
-\sum_{k = 1}^{n + 1}{p_{k}f\left( x_{k} \right)} = s_{n}\sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} + p_{n + 1}f\left( x_{n + 1} \right)</script>注意到  <script type="math/tex; mode=display">
-\sum_{k = 1}^{n}\frac{p_{k}}{s_{n}} = 1</script>从而由<script type="math/tex">K = n</script>时的琴生不等式可知  <script type="math/tex; mode=display">
-\sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \leq f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right)</script>注意到  <script type="math/tex; mode=display">
-s_{n} + p_{n + 1} = 1</script>从而由凸函数定义知  <script type="math/tex; mode=display">
-s_{n}f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right) + p_{n + 1}f\left( x_{n + 1} \right) \leq f\left( s_{n}\sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} + p_{n + 1}x_{n + 1} \right)</script>综上所述、即得  <script type="math/tex; mode=display">
-\sum_{k = 1}^{n + 1}{p_{k}f(x_{k})} \leq f\left( \sum_{k = 1}^{n + 1}{p_{k}f\left( x_{k} \right)} \right)</script></li>
-</ul>
-<p>琴生不等式的应用非常广泛，证明等概率分布具有最大熵只是其中一个小应用。在许许多多涉及到凸问题的算法中、琴生不等式都显示出了强大的威力</p>
+\begin{align}
+f_{k}\left( x \right) &= f_{k - 1}\left( x \right) + \alpha_{k}g_{k}\left( x \right) = f_{k - 2}\left( x \right) + \alpha_{k - 1}g_{k - 1}\left( x \right) + \alpha_{k}g_{k}(x) \\
+
+&= \ldots = \sum_{i = 1}^{k}{\alpha_{i}g_{i}(x)}
+\end{align}</script><p>可知、第<script type="math/tex">k + 1</script>轮的模型<script type="math/tex">f_{k + 1}</script>能表示为：</p>
+<script type="math/tex; mode=display">
+f_{k + 1}\left( x \right) = f_{k}\left( x \right) + \alpha_{k + 1}g_{k + 1}(x)</script><p>我们关心的问题就是，如何在<script type="math/tex">f_{k}(x)</script>确定下来的情况下、训练出第<script type="math/tex">k + 1</script>轮的个体分类器<script type="math/tex">g_{k + 1}(x)</script>及其权重<script type="math/tex">\alpha_{k + 1}</script>。注意到我们的损失函数是指数函数，亦即：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+L &= \sum_{i = 1}^{N}{\exp\left\lbrack - y_{i}f_{k + 1}\left( x_{i} \right) \right\rbrack} \\
+
+&= \sum_{i = 1}^{N}w_{ki}\exp\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}(x_{i})\rbrack
+\end{align}</script><p>其中</p>
+<script type="math/tex; mode=display">
+w_{ki} = \exp\lbrack - y_{i}f_{k}(x_{i})\rbrack</script><p>在<script type="math/tex">f_{k}(x)</script>确定下来的情况下是常数。由于我们的最终目的是最小化损失函数、所以<script type="math/tex">\alpha_{k + 1}</script>和<script type="math/tex">g_{k + 1}(x)</script>就可以表示为：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\left( \alpha_{k + 1},g_{k + 1}\left( x \right) \right) &= \arg{\min_{\alpha,g}{\sum_{i = 1}^{N}{w_{ki}\exp\left\lbrack - y_{i}\alpha g\left( x_{i} \right) \right\rbrack}}} \\
+
+&= \arg{\min_{\alpha,g}{\sum_{y_{i} = g\left( x_{i} \right)}^{}{w_{ki}e^{- \alpha}} + \sum_{y_{i} \neq g\left( x_{i} \right)}^{}{w_{ki}e^{\alpha}}}} \\
+
+&= \arg{\min_{\alpha,g}{\left( e^{\alpha} - e^{- \alpha} \right)\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)} + e^{- \alpha}\sum_{i = 1}^{N}w_{ki}}} \\
+
+&= \arg{\min_{\alpha,g}{\left( e^{\alpha} - e^{- \alpha} \right)\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)} + e^{- \alpha}}}
+\end{align}</script><p>上式可以分两步求解。先看当<script type="math/tex">\alpha</script>确定下来后应该如何定出<script type="math/tex">g_{k + 1}(x)</script>，易知：</p>
+<script type="math/tex; mode=display">
+g_{k + 1}\left( x \right) = \arg{\min_{g}{\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)}}}</script><p>亦即第<script type="math/tex">k + 1</script>步的个体分类器应该使训练集上的加权错误率最小。不妨设解出的<script type="math/tex">g_{k + 1}(x)</script>在训练集上的加权错误率为<script type="math/tex">e_{k + 1}</script>、亦即：</p>
+<script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g_{k + 1}\left( x_{i} \right) \right)} \triangleq e_{k + 1}</script><p>我们需要利用它来定出<script type="math/tex">\alpha_{k + 1}</script>。注意到对目标函数求偏导后易知：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\alpha_{k + 1} &= \arg{\min_{\alpha}{\left( e^{\alpha} - e^{- \alpha} \right)e_{k + 1} + e^{- \alpha}}} \\
+
+&\Leftrightarrow \left( e^{\alpha_{k + 1}} + e^{- \alpha_{k + 1}} \right)e_{k + 1} - e^{- \alpha_{k + 1}} = 0 \\
+
+&\Leftrightarrow \alpha_{k + 1} = \frac{1}{2}\ln\frac{1 - e_{k + 1}}{e_{k + 1}}
+\end{align}</script><p>这和 AdaBoost 中确定个体分类器权值的式子一模一样。接下来只需要证明样本权重更新的式子也彼此一致即可得证定理，而事实上、由于：</p>
+<script type="math/tex; mode=display">
+f_{k + 1}\left( x \right) = f_{k}\left( x \right) + \alpha_{k + 1}g_{k + 1}\left( x \right)</script><p>从而</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w_{k + 1,i} &= \exp\left\lbrack - y_{i}f_{k + 1}\left( x_{i} \right) \right\rbrack \\
+
+&= \exp\left\lbrack - y_{i}f_{k}\left( x_{i} \right) \right\rbrack \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack \\
+
+&= w_{ki} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack
+\end{align}</script><p>注意到我们要将样本权重归一化，所以须有：</p>
+<script type="math/tex; mode=display">
+w_{k + 1,i} \leftarrow \frac{w_{k + 1,i}}{Z_{k}}</script><p>其中</p>
+<script type="math/tex; mode=display">
+Z_{k} = \sum_{i = 1}^{N}w_{k + 1,i} = \sum_{i = 1}^{N}{w_{ki} \cdot \exp\left\lbrack - \alpha_{k + 1}y_{i}g_{k + 1}\left( x_{i} \right) \right\rbrack}</script><p>是故</p>
+<script type="math/tex; mode=display">
+w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack</script><p>这和 AdaBoost 中更新样本权重的式子也一模一样。综上所述、定理得证</p>
 
       
     </div>
@@ -503,8 +544,8 @@ s_{n}f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right) 
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/c12a819/" rel="prev" title="评估与可视化">
-                <i class="fa fa-chevron-left"></i> 评估与可视化
+              <a href="/posts/707464b/" rel="prev" title="AdaBoost 算法的解释">
+                <i class="fa fa-chevron-left"></i> AdaBoost 算法的解释
               </a>
             
           </div>
@@ -513,8 +554,8 @@ s_{n}f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right) 
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/posts/88953f51/" rel="next" title="“决策树”小结">
-                “决策树”小结 <i class="fa fa-chevron-right"></i>
+              <a href="/posts/48a0211a/" rel="next" title="“集成学习”小结">
+                “集成学习”小结 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -590,7 +631,7 @@ s_{n}f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right) 
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-count">34</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -601,7 +642,7 @@ s_{n}f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right) 
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -674,7 +715,7 @@ s_{n}f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right) 
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#定理内容"><span class="nav-number">1.</span> <span class="nav-text">定理内容</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#定理证明"><span class="nav-number">2.</span> <span class="nav-text">定理证明</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#经验分布函数"><span class="nav-number">1.</span> <span class="nav-text">经验分布函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AdaBoost-与前向分步加法模型"><span class="nav-number">2.</span> <span class="nav-text">AdaBoost 与前向分步加法模型</span></a></li></ol></div>
             
 
           </div>

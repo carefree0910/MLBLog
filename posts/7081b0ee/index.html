@@ -1,0 +1,1096 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数学,综述," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文首先会介绍何谓“集成”、然后会介绍两种常见的集成学习方法：Bagging、AdaBoost 的基本定义。这些概念的背后有着深刻的数学理论，但是它们同时也拥有着很好的直观。获得对它们的直观有助于加深对各种模型的分类性能的理解、同时也有助于根据具体的数据集来挑选相应的、合适的模型来进行学习">
+<meta name="keywords" content="数学,综述">
+<meta property="og:type" content="article">
+<meta property="og:title" content="“集成”的思想">
+<meta property="og:url" content="http://www.carefree0910.com/posts/7081b0ee/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="本文首先会介绍何谓“集成”、然后会介绍两种常见的集成学习方法：Bagging、AdaBoost 的基本定义。这些概念的背后有着深刻的数学理论，但是它们同时也拥有着很好的直观。获得对它们的直观有助于加深对各种模型的分类性能的理解、同时也有助于根据具体的数据集来挑选相应的、合适的模型来进行学习">
+<meta property="og:image" content="http://www.carefree0910.com/posts/7081b0ee/p1.png">
+<meta property="og:updated_time" content="2017-04-25T14:29:15.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="“集成”的思想">
+<meta name="twitter:description" content="本文首先会介绍何谓“集成”、然后会介绍两种常见的集成学习方法：Bagging、AdaBoost 的基本定义。这些概念的背后有着深刻的数学理论，但是它们同时也拥有着很好的直观。获得对它们的直观有助于加深对各种模型的分类性能的理解、同时也有助于根据具体的数据集来挑选相应的、合适的模型来进行学习">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/7081b0ee/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/7081b0ee/"/>
+
+
+
+
+
+  <title> “集成”的思想 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/7081b0ee/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                “集成”的思想
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T19:51:31+08:00">
+                2017-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/集成学习/" itemprop="url" rel="index">
+                    <span itemprop="name">集成学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文首先会介绍何谓“集成”、然后会介绍两种常见的集成学习方法：Bagging、AdaBoost 的基本定义。这些概念的背后有着深刻的数学理论，但是它们同时也拥有着很好的直观。获得对它们的直观有助于加深对各种模型的分类性能的理解、同时也有助于根据具体的数据集来挑选相应的、合适的模型来进行学习</p>
+<a id="more"></a>
+<h1 id="众擎易举"><a href="#众擎易举" class="headerlink" title="众擎易举"></a>众擎易举</h1><p>集成学习基于这样的思想：对于比较复杂的任务，综合许多人的意见来进行决策会比“一家独大”要更好。换句话说、就是通过适当的方式集成许多“个体模型”所得到的最终模型要比单独的“个体模型”的性能更优。我们可以通过下图来直观感知这个过程：</p>
+<img src="/posts/7081b0ee/p1.png" alt="p1.png" title="">
+<p>所以问题的关键转化为了两点：如何选择、生成弱分类器和如何对它们进行提升（集成）。在此基础上，通常有三种不同的思路：</p>
+<ul>
+<li>将不同类型的弱分类器进行提升</li>
+<li>将相同类型但参数不同的弱分类器进行提升</li>
+<li>将相同类型但训练集不同的弱分类器进行提升</li>
+</ul>
+<p>其中第一种思路的应用相对来说可能不太广泛，而第二、第三种思路则指导着两种常见的做法，这两种做法的区别主要体现在基本组成单元——弱分类器的生成方式：</p>
+<p>第一种做法期望各个弱分类器之间依赖性不强、可以同时进行生成。这种做法又称并行方法，其代表为 Bagging，而 Bagging 一个著名的拓展应用便是本系列的主题之一——随机森林（Random Forest，常简称为 RF）。</p>
+<p>第二种做法中弱分类器之间具有强依赖性、只能序列生成。这种做法又称串行方法，其代表为 Boosting，而 Boosting 族算法中的代表即是本系列的另一主题——AdaBoost</p>
+<h1 id="Bagging-与随机森林"><a href="#Bagging-与随机森林" class="headerlink" title="Bagging 与随机森林"></a>Bagging 与随机森林</h1><p>Bagging 是 1996 年由 Breiman 提出的，它的思想根源是数理统计中非常重要的 Bootstrap 理论。Bootstrap 可以翻译成“自举”，它通过模拟的方法来逼近样本的概率分布函数。可以想象这样一个场景：现在有一个包含 N 个样本的数据集<script type="math/tex">X = \{ x_{1},\ldots,x_{N}\}</script>，这 N 个样本是由随机变量<script type="math/tex">x</script>独立生成的。我们想要研究<script type="math/tex">x</script>的均值估计<script type="math/tex">\bar{x} = \frac{1}{N}\sum_{i = 1}^{N}x_{i}</script>的统计特性（误差、方差等等），但由于研究统计特性是需要大量样本的、而数据集<script type="math/tex">X</script>只能给我们提供一个<script type="math/tex">\bar{x}</script>的样本，从而导致无法进行研究</p>
+<p>在这种场景下，容易想到的一种解决方案是：通过<script type="math/tex">x</script>的分布生成出更多的数据集<script type="math/tex">X_{1},\ldots X_{M}</script>、每个数据集都包含 N 个样本。这 M 个数据集都能产生一个均值估计、从而就有了 M 个均值估计的样本。那么只要 M 足够大、我们就能研究<script type="math/tex">\bar{x}</script>的统计特性了</p>
+<p>当然这种解决方案的一个最大的困难就是：我们并不知道<script type="math/tex">x</script>的真实分布。Bootstrap 就是针对这个困难提出了一个解决办法：通过不断地“自采样”来模拟随机变量真实分布生成的数据集。具体而言，Bootstrap 的做法是：</p>
+<ul>
+<li>从<script type="math/tex">X</script>中随机抽出一个样本（亦即抽出<script type="math/tex">x_1,...,x_N</script>的概率相同）</li>
+<li>将该样本的拷贝放入数据集<script type="math/tex">X_j</script></li>
+<li>将该样本放回<script type="math/tex">X</script>中</li>
+</ul>
+<p>以上三个步骤将重复 N 次、从而使得<script type="math/tex">X_{j}</script>中有 N 个样本。这个过程将对<script type="math/tex">j = 1,\ldots,M</script>都进行一遍、从而我们最终能得到 M 个含有 N 个样本的数据集<script type="math/tex">X_{1},\ldots X_{M}</script></p>
+<p>简单来说的话、Bootstrap 其实就是一个有放回的随机抽样过程，所以原始数据<script type="math/tex">\{ x_{1},\ldots,x_{N}\}</script>中可能会在<script type="math/tex">X_{1},\ldots X_{M}</script>中重复出现、也有可能不出现在<script type="math/tex">X_{1},\ldots X_{M}</script>中。事实上，由于<script type="math/tex">X</script>中一个样本在 N 次采样中始终不被采到的概率为<script type="math/tex">\left( 1 - \frac{1}{N} \right)^{N}</script>、且：</p>
+<script type="math/tex; mode=display">
+\lim_{N\rightarrow\infty}\left( 1 - \frac{1}{N} \right)^{N} \rightarrow \frac{1}{e} \approx 0.368</script><p>所以在统计意义上可以认为、<script type="math/tex">X_{j}</script>中含有<script type="math/tex">X</script>中 63.2%的样本<script type="math/tex">\left( \forall j = 1,\ldots,M \right)</script></p>
+<p>这种模拟的方法在理论上是具有最优性的。事实上、这种模拟的本质和经验分布函数对真实分布函数的模拟几乎一致：</p>
+<ul>
+<li>Bootstrap 以<script type="math/tex">\frac 1N</script>的概率、有放回地从<script type="math/tex">X</script>中抽取 N 个样本作为数据集、并以之估计真实分布生成的具有 N 个样本的数据集</li>
+<li>经验分布函数则是在 N 个样本点上以每点的概率为<script type="math/tex">\frac 1N</script>作为概率密度函数、然后进行积分的函数</li>
+</ul>
+<p>经验分布函数的数学表达式为：</p>
+<script type="math/tex; mode=display">
+F_{N}\left( x \right) = \frac{1}{N}\sum_{i = 1}^{N}{I_{\left( - \infty,x \right\rbrack}(x_{i})}</script><p>可以看出、经验分布函数用到了频率估计概率的思想。用它来模拟真实分布函数是具有很好的优良性的，详细的讨论可参见<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></p>
+<p>知道 Bootstrap 是什么之后、我们就可以来看 Bagging 的具体定义了。Bagging 的全称是 Bootstrap Aggregating，其思想非常简单：</p>
+<ul>
+<li>用 Bootstrap 生成出 M 个数据集</li>
+<li>用这 M 个数据集训练出 M 个弱分类器</li>
+<li>最终模型即为这M个弱分类器的简单组合</li>
+</ul>
+<p>所谓简单组合就是：</p>
+<ul>
+<li>对于分类问题使用简单的投票表决</li>
+<li>对于回归问题则进行简单的取平均</li>
+</ul>
+<p>简单组合虽说简单、其背后仍然是有数学理论支撑的。考虑二分类问题：</p>
+<script type="math/tex; mode=display">
+y \in \{ - 1, + 1\}</script><p>假设样本空间到类别空间的真实映射为<script type="math/tex">f</script>、我们得到的 M 个弱分类器模型<script type="math/tex">G_{1},\ldots,G_{M}</script>所对应的映射为<script type="math/tex">g_{1},\ldots,g_{M}</script>，那么简单组合下的最终模型对应的映射即为：</p>
+<script type="math/tex; mode=display">
+g\left( x \right) = \text{sign}\left( \sum_{j = 1}^{M}{g_{j}\left( x \right)} \right)</script><p>这里的 sign 是符号函数、满足：</p>
+<script type="math/tex; mode=display">
+\text{sign}\left( x \right) = \left\{ \begin{matrix}
+ - 1,\ \ if\ x < 0 \\
+ + 1,\ \ if\ x > 0 \\
+\end{matrix} \right.\</script><p>其中，<script type="math/tex">\text{sign}(0)</script>则可为<script type="math/tex">-1</script>也可为<script type="math/tex">+1</script>，令其有 50%的概率输出<script type="math/tex">-</script>、<script type="math/tex">+1</script>也是可行的</p>
+<p>如果我们此时假设每个弱分类器的错误率为<script type="math/tex">\epsilon</script>：</p>
+<script type="math/tex; mode=display">
+p\left( g_{i}\left( x \right) \neq f\left( x \right) \right) = \epsilon</script><p>如果我们假设弱分类器的错误率相互独立，那么由霍夫丁不等式（Hoeffding’s Inequality）可以得知：</p>
+<script type="math/tex; mode=display">
+p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\lfloor \frac{M}{2} \right\rfloor}\left( \frac{M}{j} \right)\left( 1 - \epsilon \right)^{j}\epsilon^{M - j} \leq \exp\left( - \frac{1}{2}M\left( 1 - 2\epsilon \right)^{2} \right)</script><p>亦即最终模型的错误率随弱分类器的个数 M 的增加、将会以指数级下降并最终趋于 0</p>
+<p>虽说这个结果看上去很振奋人心，但需要注意的是、我们做了一个非常强的关键假设：假设弱分类器的错误率相互独立。这可以说是不可能做到的，因为这些弱分类器想要解决的都是同一个问题、且使用的训练集也都源自于同一份数据集</p>
+<p>但不管怎么说，以上的分析给了我们这样一个重要信息：弱分类器之间的“差异”似乎应该尽可能的大。基于此，结合 Bagging 的特点、我们可以得出这样一个结论：对于“不稳定”（或说对训练集敏感：若训练样本稍有改变，得到的从样本空间到类别空间的映射 g 就会产生较大的变化）的分类器，Bagging 能够显著地对其进行提升。这也是被大量实验结果所证实了的</p>
+<p>正如前文提过的，Bagging 有一个著名的拓展应用叫“随机森林”，从名字就容易想到、它是当个体模型为决策树时的 Bagging 算法。不过需要指出的是，随机森林算法不仅对样本进行 Bootstrap 采样，对每个 Node 调用生成算法时都会随机挑选出一个可选特征空间的子空间作为该决策树的可选特征空间；同时，生成好个体决策树后不进行剪枝、而是保持原始的形式。换句话说、随机森林算法流程大致如下：</p>
+<ul>
+<li>用 Bootstrap 生成出 M 个数据集</li>
+<li>用这 M 个数据集训练出 M 颗不进行后剪枝决策树，且在每颗决策树的生成过程中，每次对 Node 进行划分时、都从可选特征（比如说有 d 个）中随机挑选出 k 个（<script type="math/tex">k\le d</script>）特征，然后依信息增益的定义从这 k 个特征中选出信息增益最大的特征作为划分标准</li>
+<li>最终模型即为这 M 个弱分类器的简单组合</li>
+</ul>
+<p><strong><em>注意：有一种说法是随机森林中的个体决策树模型只能使用 CART 树</em></strong></p>
+<p>也就是说，除了和一般 Bagging 算法那样对样本进行随机采样以外、随机森林还对特征进行了某种意义上的随机采样。这样做的意义是直观的：通过对特征引入随机扰动，可以使个体模型之间的差异进一步增加、从而提升最终模型的泛化能力。而这个特征选取的随机性，恰恰被上述算法第二步中的参数k所控制：</p>
+<ul>
+<li>若<script type="math/tex">k=d</script>，那么训练出来的决策树和一般意义下的决策树别无二致、亦即特征选取这一部分不具有随机性</li>
+<li>若<script type="math/tex">k=1</script>，那么生成决策树的每一步都是在随机选择属性、亦即特征选取的随机性达到最大</li>
+</ul>
+<p>Breiman 在提出随机森林算法的同时指出，一般情况下、推荐取<script type="math/tex">k=\log_2{d}</script></p>
+<h1 id="PAC-框架与-Boosting"><a href="#PAC-框架与-Boosting" class="headerlink" title="PAC 框架与 Boosting"></a>PAC 框架与 Boosting</h1><p>虽然同属集成学习方法，但 Boosting 和 Bagging 的数学理论根基不尽相同：Boosting 产生于计算学习理论（Computational Learning Theory）[Valiant, 1984]。一般而言，如果只是应用机器学习的话、我们无需对它进行太多的了解（甚至可以说对它一知半解反而有害），所以本小节只打算对其最基本的概率近似正确（PAC）学习理论中的“可学习性（PAC Learnability）”进行简要的介绍</p>
+<p>PAC 学习整体来说是一个比较纯粹的数学理论。有一种说法是、PAC 学习是统计学家研究机器学习的方式，它关心模型的可解释性、然而机器学习专家通常更关心模型的预测能力。这也正是为何说无需太过了解它，因为我们的目的终究不是成为统计的专家、而是更希望成为一个能够应用机器学习的人。不过幸运的是，虽然为了叙述 Boosting、PAC 学习中“可学习性”的概念难以避开，但其本身却是具有很直观的解释的。下面我们就来看看这个直观解释：</p>
+<p>PAC 提出的一个主要的假设、就是它要求数据是从某个稳定的概率分布中产生。直观地说，就是样本在样本空间中的分布状况不能随时间的变化而变化、否则就失去了学习的意义（因为学习到的永远只是“某个时间”的分布，如果未知数据所处时间的分布状况和该时间数据的分布状况不同的话、模型就直接失效了）。然后所谓的PAC可学习性，就是看学习的算法是否能够在合理的时间（多项式时间）内、以足够高的概率输出一个错误率足够低的模型。由此，所谓的“强可学习”和“弱可学习”的概念就很直观了：</p>
+<ul>
+<li>若存在一个多项式算法可以学习出准确率很高的模型，则称为强可学习</li>
+<li>若在在一个多项式算法可以学习但准确率仅仅略高于随机猜测，则称为弱可学习</li>
+</ul>
+<p><strong><em>注意：由于进行机器学习时、我们只能针对训练数据集进行学习、所以和真实情况相比肯定是有偏差的。这正是需要提出 PAC 可学习这个概念的原因之一</em></strong></p>
+<p>虽然我们区分定义了这两个概念，不过神奇之处在于，这两个概念在PAC学习框架下是完全等价的[Schapire, 1990]。这意味着对于一个学习问题，只要我们找到了一个“弱学习算法”，就可以把它变成一个“强学习算法”。这当然是意义深刻的，因为往往比较粗糙的“弱学习算法”比较好找、而相对精确的“强学习算法”却难得一求</p>
+<p>那么具体而言应该怎么做呢？这里就需要用到所谓的 Boosting（提升方法）了。提升方法可以定义为用于将由“弱学习算法”生成的“弱模型”、提升成和“强学习算法”所生成的“强模型”性能差不多的模型的方法，它的基本组成单元是许许多多的“弱模型”、然后通过某种手段把它们集成为最终模型。虽然该过程听上去和上一小节介绍的 Bagging 差不多、但它们的思想和背后的数学理论却有较大区别，加以辨析是有必要的</p>
+<p>需要指出的是，Boosting 事实上是一族算法、该族算法有一个类似的框架：</p>
+<ul>
+<li>根据当前的数据训练出一个弱模型</li>
+<li>根据该弱模型的表现调整数据的样本权重。具体而言：<ul>
+<li>让该弱模型做错的样本在后续训练中获得更多的关注</li>
+<li>让该弱模型做对的样本在后续训练中获得较少的关注</li>
+</ul>
+</li>
+<li>最后再根据该弱模型的表现决定该弱模型的“话语权”、亦即投票表决时的“可信度”。自然、表现越好就越有话语权</li>
+</ul>
+<p>可以证明，当训练样本有无穷多时、Boosting 能让弱模型集成出一个对训练样本集的准确率任意高的模型。然而实际任务中训练样本当然不可能有无穷多，所以问题就转为了如何在固定的训练集上应用 Boosting 方法。而在 1996 年，Freund 和 Schapire 所提出的 AdaBoost（Adaptive Boosting）正是一个相当不错的解决方案，在理论和实验上均有优异的表现。虽然 AdaBoost 背后的理论深究起来可能会有些繁复、但它的思想并没有脱离 Boosting 族算法的那一套框架。值得一提的是、Boosting 还有一套比较有意思的解释方法；我们会在后文详细讨论其中的代表性算法——AdaBoost 的解释、这里就先按下不表</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+            <a href="/tags/综述/" rel="tag"># 综述</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/d8e97c87/" rel="prev" title="集成学习综述">
+                <i class="fa fa-chevron-left"></i> 集成学习综述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/c0a9c025/" rel="next" title="随机森林算法">
+                随机森林算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#众擎易举"><span class="nav-number">1.</span> <span class="nav-text">众擎易举</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bagging-与随机森林"><span class="nav-number">2.</span> <span class="nav-text">Bagging 与随机森林</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PAC-框架与-Boosting"><span class="nav-number">3.</span> <span class="nav-text">PAC 框架与 Boosting</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -100,7 +100,7 @@
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="（本文会用到的所有代码都在这里） 对于我个人而言、光看这么一个框架是非常容易摸不着头脑的毕竟之前花了许多时间在数学部分讲的那些算法完全没有体现在这个框架中、取而代之的是一些我抽象出来的和算法无关的结构性部分……虽然从逻辑上来说应该先说明如何搭建这个框架，但从容易理解的角度来说、个人建议先不看这章的内容而是先看后续的实现具体算法的章节然后如果那时有不懂的定义、再对照这一章的相关部分来看不过如果是对朴">
 <meta property="og:image" content="http://www.carefree0910.com/posts/fa51e28/p1.jpg">
-<meta property="og:updated_time" content="2017-04-20T12:50:15.000Z">
+<meta property="og:updated_time" content="2017-04-25T15:28:11.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="框架的实现">
 <meta name="twitter:description" content="（本文会用到的所有代码都在这里） 对于我个人而言、光看这么一个框架是非常容易摸不着头脑的毕竟之前花了许多时间在数学部分讲的那些算法完全没有体现在这个框架中、取而代之的是一些我抽象出来的和算法无关的结构性部分……虽然从逻辑上来说应该先说明如何搭建这个框架，但从容易理解的角度来说、个人建议先不看这章的内容而是先看后续的实现具体算法的章节然后如果那时有不懂的定义、再对照这一章的相关部分来看不过如果是对朴">
@@ -420,6 +420,13 @@
 <p>其中、<code>self._con_counter[d][c][p]</code><script type="math/tex">=\hat p(x^{(d)}=p|y=c)</script>（con 是 conditional 的缩写）</p>
 <img src="/posts/fa51e28/p1.jpg" alt="注释比代码还多是想闹哪样？？？(╯‵□′)╯︵┻━┻" title="注释比代码还多是想闹哪样？？？(╯‵□′)╯︵┻━┻">
 <p>总之和我一样陷入了茫然的观众老爷们可以先不太在意这一坨是什么玩意儿，毕竟这些东西是抽象程度比较高的属性……等结合具体算法时、这些属性的意义可能就会明确得多</p>
+<p>不过需要注意的是，我们实现的<code>NaiveBayes</code>基类继承了一个叫<code>ClassifierBase</code>的基类、其实现是我们之前没有提及的。具体的代码可参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Bases.py" target="_blank" rel="external">GitHub</a>，这里仅大致说一下它所实现的、一些非常普适性的功能：</p>
+<ul>
+<li>可视化二维数据</li>
+<li>重载 <strong>str</strong>、<strong>repr</strong> 和 <strong>getitem</strong> 方法</li>
+<li>根据<code>predict</code>方法、输出某个数据集上的准确率</li>
+</ul>
+<p>这样做主要是为了合理地重用代码，从而能够使机器学习模型的开发更加便捷、高效。在今后的实现中，我们也会频繁地运用到<code>ClassifierBase</code>这个基类</p>
 <p>下面进入正题……首先来看怎么计算先验概率（直接利用上面的<code>self._cat_counter</code>属性即可）</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_prior_probability</span><span class="params">(self, lb=<span class="number">1</span>)</span>:</span></div><div class="line">    <span class="keyword">return</span> [(_c_num + lb) / (len(self._y) + lb * len(self._cat_counter))</div><div class="line">            <span class="keyword">for</span> _c_num <span class="keyword">in</span> self._cat_counter]</div></pre></td></tr></table></figure>
 <p>其中参数<code>lb</code>即为平滑项，默认为 1 意味着默认使用拉普拉斯平滑 </p>
@@ -575,7 +582,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-count">34</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -586,7 +593,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

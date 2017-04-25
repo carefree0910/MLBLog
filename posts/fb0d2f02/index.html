@@ -1,0 +1,1076 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析 直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集成模型的性能分析">
+<meta property="og:url" content="http://www.carefree0910.com/posts/fb0d2f02/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析 直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p3.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p4.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p5.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p6.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p7.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p8.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p9.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p10.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p11.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p12.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p13.png">
+<meta property="og:updated_time" content="2017-04-25T16:11:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="集成模型的性能分析">
+<meta name="twitter:description" content="正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析 直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/fb0d2f02/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/fb0d2f02/"/>
+
+
+
+
+
+  <title> 集成模型的性能分析 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/fb0d2f02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                集成模型的性能分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T23:51:10+08:00">
+                2017-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/集成学习/" itemprop="url" rel="index">
+                    <span itemprop="name">集成学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析</p>
+<p>直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较贴近现实的实验。为讨论方便，我们一律采用决策树作为 AdaBoost 的弱分类器（亦即采用提升树模型进行讨论）、其强度可以通过调整其最深层数来控制。我们可以利用<code>DataUtil</code>类来生成或获取原始数据集，其完整代码可参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py" target="_blank" rel="external">这里</a>、生成数据集的代码则会在前三小节分别放出</p>
+<p>对于二维数据，我们拟打算使用三种数据集来进行评估：</p>
+<ul>
+<li>随机数据集。该数据集主要用于直观地感受模型的分类能力</li>
+<li>异或数据集。该数据集主要用于直观地理解：<ul>
+<li>集成模型正则化的能力</li>
+<li>为何说 AdaBoost 不要选用分类能力太强的弱分类器</li>
+</ul>
+</li>
+<li>螺旋线数据集，主要用于直观认知随机森林和提升树的不足</li>
+</ul>
+<a id="more"></a>
+<h1 id="随机数据集上的表现"><a href="#随机数据集上的表现" class="headerlink" title="随机数据集上的表现"></a>随机数据集上的表现</h1><p>生成随机数据集的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_random</span><span class="params">(size=<span class="number">100</span>)</span>:</span></div><div class="line">    xy = np.random.rand(size, <span class="number">2</span>)</div><div class="line">    z = np.random.randint(<span class="number">2</span>, size=size)</div><div class="line">    <span class="comment"># 注意：我们的AdaBoost框架要求类别空间为(-1,+1)</span></div><div class="line">    z[z == <span class="number">0</span>] = <span class="number">-1</span></div><div class="line">    <span class="keyword">return</span> xy, z</div></pre></td></tr></table></figure>
+<p>随机森林在随机数据集上的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p1.png" alt="p1.png" title="">
+<p>左图为包含 1 棵 CART 树的随机森林，准确率为 78.0%；右图则为包含 10 棵 CART 树的随机森林，准确率为 93.0%。如果将树的数量继续往上抬、达到 100%准确率并非难事。比如，包含 5 0棵 CART 树的随机森林的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p2.png" alt="随机数据集上准确率为 100%的随机森林" title="随机数据集上准确率为 100%的随机森林">
+<p>提升树（弱模型为决策树的 AdaBoost）在随机数据集上的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p3.png" alt="p3.png" title="">
+<p>左图为包含 1 棵 CART 树的 AdaBoost，准确率为 93.0%；右图则为包含 10 棵 CART 树的 AdaBoost，准确率为 99.0%</p>
+<h1 id="异或数据集上的表现"><a href="#异或数据集上的表现" class="headerlink" title="异或数据集上的表现"></a>异或数据集上的表现</h1><p>这里主要是想说明随机森林和提升树正则化的效果。从直观上来说，由于随机森林的理论基础是 Bootstrap、所以自然是包含越多树越好；至于 AdaBoost，可以想象它会对难以分类的数据特别在意、从而导致如下两种可能的结果：</p>
+<ul>
+<li>太过注重噪声，导致过拟合</li>
+<li>专注于类似于下一个系列要讲的 SVM 中的“支持向量”，从而达到正则化</li>
+</ul>
+<p>事实上正如之前提到过的，即使 AdaBoost 在某一步迭代时、所得的模型在训练集上的加权错误率已经达到了 0，继续进行训练仍然可以使模型进一步提升（因为单个模型的正确率没有那么高、从而能使模型继续专注于“支持向量”。所谓支持向量、可以暂时直观地理解为“非常重要的”样本）。为说明这一点，我们可以比较同一数据集上、同样使用最深层数为 3 层的决策树作为弱分类器时、两种不同训练策略在异或数据集上的表现。为了比较准确地衡量正则化能力，我们需要进行交叉验证。、</p>
+<p>生成异或数据集的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_xor</span><span class="params">(size=<span class="number">100</span>)</span>:</span></div><div class="line">    x = np.random.randn(size)</div><div class="line">    y = np.random.randn(size)</div><div class="line">    z = np.ones(size)</div><div class="line">    z[x * y &lt; <span class="number">0</span>] = <span class="number">-1</span></div><div class="line">    <span class="keyword">return</span> np.c_[x, y].astype(np.float32), z</div></pre></td></tr></table></figure>
+<p>随机森林在异或数据集上的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p4.png" alt="p4.png" title="">
+<p><strong><em>注意：该异或数据集和上一章用到的异或数据集是同一个数据集，感兴趣的读者可以进行一些对比</em></strong></p>
+<p>左图为包含 1 棵 CART 树的随机森林，准确率为 93.0%；右图则为包含 10 棵 CART 树的随机森林，准确率为 98.0%。虽说右图中随机森林的表现已经足够好，由前文讨论可知、我们应该尝试训练一个更复杂的随机森林来看看其正则化能力。比如，包含 1000 棵 CART 树的随机森林的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p5.png" alt="p5.png" title="">
+<p>仔细观察决策边界，可以发现它会倾向于画在使得样本和边界“间隔较大”的地方。关于“间隔”的详细讨论会放在下一个系列，这里只需直观地感受一下即可</p>
+<p>对于提升树，首先看一下不提前停止训练时的表现。为更好地说明问题，这里我们换了一个异或数据集来进行分析：</p>
+<img src="/posts/fb0d2f02/p6.png" alt="p6.png" title="">
+<p>此时在测试数据集上的正确率为 97.0%。然后看当模型在训练集上错误率足够小就马上停止训练时的表现：</p>
+<img src="/posts/fb0d2f02/p7.png" alt="p7.png" title="">
+<p>此时在测试数据集上的正确率为 94.0%</p>
+<p>当然，正如前面所说，事实上确实有论文（G. Ratsch et al. ML, 2001）给出了 AdaBoost 会很快就过拟合的例子。但总体而言，笔者认为 AdaBoost 在正则化这一方面的表现还是相当优异的</p>
+<p>由前面的诸多讨论可以得知，AdaBoost 的正则化能力是来源于各个弱分类器的“分而治之”，那么如果使用分类能力强的弱分类器会有什么结果呢？下面就放出当选用不限制层数的决策树作为弱模型的、异或数据集上的表现，相信会带来很好的直观：</p>
+<img src="/posts/fb0d2f02/p8.png" alt="p8.png" title="">
+<p>此时在测试数据集上的正确率为 90.0%。值得一提的是，用单独的决策树做出来的效果和上图的效果几乎完全一致。换句话说、此时使用 AdaBoost 没有太大的意义</p>
+<h1 id="螺旋数据集上的表现"><a href="#螺旋数据集上的表现" class="headerlink" title="螺旋数据集上的表现"></a>螺旋数据集上的表现</h1><p>随机森林和提升树虽然确实都相当强大、但它同样具有其基本组成单元——决策树所具有的某些缺点。比如说，它们在处理连续性比较强的数据时可能会有些吃力、因为它们的决策边界一般而言都是“不太光滑”的。下面我们就统一使用个体决策树不做层数限制的随机森林和提升树以及螺旋线数据集作为样例来进行说明</p>
+<p>生成螺旋数据集的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_spin</span><span class="params">(size=<span class="number">30</span>)</span>:</span></div><div class="line">    xs = np.zeros((size * <span class="number">4</span>, <span class="number">2</span>), dtype=np.float32)</div><div class="line">    ys = np.zeros(size * <span class="number">4</span>, dtype=np.int8)</div><div class="line">    <span class="comment"># 根据螺旋线在极坐标中的公式、生成四条螺旋线</span></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</div><div class="line">        ix = range(size * i, size * (i + <span class="number">1</span>))</div><div class="line">        <span class="comment"># 去掉原点以避免出现原点同时从属于两类的不合理情况</span></div><div class="line">        r = np.linspace(<span class="number">0.0</span>, <span class="number">1</span>, size + <span class="number">1</span>)[<span class="number">1</span>:]</div><div class="line">        t = np.linspace(<span class="number">2</span> * i * pi / <span class="number">4</span>, <span class="number">2</span> * (i + <span class="number">4</span>) * pi / <span class="number">4</span>, size) + np.random.random(</div><div class="line">            size=size) * <span class="number">0.1</span></div><div class="line">        xs[ix] = np.c_[r * np.sin(t), r * np.cos(t)]</div><div class="line">        ys[ix] = <span class="number">2</span> * (i % <span class="number">2</span>) - <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> xs, ys</div></pre></td></tr></table></figure>
+<p>随机森林和提升树在其上的表现分别如下两张图所示：</p>
+<img src="/posts/fb0d2f02/p9.png" alt="p9.png" title="">
+<img src="/posts/fb0d2f02/p10.png" alt="p10.png" title="">
+<p>上面两组图的左边都是包含 10 棵 CART 树的模型、右边都是包含 1000 棵 CART 树的模型，准确率则都是为 100.0%。可以看到，虽然它们都确实能够将大致的趋势给描述出来、但是决策边界相对而言都是“直来直去”的，这一点要比支持向量机、神经网络等模型的训练出来的结果要差不少。总之，决策树那使用二类问题的解决方案来处理连续型特征的做法、导致了随机森林和提升树在处理连续特征上的一些不足</p>
+<h1 id="蘑菇数据集上的表现"><a href="#蘑菇数据集上的表现" class="headerlink" title="蘑菇数据集上的表现"></a>蘑菇数据集上的表现</h1><p>目前为止我们对二维数据上的测试做了比较详尽的说明，接下来我们不妨拿蘑菇数据集来测试一下我们的模型在真实数据下的表现；鉴于该数据集比较简单、我们只使用 100 个样本进行训练并用剩余的 8000 多个样本进行测试。为了直观感受模型的分类能力，我们可以画出当个体模型为 CART 决策树桩时、两种集成模型在测试集上的准确率随训练迭代次数变化而变化的曲线：</p>
+<img src="/posts/fb0d2f02/p11.png" alt="p11.png" title="">
+<p>其中蓝线是随机森林的训练曲线、绿线是提升树的训练曲线。这个结果是符合直观的，毕竟从个体模型来讲，引入了随机性的、随机森林中的决策树桩要比提升树中正常的决策树桩要弱，所以提升树的收敛速度理应比随机森林的要快；此外，由于随机森林和提升树相比、受个体模型分类能力的影响更大、我们采用的又是 CART 决策树桩这种相当弱的个体模型，所以随机森林收敛后的表现也要比提升树收敛后的表现要差</p>
+<p>不过需要指出的是，当我们取消个体 CART 决策树的层数限制时，虽然随机森林的收敛速度仍会比提升树的收敛速度慢、但是收敛后的表现却很有可能比提升树收敛后的表现要好。这是因为取消了层数限制的决策树是相当强力的模型，而且：</p>
+<ul>
+<li>一方面正如刚刚所说的，随机森林受个体模型的分类能力影响较大、所以取消个体树的层数限制后、随机森林的分类能力自然大大增强</li>
+<li>另一方面则如之前所讨论的，具有较强分类能力的个体模型与 AdaBoost 的原理可能不太兼容，这就使得 AdaBoost 本身的优势被抑制了</li>
+</ul>
+<p>取消层数限制后重复上述实验，此时两种集成模型的训练曲线如下图所示：</p>
+<img src="/posts/fb0d2f02/p12.png" alt="p12.png" title="">
+<p>可能观众老爷们已经发现，取消层数限制后的提升树似乎还没有取消限制之前的提升树的表现好；事实上，由于我们只用了 100 个样本来进行训练，所以容易想象、取消限制后的提升树将会产生比较严重的过拟合。可以把取消层数限制前后的训练曲线放在一起来进行直观对比，结果如下图所示：</p>
+<img src="/posts/fb0d2f02/p13.png" alt="p13.png" title="">
+<p>其中蓝线是个体模型为 CART 决策树桩时的训练曲线、绿线是个体模型为正常 CART 决策树时的训练曲线</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/f5f50863/" rel="prev" title="AdaBoost 算法">
+                <i class="fa fa-chevron-left"></i> AdaBoost 算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/707464b/" rel="next" title="AdaBoost 算法的解释">
+                AdaBoost 算法的解释 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#随机数据集上的表现"><span class="nav-number">1.</span> <span class="nav-text">随机数据集上的表现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#异或数据集上的表现"><span class="nav-number">2.</span> <span class="nav-text">异或数据集上的表现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#螺旋数据集上的表现"><span class="nav-number">3.</span> <span class="nav-text">螺旋数据集上的表现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#蘑菇数据集上的表现"><span class="nav-number">4.</span> <span class="nav-text">蘑菇数据集上的表现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

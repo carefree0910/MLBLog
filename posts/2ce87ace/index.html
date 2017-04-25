@@ -102,7 +102,7 @@
 <meta property="og:image" content="http://www.carefree0910.com/posts/2ce87ace/p1.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/2ce87ace/p2.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/2ce87ace/p3.png">
-<meta property="og:updated_time" content="2017-04-23T02:54:16.000Z">
+<meta property="og:updated_time" content="2017-04-25T12:17:05.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据的信息">
 <meta name="twitter:description" content="本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野">
@@ -409,8 +409,7 @@
       
         <p>本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野</p>
 <a id="more"></a>
-<h1 id="信息论简介"><a href="#信息论简介" class="headerlink" title="信息论简介"></a>信息论简介</h1><p><strong>（注：本节有许多内容节选、修改、总结自维基百科）</strong></p>
-<p>被誉为信息论创始人的是克劳德·艾尔伍德·香农（Claude Elwood Shannon，1916.4.30－2001.2.26），他是美国数学家、电子工程师和密码学家，是密歇根大学学士、麻省理工学院博士。他在 1948 年发表的划时代的论文——“通信的数学原理”奠定了现代信息论的基础</p>
+<h1 id="信息论简介"><a href="#信息论简介" class="headerlink" title="信息论简介"></a>信息论简介</h1><p>（注：本节有许多内容节选、修改、总结自维基百科）<br>被誉为信息论创始人的是克劳德·艾尔伍德·香农（Claude Elwood Shannon，1916.4.30－2001.2.26），他是美国数学家、电子工程师和密码学家，是密歇根大学学士、麻省理工学院博士。他在 1948 年发表的划时代的论文——“通信的数学原理”奠定了现代信息论的基础</p>
 <p>信息论（Information Theory）涉及的领域相当多，包括但不限于信息的量化、存储和通信、统计推断、自然语言处理、密码学等等。信息论的主要内容可以类比人类最广泛的交流手段——语言来阐述。一种简洁的语言（以英语为例）通常有如下两个重要特点：</p>
 <ul>
 <li>最常用的一些词汇（比如“a”、“the”、“I”）应该要比相对而言不太常用的词（比如“Python”、“Machine”、“Learning”）要短一些</li>
@@ -425,11 +424,11 @@
 H\left( y \right) = - \sum_{k = 1}^{K}{p_{k}\log p_{k}}</script><p>对于具体的、随机变量<script type="math/tex">y</script>生成的数据集<script type="math/tex">D = \{ y_{1},\ldots,y_{N}\}</script>而言，在实际操作中通常会利用经验熵来估计真正的信息熵：</p>
 <script type="math/tex; mode=display">
 H\left( y \right) = H\left( D \right) = - \sum_{k = 1}^{K}{\frac{|C_{k}|}{|D|}\log\frac{|C_{k}|}{|D|}}</script><p>这里假设随机变量<script type="math/tex">y</script>的取值空间为<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script>，<script type="math/tex">p_{k}</script>表示<script type="math/tex">y</script>取<script type="math/tex">c_{k}</script>的概率：<script type="math/tex">p_{k} = p(y = c_{k})</script>；<script type="math/tex">|C_{k}|</script>代表由随机变量<script type="math/tex">y</script>中类别为<script type="math/tex">c_{k}</script>的样本的个数、<script type="math/tex">|D|</script>代表<script type="math/tex">D</script>的总样本个数（亦即<script type="math/tex">\left| D \right| = N</script>）。可以看到，经验公式背后的思想其实就是“频率估计概率”</p>
-<p>通常来说，公式中对数的底会取为2、此时信息熵<script type="math/tex">H(y)</script>的单位叫作比特（bit）；如果把底取为<script type="math/tex">e</script>（亦即取自然对数）的话，<script type="math/tex">H(y)</script>的单位就称作纳特（nat）</p>
+<p>通常来说，公式中对数的底会取为 2、此时信息熵<script type="math/tex">H(y)</script>的单位叫作比特（bit）；如果把底取为<script type="math/tex">e</script>（亦即取自然对数）的话，<script type="math/tex">H(y)</script>的单位就称作纳特（nat）</p>
 <p>接下来说明为何上式能够度量数据的不确定性。可以证明（详细推导可参见<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>），当：</p>
 <script type="math/tex; mode=display">
 p_{1} = p_{2} = \ldots = p_{K} = \frac{1}{K}</script><p>时，<script type="math/tex">H(y)</script>达到最大值<script type="math/tex">- \log\frac{1}{K}</script>、亦即<script type="math/tex">\log K</script>。由于<script type="math/tex">p_{k} = p(y = c_{k})</script>，上式即意味着随机变量<script type="math/tex">y</script>取每一个类的概率都是一样的、亦即<script type="math/tex">y</script>完全没有规律可循，想要预测它的取值只能靠运气。换句话说，由<script type="math/tex">y</script>生成出来的数据<script type="math/tex">\{ y_{1},\ldots,y_{N}\}</script>的不确定性是在取值空间为<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script>、样本数为 N 的数据中最大的（想象预测 N 次正 K 面体骰子的结果）</p>
-<p>我们的目的是想让<script type="math/tex">y</script>的不确定性减小、亦即想让<script type="math/tex">y</script>变得有规律以方便我们预测。稍微严谨地来说，就是<script type="math/tex">y</script>取某个类的概率特别大、取其它类的概率都特别小。极端的例子自然就是存在某个<script type="math/tex">k^{*}</script>、使得<script type="math/tex">p\left( {y = c}_{k^{*}} \right) = 1</script>、<script type="math/tex">p\left( y = c_{k} \right) = 0,\forall k \neq k^{*}</script>、亦即<script type="math/tex">y</script>生成的样本总属于<script type="math/tex">c_{k^{*}}</script>类。带入<script type="math/tex">H(y)</script>的定义式，可以发现此时<script type="math/tex">H\left( y \right) = 0</script>、亦即<script type="math/tex">y</script>生成的样本没有不确定性</p>
+<p>我们的目的是想让<script type="math/tex">y</script>的不确定性减小、亦即想让<script type="math/tex">y</script>变得有规律以方便我们预测。稍微严谨地来说，就是<script type="math/tex">y</script>取某个类的概率特别大、取其它类的概率都特别小。极端的例子自然就是存在某个<script type="math/tex">k^{*}</script>、使得<script type="math/tex">p\left( {y = c}_{k^{*}} \right) = 1</script>、<script type="math/tex">p\left( y = c_{k} \right) = 0,\forall k \neq k^{*}</script>、亦即<em>y</em>生成的样本总属于<script type="math/tex">c_{k^{*}}</script>类。带入<script type="math/tex">H(y)</script>的定义式，可以发现此时<script type="math/tex">H\left( y \right) = 0</script>、亦即<script type="math/tex">y</script>生成的样本没有不确定性</p>
 <p><strong><em>注意：由于<script type="math/tex">p\log p \rightarrow 0\ (p \rightarrow 0)</script>、所以认为<script type="math/tex">0\log 0 = 0</script></em></strong></p>
 <p>特殊的情况就是二类问题、亦即<script type="math/tex">K = 2</script>的情况。先不妨设<script type="math/tex">y</script>只取 0、1 二值，再设：</p>
 <script type="math/tex; mode=display">
@@ -444,7 +443,7 @@ H\left( y \right) = - \operatorname{plog}p - \left( 1 - p \right)\log{(1 - p)}</
 <script type="math/tex; mode=display">
 H\left( y \right) = - p\left( y \in Y_{1} \right)\log{p\left( y \in Y_{1} \right)} - p\left( y \in Y_{2} \right)\log{p(y \in Y_{2})}</script><p>且易知：</p>
 <script type="math/tex; mode=display">
-p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>如无特殊说明，今后谈及二类问题时讨论的范围都包括推广后的二类问题</p>
+p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>如无特殊说明，今后谈及二类问题时讨论的范围都包括推广后的二类问题。</p>
 <p>以上的叙述说明了，<script type="math/tex">y</script>越乱意味着<script type="math/tex">H(y)</script>越大、<script type="math/tex">y</script>越有规律意味着<script type="math/tex">H(y)</script>越小，亦即<script type="math/tex">H(y)</script>确实可以作为不确定性的度量标准</p>
 <h2 id="基尼系数"><a href="#基尼系数" class="headerlink" title="基尼系数"></a>基尼系数</h2><p>基尼系数的定义会更简洁一些：</p>
 <script type="math/tex; mode=display">
@@ -466,24 +465,24 @@ p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>以上�
 <ul>
 <li>所谓条件熵，就是根据特征<script type="math/tex">A</script>的不同取值<script type="math/tex">\{ a_{1},\ldots,a_{m}\}</script>对<script type="math/tex">y</script>进行限制后，先对这些被限制的<script type="math/tex">y</script>分别计算信息熵、再把这些信息熵（一共有 m 个）根据特征取值本身的概率加权求和、从而得到总的条件熵。换句话说，条件熵是由被<script type="math/tex">A</script>不同取值限制的各个部分的<script type="math/tex">y</script>的不确定性以取值本身的概率作为权重加总得到的</li>
 </ul>
-<p>所以，条件熵<script type="math/tex">H(y|A)</script>越小、意味着<script type="math/tex">y</script>被<script type="math/tex">A</script>限制后的总的不确定性越小、从而意味着<script type="math/tex">A</script>更能够帮助我们做出决策</p>
+<p>所以，条件熵<script type="math/tex">H(y|A)</script>越小、意味着<script type="math/tex">y</script>被<script type="math/tex">A</script>限制后的总的不确定性越小、从而意味着<em>A</em>更能够帮助我们做出决策</p>
 <p>接下来就是数学定义：</p>
 <script type="math/tex; mode=display">
 H\left( y \middle| A \right) = \sum_{j = 1}^{m}{p\left( A = a_{j} \right)H(y|A = a_{j})}</script><p>其中</p>
 <script type="math/tex; mode=display">
 H\left( y \middle| A = a_{j} \right) = - \sum_{k = 1}^{K}{p\left( y = c_{k} \middle| A = a_{j} \right)\log{p(y = c_{k}|A = a_{j})}}</script><p>同样可以用经验条件熵来估计真正的条件熵：</p>
 <script type="math/tex; mode=display">
-H\left( y \middle| A \right) = H\left( y \middle| D \right) = \sum_{j = 1}^{m}{\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}{\frac{|D_{jk}|}{|D_{j}|}\log\frac{|D_{jk}|}{|D_{j}|}}}</script><p>这里的<script type="math/tex">D_{j}</script>表示在<script type="math/tex">A = a_{j}</script>限制下的数据集。通常可以记<script type="math/tex">D_{j}</script>中的样本<script type="math/tex">y_{i}</script>满足<script type="math/tex">y_{i}^{A} = a_{j}</script>，亦即：</p>
+H\left( y \middle| A \right) = H\left( y \middle| D \right) = \sum_{j = 1}^{m}{\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}{\frac{|D_{\text{jk}}|}{|D_{j}|}\log\frac{|D_{\text{jk}}|}{|D_{j}|}}}</script><p>这里的<script type="math/tex">D_{j}</script>表示在<script type="math/tex">A = a_{j}</script>限制下的数据集。通常可以记<script type="math/tex">D_{j}</script>中的样本<script type="math/tex">y_{i}</script>满足<script type="math/tex">y_{i}^{A} = a_{j}</script>，亦即：</p>
 <script type="math/tex; mode=display">
-y_{i}^{A} = a_{j} \Leftrightarrow \left( A_{i},y_{i} \right) \in Y_{j} \Leftrightarrow A_{i} = a_{j}</script><p>而公式中的<script type="math/tex">|D_{jk}|</script>则代表着<script type="math/tex">D_{j}</script>中第 k 类样本的个数。</p>
+y_{i}^{A} = a_{j} \Leftrightarrow \left( A_{i},y_{i} \right) \in Y_{j} \Leftrightarrow A_{i} = a_{j}</script><p>而公式中的<script type="math/tex">|D_{\text{jk}}|</script>则代表着<script type="math/tex">D_{j}</script>中第 k 类样本的个数</p>
 <p>从条件熵的直观含义，信息的增益就可以自然地定义为：</p>
 <script type="math/tex; mode=display">
-g\left( y,A \right) = H\left( y \right) - H(y|A)</script><p>这里的<script type="math/tex">g(y,A)</script>常被称为互信息（Mutual Information），决策树中的 ID3 算法即是利用它来作为特征选取的标准的（相关定义会在后文给出）。但是，如果简单地以<script type="math/tex">g(y,A)</script>作为标准的话，会存在偏向于选择取值较多的特征、也就是 m 比较大的特征的问题。我们仍然可以从直观上去理解为什么会偏向于选取 m 较大的特征以及为什么这样做是不尽合理的：</p>
+g\left( y,A \right) = H\left( y \right) - H(y|A)</script><p>这里的<script type="math/tex">g(y,A)</script>常被称为互信息（Mutual<br>Information），决策树中的 ID3 算法即是利用它来作为特征选取的标准的（相关定义会在后文给出）。但是，如果简单地以<script type="math/tex">g(y,A)</script>作为标准的话，会存在偏向于选择取值较多的特征、也就是 m 比较大的特征的问题。我们仍然可以从直观上去理解为什么会偏向于选取 m 较大的特征以及为什么这样做是不尽合理的：</p>
 <ul>
 <li>我们希望得到的决策树应该是比较深（又不会太深）的决策树，从而它可以基于多个方面而不是片面地根据某些特征来判断</li>
 <li>如果单纯以<script type="math/tex">g(y,A)</script>作为标准，由于<script type="math/tex">g(y,A)</script>的直观意义是<script type="math/tex">y</script>被<script type="math/tex">A</script>划分后不确定性的减少量，可想而知，当<script type="math/tex">A</script>的取值很多时，<script type="math/tex">y</script>会被<script type="math/tex">A</script>划分成很多份、于是其不确定性自然会减少很多、从而 ID3 算法会倾向于选择<script type="math/tex">A</script>作为划分依据。但如果这样做的话，可以想象、我们最终得到的决策树将会是一颗很胖很矮的决策树，这并不是我们想要的</li>
 </ul>
-<p>为解决该问题、我们可以给 m 一个惩罚，由此我们可以得到信息增益比（Information Gain Ratio）的概念，该概念对应着 C4.5 算法：</p>
+<p>为解决该问题、我们可以给 m 一个惩罚，由此我们可以得到信息增益比（Information<br>Gain Ratio）的概念，该概念对应着 C4.5 算法：</p>
 <script type="math/tex; mode=display">
 g_{R}(y,A) = \frac{g(y,A)}{H_{A}(y)}</script><p>其中<script type="math/tex">H_{A}(y)</script>是<script type="math/tex">y</script>关于<script type="math/tex">A</script>的熵，它的定义为：</p>
 <script type="math/tex; mode=display">
@@ -496,13 +495,9 @@ H_{A}\left( y \right) = H_{A}\left( D \right) = - \sum_{j = 1}^{m}{\frac{\left| 
 <script type="math/tex; mode=display">
 \text{Gini}\left( y \middle| A = a_{j} \right) = 1 - \sum_{k = 1}^{K}{p^{2}\left( y = c_{k} \middle| A = a_{j} \right)}</script><p>同样可以用经验条件基尼系数来进行估计：</p>
 <script type="math/tex; mode=display">
-\begin{align}
-\text{Gini}\left( y \middle| A \right) = \text{Gini}(y|D) &= \sum_{j = 1}^{m}{\frac{\left| D_{i} \right|}{\left| D \right|}\left\lbrack 1 - \sum_{k = 1}^{K}\left( \frac{\left| D_{jk} \right|}{\left| D_{j} \right|} \right)^{2} \right\rbrack} \\
-
-&= 1 - \sum_{j = 1}^{m}\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}\left( \frac{\left| D_{jk} \right|}{\left| D_{j} \right|} \right)^{2}
-\end{align}</script><p>信息的增益则自然地定义为（不妨称之为“基尼增益”）：</p>
+{\text{Gini}\left( y \middle| A \right) = \text{Gini}(y|D) = \sum_{j = 1}^{m}{\frac{\left| D_{i} \right|}{\left| D \right|}\left\lbrack 1 - \sum_{k = 1}^{K}\left( \frac{\left| D_{\text{jk}} \right|}{\left| D_{j} \right|} \right)^{2} \right\rbrack}\backslash n}{= 1 - \sum_{j = 1}^{m}\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}\left( \frac{\left| D_{\text{Jk}} \right|}{\left| D_{j} \right|} \right)^{2}}</script><p>信息的增益则自然地定义为（不妨称之为“基尼增益”）：</p>
 <script type="math/tex; mode=display">
-g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\left( y \middle| A \right)</script><p>决策树算法中的 CART 算法通常会应用这种定义</p>
+g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\left( y \middle| A \right)</script><p>决策树算法中的CART算法通常会应用这种定义</p>
 
       
     </div>
@@ -655,7 +650,7 @@ g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\le
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-count">34</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -666,7 +661,7 @@ g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\le
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

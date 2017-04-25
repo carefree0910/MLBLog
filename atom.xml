@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.carefree0910.com/"/>
-  <updated>2017-04-23T02:44:13.000Z</updated>
+  <updated>2017-04-25T16:42:32.000Z</updated>
   <id>http://www.carefree0910.com/</id>
   
   <author>
@@ -14,6 +14,581 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>“集成学习”小结</title>
+    <link href="http://www.carefree0910.com/posts/48a0211a/"/>
+    <id>http://www.carefree0910.com/posts/48a0211a/</id>
+    <published>2017-04-25T16:41:26.000Z</published>
+    <updated>2017-04-25T16:42:32.000Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>集成学习是将个体模型进行集成的方法，大致可分为 Bagging 和 Boosting 两类</li>
+<li>随机森林是 Bagging 算法的一种常见拓展、性能优异；它不仅对样本的选取引入随机性、还对个体模型（决策树）的特征选取步骤引入随机性</li>
+<li>AdaBoost 是 Boosting 族算法的代表，通过以下三步进行提升：<ul>
+<li>根据样本权重训练弱分类器</li>
+<li>根据该弱分类器的加权错误率为其分配“话语权”</li>
+<li>根据该弱分类器的表现更新样本权重</li>
+</ul>
+</li>
+<li>集成模型具有相当不错的正则化能力、但该正则化能力并不是必然存在的</li>
+<li>AdaBoost 可以用前向分步算法和加法模型来解释</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;集成学习是将个体模型进行集成的方法，大致可分为 Bagging 和 Boosting 两类&lt;/li&gt;
+&lt;li&gt;随机森林是 Bagging 算法的一种常见拓展、性能优异；它不仅对样本的选取引入随机性、还对个体模型（决策树）的特征选取步骤引入随机性&lt;/li&gt;
+&lt;li
+    
+    </summary>
+    
+      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>相关数学理论</title>
+    <link href="http://www.carefree0910.com/posts/613bbb2f/"/>
+    <id>http://www.carefree0910.com/posts/613bbb2f/</id>
+    <published>2017-04-25T16:19:04.000Z</published>
+    <updated>2017-04-25T16:49:37.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度</p>
+<a id="more"></a>
+<h1 id="经验分布函数"><a href="#经验分布函数" class="headerlink" title="经验分布函数"></a>经验分布函数</h1><p>正如前文所说，经验分布函数的数学表达式为：</p>
+<script type="math/tex; mode=display">
+F_{N}\left( x \right) = \frac{1}{N}\sum_{i = 1}^{N}{I_{\left( - \infty,x \right\rbrack}(x_{i})}</script><p>如果将<script type="math/tex">x_{1},\ldots,x_{N}</script>按从小到大的顺序排成<script type="math/tex">x_{(1)},\ldots,x_{\left( N \right)}</script>，我们通常称其中的<script type="math/tex">x_{\left( i \right)}</script>为第 i 个次序统计量。易知可以利用次序统计量将<script type="math/tex">F_{N}(x)</script>表示成更直观的形式：</p>
+<script type="math/tex; mode=display">
+F_{N}\left( x \right) = \left\{ \begin{matrix}
+0,\ \ &x < x_{\left( 1 \right)} \\
+\frac{i}{N},\ \ &x \in \left\lbrack x_{\left( i \right)},x_{\left( i + 1 \right)} \right)\ (i = 1,\ldots,N - 1) \\
+1,\ \ &x \geq x_{\left( N \right)} \\
+\end{matrix} \right.\</script><p>关于其优良性，前文所说的“频率估计概率”的严谨叙述其实就是强大数律：</p>
+<script type="math/tex; mode=display">
+p\left( \lim_{N}{F_{N}\left( x \right) - F\left( x \right) = 0} \right) = 1\ (\forall x)</script><p>亦即</p>
+<script type="math/tex; mode=display">
+F_{N}(x) \xrightarrow{a.s.} F(x)</script><p>同时还有一个更强的结论（Glivenko-Cantelli 定理）：</p>
+<script type="math/tex; mode=display">
+p\left( \lim_{N}{\sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right| = 0} \right) = 1</script><p>亦即</p>
+<script type="math/tex; mode=display">
+\left\| F_{N}\left( x \right) - F\left( x \right) \right\|_{\infty} \equiv \sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right|\xrightarrow{a.s.}0</script><p>其中，<script type="math/tex">\sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right|</script>就是著名的柯尔莫诺夫-斯米尔诺夫检验（Kolmogorov-Smirnov Statistic）。值得一提的是，用其它范数来代替这里的无穷范数有时也是合理的。比如说用二范数来代替时、对应的就是 Cramér-von Mises Criterion</p>
+<p>此外，我们还可以利用中心极限定理等来研究经验分布函数（比如与正态分布扯上关系等等），这里就不详细展开了。总之，经验分布函数的优良性是相当有保证的，与其本质类似的 Bootstrap 的优良性也因而有了保证。当然、Bootstrap 自己是有一套成熟理论的，不过如果就这点展开来叙述的话、多多少少会偏离了本系列文章的主旨，所以这里就仅通过讨论经验分布函数来间接地感受 Bootstrap 的优良性</p>
+<h1 id="AdaBoost-与前向分步加法模型"><a href="#AdaBoost-与前向分步加法模型" class="headerlink" title="AdaBoost 与前向分步加法模型"></a>AdaBoost 与前向分步加法模型</h1><p>本节主要用于推导如下定理：AdaBoost 分类模型可以等价为损失函数为指数函数的前向分步加法模型</p>
+<p>假设经过<script type="math/tex">k</script>轮迭代后、前项分布算法已经得到了加法模型<script type="math/tex">f_{k}(x)</script>，亦即：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+f_{k}\left( x \right) &= f_{k - 1}\left( x \right) + \alpha_{k}g_{k}\left( x \right) = f_{k - 2}\left( x \right) + \alpha_{k - 1}g_{k - 1}\left( x \right) + \alpha_{k}g_{k}(x) \\
+
+&= \ldots = \sum_{i = 1}^{k}{\alpha_{i}g_{i}(x)}
+\end{align}</script><p>可知、第<script type="math/tex">k + 1</script>轮的模型<script type="math/tex">f_{k + 1}</script>能表示为：</p>
+<script type="math/tex; mode=display">
+f_{k + 1}\left( x \right) = f_{k}\left( x \right) + \alpha_{k + 1}g_{k + 1}(x)</script><p>我们关心的问题就是，如何在<script type="math/tex">f_{k}(x)</script>确定下来的情况下、训练出第<script type="math/tex">k + 1</script>轮的个体分类器<script type="math/tex">g_{k + 1}(x)</script>及其权重<script type="math/tex">\alpha_{k + 1}</script>。注意到我们的损失函数是指数函数，亦即：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+L &= \sum_{i = 1}^{N}{\exp\left\lbrack - y_{i}f_{k + 1}\left( x_{i} \right) \right\rbrack} \\
+
+&= \sum_{i = 1}^{N}w_{ki}\exp\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}(x_{i})\rbrack
+\end{align}</script><p>其中</p>
+<script type="math/tex; mode=display">
+w_{ki} = \exp\lbrack - y_{i}f_{k}(x_{i})\rbrack</script><p>在<script type="math/tex">f_{k}(x)</script>确定下来的情况下是常数。由于我们的最终目的是最小化损失函数、所以<script type="math/tex">\alpha_{k + 1}</script>和<script type="math/tex">g_{k + 1}(x)</script>就可以表示为：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\left( \alpha_{k + 1},g_{k + 1}\left( x \right) \right) &= \arg{\min_{\alpha,g}{\sum_{i = 1}^{N}{w_{ki}\exp\left\lbrack - y_{i}\alpha g\left( x_{i} \right) \right\rbrack}}} \\
+
+&= \arg{\min_{\alpha,g}{\sum_{y_{i} = g\left( x_{i} \right)}^{}{w_{ki}e^{- \alpha}} + \sum_{y_{i} \neq g\left( x_{i} \right)}^{}{w_{ki}e^{\alpha}}}} \\
+
+&= \arg{\min_{\alpha,g}{\left( e^{\alpha} - e^{- \alpha} \right)\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)} + e^{- \alpha}\sum_{i = 1}^{N}w_{ki}}} \\
+
+&= \arg{\min_{\alpha,g}{\left( e^{\alpha} - e^{- \alpha} \right)\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)} + e^{- \alpha}}}
+\end{align}</script><p>上式可以分两步求解。先看当<script type="math/tex">\alpha</script>确定下来后应该如何定出<script type="math/tex">g_{k + 1}(x)</script>，易知：</p>
+<script type="math/tex; mode=display">
+g_{k + 1}\left( x \right) = \arg{\min_{g}{\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)}}}</script><p>亦即第<script type="math/tex">k + 1</script>步的个体分类器应该使训练集上的加权错误率最小。不妨设解出的<script type="math/tex">g_{k + 1}(x)</script>在训练集上的加权错误率为<script type="math/tex">e_{k + 1}</script>、亦即：</p>
+<script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g_{k + 1}\left( x_{i} \right) \right)} \triangleq e_{k + 1}</script><p>我们需要利用它来定出<script type="math/tex">\alpha_{k + 1}</script>。注意到对目标函数求偏导后易知：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\alpha_{k + 1} &= \arg{\min_{\alpha}{\left( e^{\alpha} - e^{- \alpha} \right)e_{k + 1} + e^{- \alpha}}} \\
+
+&\Leftrightarrow \left( e^{\alpha_{k + 1}} + e^{- \alpha_{k + 1}} \right)e_{k + 1} - e^{- \alpha_{k + 1}} = 0 \\
+
+&\Leftrightarrow \alpha_{k + 1} = \frac{1}{2}\ln\frac{1 - e_{k + 1}}{e_{k + 1}}
+\end{align}</script><p>这和 AdaBoost 中确定个体分类器权值的式子一模一样。接下来只需要证明样本权重更新的式子也彼此一致即可得证定理，而事实上、由于：</p>
+<script type="math/tex; mode=display">
+f_{k + 1}\left( x \right) = f_{k}\left( x \right) + \alpha_{k + 1}g_{k + 1}\left( x \right)</script><p>从而</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w_{k + 1,i} &= \exp\left\lbrack - y_{i}f_{k + 1}\left( x_{i} \right) \right\rbrack \\
+
+&= \exp\left\lbrack - y_{i}f_{k}\left( x_{i} \right) \right\rbrack \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack \\
+
+&= w_{ki} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack
+\end{align}</script><p>注意到我们要将样本权重归一化，所以须有：</p>
+<script type="math/tex; mode=display">
+w_{k + 1,i} \leftarrow \frac{w_{k + 1,i}}{Z_{k}}</script><p>其中</p>
+<script type="math/tex; mode=display">
+Z_{k} = \sum_{i = 1}^{N}w_{k + 1,i} = \sum_{i = 1}^{N}{w_{ki} \cdot \exp\left\lbrack - \alpha_{k + 1}y_{i}g_{k + 1}\left( x_{i} \right) \right\rbrack}</script><p>是故</p>
+<script type="math/tex; mode=display">
+w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack</script><p>这和 AdaBoost 中更新样本权重的式子也一模一样。综上所述、定理得证</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>AdaBoost 算法的解释</title>
+    <link href="http://www.carefree0910.com/posts/707464b/"/>
+    <id>http://www.carefree0910.com/posts/707464b/</id>
+    <published>2017-04-25T16:06:50.000Z</published>
+    <updated>2017-04-25T16:18:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>我们前面提到过 Bagging 的数学基础是 Bootstrap 理论、但还没有讲 Boosting 的数学基础。本节拟打算直观地阐述 Boosting 族的代表算法——AdaBoost 算法的解释，由于具体的推导相当繁琐，相关的细节我们会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>里面说明</p>
+<a id="more"></a>
+<p>首先将结论给出：AdaBoost 算法是前向分步算法的特例，AdaBoost 模型等价于损失函数为指数函数的加法模型</p>
+<p>其中，加法模型的定义是直观且熟悉的：</p>
+<script type="math/tex; mode=display">
+f\left( x \right) = \sum_{k = 1}^{M}{\alpha_{k}g(x;\Theta_{k})}</script><p>这里的<script type="math/tex">g(x;\Theta_{k})</script>为基函数，<script type="math/tex">\alpha_{k}</script>是基函数的权重，<script type="math/tex">\Theta_{k}</script>是基函数的参数。显然的是，我们的 AdaBoost 算法的最后一步生成的模型正是这么一个加法模型</p>
+<p>而所谓的前向分步算法，就是从前向后、一步一步地学习加法模型中的每一个基函数及其权重而非将<script type="math/tex">f(x)</script>作为一个整体来训练，这也正是 AdaBoost 的思想</p>
+<p>如果此时需要最小化的损失函数是指数损失函数<script type="math/tex">L\left( y,f\left( x \right) \right) = \exp\left\lbrack - yf\left( x \right) \right\rbrack</script>的话，通过一系列的数学推导后可以证明、此时的加法模型确实等价于 AdaBoost 模型</p>
+<p>可能大家会觉得这里面有一些别扭：为什么一个实现起来非常简便的模型，它背后的数学原理却如此复杂？事实上有趣的是，AdaBoost 是为数不多的、先有算法后有解释的模型。也就是说，是先有了 AdaBoost 这个东西，然后数学家们看到它的表现非常好之后、才开始绞尽脑汁并想出了一套适用于 AdaBoost 的数学理论。更有意思的是，该数学理论并非毫无意义：在 AdaBoost 的回归问题中，就可以用前向分步算法的理论、将每一步的训练转化为了拟合当前模型的残差、从而简化了训练步骤。我们可以简单地叙述一下其原理：</p>
+<p>加法模型的等价叙述为</p>
+<script type="math/tex; mode=display">
+f_{k + 1}\left( x \right) = f_{k}\left( x \right) + g_{k + 1}(x;\Theta_{k + 1})</script><p>其中<script type="math/tex">g_{k + 1}</script>为第<script type="math/tex">k + 1</script>步的基函数（亦即 AdaBoost 中的弱分类器），<script type="math/tex">\Theta_{k + 1}</script>为其参数。当采用平方误差损失函数<script type="math/tex">L\left( y,f\left( x \right) \right) = {\lbrack y - f\left( x \right)\rbrack}^{2}</script>时，可知第<script type="math/tex">k + 1</script>步的损失变为：</p>
+<script type="math/tex; mode=display">
+L = {\left\lbrack y - f_{k + 1}\left( x \right) \right\rbrack^{2} = \left\lbrack y - f_{k}\left( x \right) - g_{k + 1} \right\rbrack}^{2} = \left\lbrack r_{k}(x) - g_{k + 1}(x) \right\rbrack^{2}</script><p>其中<script type="math/tex">r_{k}(x) = y - f_{k}(x)</script>是第<script type="math/tex">k</script>步模型的残差。</p>
+<p>从上式可以看出在第<script type="math/tex">k + 1</script>步时，为了最小化损失<script type="math/tex">L</script>，只需让当前的基函数<script type="math/tex">g_{k + 1}</script>拟合当前模型的残差<script type="math/tex">r_{k}</script>即可，这就完成了 AdaBoost 回归问题的转化。比较具有代表性的是回归问题的提升树算法，它正是利用了以上叙述的转化技巧来进行模型训练的</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;我们前面提到过 Bagging 的数学基础是 Bootstrap 理论、但还没有讲 Boosting 的数学基础。本节拟打算直观地阐述 Boosting 族的代表算法——AdaBoost 算法的解释，由于具体的推导相当繁琐，相关的细节我们会放在&lt;a href=&quot;/posts/613bbb2f/&quot; title=&quot;相关数学理论&quot;&gt;相关数学理论&lt;/a&gt;里面说明&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>集成模型的性能分析</title>
+    <link href="http://www.carefree0910.com/posts/fb0d2f02/"/>
+    <id>http://www.carefree0910.com/posts/fb0d2f02/</id>
+    <published>2017-04-25T15:51:10.000Z</published>
+    <updated>2017-04-25T16:11:20.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析</p>
+<p>直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较贴近现实的实验。为讨论方便，我们一律采用决策树作为 AdaBoost 的弱分类器（亦即采用提升树模型进行讨论）、其强度可以通过调整其最深层数来控制。我们可以利用<code>DataUtil</code>类来生成或获取原始数据集，其完整代码可参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py" target="_blank" rel="external">这里</a>、生成数据集的代码则会在前三小节分别放出</p>
+<p>对于二维数据，我们拟打算使用三种数据集来进行评估：</p>
+<ul>
+<li>随机数据集。该数据集主要用于直观地感受模型的分类能力</li>
+<li>异或数据集。该数据集主要用于直观地理解：<ul>
+<li>集成模型正则化的能力</li>
+<li>为何说 AdaBoost 不要选用分类能力太强的弱分类器</li>
+</ul>
+</li>
+<li>螺旋线数据集，主要用于直观认知随机森林和提升树的不足</li>
+</ul>
+<a id="more"></a>
+<h1 id="随机数据集上的表现"><a href="#随机数据集上的表现" class="headerlink" title="随机数据集上的表现"></a>随机数据集上的表现</h1><p>生成随机数据集的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_random</span><span class="params">(size=<span class="number">100</span>)</span>:</span></div><div class="line">    xy = np.random.rand(size, <span class="number">2</span>)</div><div class="line">    z = np.random.randint(<span class="number">2</span>, size=size)</div><div class="line">    <span class="comment"># 注意：我们的AdaBoost框架要求类别空间为(-1,+1)</span></div><div class="line">    z[z == <span class="number">0</span>] = <span class="number">-1</span></div><div class="line">    <span class="keyword">return</span> xy, z</div></pre></td></tr></table></figure>
+<p>随机森林在随机数据集上的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p1.png" alt="p1.png" title="">
+<p>左图为包含 1 棵 CART 树的随机森林，准确率为 78.0%；右图则为包含 10 棵 CART 树的随机森林，准确率为 93.0%。如果将树的数量继续往上抬、达到 100%准确率并非难事。比如，包含 5 0棵 CART 树的随机森林的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p2.png" alt="随机数据集上准确率为 100%的随机森林" title="随机数据集上准确率为 100%的随机森林">
+<p>提升树（弱模型为决策树的 AdaBoost）在随机数据集上的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p3.png" alt="p3.png" title="">
+<p>左图为包含 1 棵 CART 树的 AdaBoost，准确率为 93.0%；右图则为包含 10 棵 CART 树的 AdaBoost，准确率为 99.0%</p>
+<h1 id="异或数据集上的表现"><a href="#异或数据集上的表现" class="headerlink" title="异或数据集上的表现"></a>异或数据集上的表现</h1><p>这里主要是想说明随机森林和提升树正则化的效果。从直观上来说，由于随机森林的理论基础是 Bootstrap、所以自然是包含越多树越好；至于 AdaBoost，可以想象它会对难以分类的数据特别在意、从而导致如下两种可能的结果：</p>
+<ul>
+<li>太过注重噪声，导致过拟合</li>
+<li>专注于类似于下一个系列要讲的 SVM 中的“支持向量”，从而达到正则化</li>
+</ul>
+<p>事实上正如之前提到过的，即使 AdaBoost 在某一步迭代时、所得的模型在训练集上的加权错误率已经达到了 0，继续进行训练仍然可以使模型进一步提升（因为单个模型的正确率没有那么高、从而能使模型继续专注于“支持向量”。所谓支持向量、可以暂时直观地理解为“非常重要的”样本）。为说明这一点，我们可以比较同一数据集上、同样使用最深层数为 3 层的决策树作为弱分类器时、两种不同训练策略在异或数据集上的表现。为了比较准确地衡量正则化能力，我们需要进行交叉验证。、</p>
+<p>生成异或数据集的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_xor</span><span class="params">(size=<span class="number">100</span>)</span>:</span></div><div class="line">    x = np.random.randn(size)</div><div class="line">    y = np.random.randn(size)</div><div class="line">    z = np.ones(size)</div><div class="line">    z[x * y &lt; <span class="number">0</span>] = <span class="number">-1</span></div><div class="line">    <span class="keyword">return</span> np.c_[x, y].astype(np.float32), z</div></pre></td></tr></table></figure>
+<p>随机森林在异或数据集上的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p4.png" alt="p4.png" title="">
+<p><strong><em>注意：该异或数据集和上一章用到的异或数据集是同一个数据集，感兴趣的读者可以进行一些对比</em></strong></p>
+<p>左图为包含 1 棵 CART 树的随机森林，准确率为 93.0%；右图则为包含 10 棵 CART 树的随机森林，准确率为 98.0%。虽说右图中随机森林的表现已经足够好，由前文讨论可知、我们应该尝试训练一个更复杂的随机森林来看看其正则化能力。比如，包含 1000 棵 CART 树的随机森林的表现如下图所示：</p>
+<img src="/posts/fb0d2f02/p5.png" alt="p5.png" title="">
+<p>仔细观察决策边界，可以发现它会倾向于画在使得样本和边界“间隔较大”的地方。关于“间隔”的详细讨论会放在下一个系列，这里只需直观地感受一下即可</p>
+<p>对于提升树，首先看一下不提前停止训练时的表现。为更好地说明问题，这里我们换了一个异或数据集来进行分析：</p>
+<img src="/posts/fb0d2f02/p6.png" alt="p6.png" title="">
+<p>此时在测试数据集上的正确率为 97.0%。然后看当模型在训练集上错误率足够小就马上停止训练时的表现：</p>
+<img src="/posts/fb0d2f02/p7.png" alt="p7.png" title="">
+<p>此时在测试数据集上的正确率为 94.0%</p>
+<p>当然，正如前面所说，事实上确实有论文（G. Ratsch et al. ML, 2001）给出了 AdaBoost 会很快就过拟合的例子。但总体而言，笔者认为 AdaBoost 在正则化这一方面的表现还是相当优异的</p>
+<p>由前面的诸多讨论可以得知，AdaBoost 的正则化能力是来源于各个弱分类器的“分而治之”，那么如果使用分类能力强的弱分类器会有什么结果呢？下面就放出当选用不限制层数的决策树作为弱模型的、异或数据集上的表现，相信会带来很好的直观：</p>
+<img src="/posts/fb0d2f02/p8.png" alt="p8.png" title="">
+<p>此时在测试数据集上的正确率为 90.0%。值得一提的是，用单独的决策树做出来的效果和上图的效果几乎完全一致。换句话说、此时使用 AdaBoost 没有太大的意义</p>
+<h1 id="螺旋数据集上的表现"><a href="#螺旋数据集上的表现" class="headerlink" title="螺旋数据集上的表现"></a>螺旋数据集上的表现</h1><p>随机森林和提升树虽然确实都相当强大、但它同样具有其基本组成单元——决策树所具有的某些缺点。比如说，它们在处理连续性比较强的数据时可能会有些吃力、因为它们的决策边界一般而言都是“不太光滑”的。下面我们就统一使用个体决策树不做层数限制的随机森林和提升树以及螺旋线数据集作为样例来进行说明</p>
+<p>生成螺旋数据集的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_spin</span><span class="params">(size=<span class="number">30</span>)</span>:</span></div><div class="line">    xs = np.zeros((size * <span class="number">4</span>, <span class="number">2</span>), dtype=np.float32)</div><div class="line">    ys = np.zeros(size * <span class="number">4</span>, dtype=np.int8)</div><div class="line">    <span class="comment"># 根据螺旋线在极坐标中的公式、生成四条螺旋线</span></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</div><div class="line">        ix = range(size * i, size * (i + <span class="number">1</span>))</div><div class="line">        <span class="comment"># 去掉原点以避免出现原点同时从属于两类的不合理情况</span></div><div class="line">        r = np.linspace(<span class="number">0.0</span>, <span class="number">1</span>, size + <span class="number">1</span>)[<span class="number">1</span>:]</div><div class="line">        t = np.linspace(<span class="number">2</span> * i * pi / <span class="number">4</span>, <span class="number">2</span> * (i + <span class="number">4</span>) * pi / <span class="number">4</span>, size) + np.random.random(</div><div class="line">            size=size) * <span class="number">0.1</span></div><div class="line">        xs[ix] = np.c_[r * np.sin(t), r * np.cos(t)]</div><div class="line">        ys[ix] = <span class="number">2</span> * (i % <span class="number">2</span>) - <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> xs, ys</div></pre></td></tr></table></figure>
+<p>随机森林和提升树在其上的表现分别如下两张图所示：</p>
+<img src="/posts/fb0d2f02/p9.png" alt="p9.png" title="">
+<img src="/posts/fb0d2f02/p10.png" alt="p10.png" title="">
+<p>上面两组图的左边都是包含 10 棵 CART 树的模型、右边都是包含 1000 棵 CART 树的模型，准确率则都是为 100.0%。可以看到，虽然它们都确实能够将大致的趋势给描述出来、但是决策边界相对而言都是“直来直去”的，这一点要比支持向量机、神经网络等模型的训练出来的结果要差不少。总之，决策树那使用二类问题的解决方案来处理连续型特征的做法、导致了随机森林和提升树在处理连续特征上的一些不足</p>
+<h1 id="蘑菇数据集上的表现"><a href="#蘑菇数据集上的表现" class="headerlink" title="蘑菇数据集上的表现"></a>蘑菇数据集上的表现</h1><p>目前为止我们对二维数据上的测试做了比较详尽的说明，接下来我们不妨拿蘑菇数据集来测试一下我们的模型在真实数据下的表现；鉴于该数据集比较简单、我们只使用 100 个样本进行训练并用剩余的 8000 多个样本进行测试。为了直观感受模型的分类能力，我们可以画出当个体模型为 CART 决策树桩时、两种集成模型在测试集上的准确率随训练迭代次数变化而变化的曲线：</p>
+<img src="/posts/fb0d2f02/p11.png" alt="p11.png" title="">
+<p>其中蓝线是随机森林的训练曲线、绿线是提升树的训练曲线。这个结果是符合直观的，毕竟从个体模型来讲，引入了随机性的、随机森林中的决策树桩要比提升树中正常的决策树桩要弱，所以提升树的收敛速度理应比随机森林的要快；此外，由于随机森林和提升树相比、受个体模型分类能力的影响更大、我们采用的又是 CART 决策树桩这种相当弱的个体模型，所以随机森林收敛后的表现也要比提升树收敛后的表现要差</p>
+<p>不过需要指出的是，当我们取消个体 CART 决策树的层数限制时，虽然随机森林的收敛速度仍会比提升树的收敛速度慢、但是收敛后的表现却很有可能比提升树收敛后的表现要好。这是因为取消了层数限制的决策树是相当强力的模型，而且：</p>
+<ul>
+<li>一方面正如刚刚所说的，随机森林受个体模型的分类能力影响较大、所以取消个体树的层数限制后、随机森林的分类能力自然大大增强</li>
+<li>另一方面则如之前所讨论的，具有较强分类能力的个体模型与 AdaBoost 的原理可能不太兼容，这就使得 AdaBoost 本身的优势被抑制了</li>
+</ul>
+<p>取消层数限制后重复上述实验，此时两种集成模型的训练曲线如下图所示：</p>
+<img src="/posts/fb0d2f02/p12.png" alt="p12.png" title="">
+<p>可能观众老爷们已经发现，取消层数限制后的提升树似乎还没有取消限制之前的提升树的表现好；事实上，由于我们只用了 100 个样本来进行训练，所以容易想象、取消限制后的提升树将会产生比较严重的过拟合。可以把取消层数限制前后的训练曲线放在一起来进行直观对比，结果如下图所示：</p>
+<img src="/posts/fb0d2f02/p13.png" alt="p13.png" title="">
+<p>其中蓝线是个体模型为 CART 决策树桩时的训练曲线、绿线是个体模型为正常 CART 决策树时的训练曲线</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析&lt;/p&gt;
+&lt;p&gt;直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较贴近现实的实验。为讨论方便，我们一律采用决策树作为 AdaBoost 的弱分类器（亦即采用提升树模型进行讨论）、其强度可以通过调整其最深层数来控制。我们可以利用&lt;code&gt;DataUtil&lt;/code&gt;类来生成或获取原始数据集，其完整代码可参见&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py&quot;&gt;这里&lt;/a&gt;、生成数据集的代码则会在前三小节分别放出&lt;/p&gt;
+&lt;p&gt;对于二维数据，我们拟打算使用三种数据集来进行评估：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;随机数据集。该数据集主要用于直观地感受模型的分类能力&lt;/li&gt;
+&lt;li&gt;异或数据集。该数据集主要用于直观地理解：&lt;ul&gt;
+&lt;li&gt;集成模型正则化的能力&lt;/li&gt;
+&lt;li&gt;为何说 AdaBoost 不要选用分类能力太强的弱分类器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;螺旋线数据集，主要用于直观认知随机森林和提升树的不足&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>AdaBoost 算法</title>
+    <link href="http://www.carefree0910.com/posts/f5f50863/"/>
+    <id>http://www.carefree0910.com/posts/f5f50863/</id>
+    <published>2017-04-25T15:31:03.000Z</published>
+    <updated>2017-04-25T15:50:26.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>由前文的讨论可知，问题的关键主要在如下两点：</p>
+<ul>
+<li>如何根据弱模型的表现更新训练集的权重</li>
+<li>如何根据弱模型的表现决定弱模型的话语权</li>
+</ul>
+<p>我们接下来就看看 AdaBoost 算法是怎样解决上述两个问题的。事实上，能够将这两个问题的解决方案有机地糅合在一起、正是 AdaBoost 的巧妙之处之一</p>
+<a id="more"></a>
+<h1 id="AdaBoost-算法陈述"><a href="#AdaBoost-算法陈述" class="headerlink" title="AdaBoost 算法陈述"></a>AdaBoost 算法陈述</h1><p>不失一般性、我们以二类分类问题来进行讨论，易知此时我们的弱模型、强模型和最终模型为弱分类器、强分类器和最终分类器。再不妨假设我们现在有的是一个二类分类的训练数据集：</p>
+<script type="math/tex; mode=display">
+D = \{\left( x_{1},y_{1} \right),\left( x_{2},y_{2} \right),\ldots,(x_{n},\ y_{n})\}</script><p>其中，每个样本点都是由实例<script type="math/tex">x_{i}</script>和类别<script type="math/tex">y_{i}</script>组成、且：</p>
+<script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script><p>这里的<script type="math/tex">X</script>是样本空间、<script type="math/tex">Y</script>是类别空间。AdaBoost 会利用如下的步骤、从训练数据中训练出一系列的弱分类器、然后把这些弱分类器集成为一个强分类器：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集（包含 N 个数据）、弱学习算法及对应的弱分类器、迭代次数 M</li>
+<li><strong>过程</strong>：<ol>
+<li>初始化训练数据的权值分布  <script type="math/tex; mode=display">
+W_{0} = (w_{01},\ldots,w_{0N})</script></li>
+<li>对<script type="math/tex">k = 0,1,\ldots,\ M - 1</script>：<ol>
+<li>使用权值分布为<script type="math/tex">W_{k}</script>的训练数据集训练弱分类器  <script type="math/tex; mode=display">g_{k + 1}(x)$$：$$X \rightarrow \{ - 1,\  + 1\}</script></li>
+<li>计算<script type="math/tex">g_{k + 1}(x)</script>在训练数据集上的加权错误率  <script type="math/tex; mode=display">
+e_{k + 1} = \sum_{i = 1}^{N}{w_{\text{ki}}I(g_{k + 1}\left( x_{i} \right) \neq y_{i})}</script></li>
+<li>根据加权错误率计算<script type="math/tex">g_{k + 1}(x)</script>的“话语权”  <script type="math/tex; mode=display">
+\alpha_{k + 1} = \frac{1}{2}\ln\frac{1 - e_{k + 1}}{e_{k + 1}}</script></li>
+<li>根据<script type="math/tex">g_{k + 1}(x)</script>的表现更新训练数据集的权值分布：被<script type="math/tex">g_{k + 1}\left( x \right)</script>误分的样本（<script type="math/tex">y_{i}g_{k + 1}\left( x_{i} \right) < 0</script>的样本）要相对地（以<script type="math/tex">e^{\alpha_{k + 1}}</script>为比例地）增大其权重，反之则要（以<script type="math/tex">e^{- \alpha_{k + 1}}</script>为比例地）减少其权重  <script type="math/tex; mode=display">
+w_{k + 1,i} = \frac{w_{\text{ki}}}{Z_{k}} \cdot exp( - \alpha_{k + 1}y_{i}g_{k + 1}(x_{i}))</script><script type="math/tex; mode=display">
+W_{k + 1} = (w_{k + 1,1},\ldots,w_{k + 1,N})</script>这里的<script type="math/tex">Z_{k}</script>是规范化因子  <script type="math/tex; mode=display">
+Z_{k} = \sum_{i = 1}^{N}{w_{\text{ki}} \cdot exp( - \alpha_{k + 1}y_{i}g_{k + 1}(x_{i}))}</script>它的作用是将<script type="math/tex">W_{k + 1}</script>归一化成为一个概率分布</li>
+</ol>
+</li>
+<li>加权集成弱分类器  <script type="math/tex; mode=display">
+f\left( x \right) = \sum_{k = 1}^{M}{\alpha_{k}g_{k}(x)}</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：最终分类器<script type="math/tex">g(x)</script>  <script type="math/tex; mode=display">
+g\left( x \right) = sign\left( f\left( x \right) \right) = \text{sign}\left( \sum_{k = 1}^{M}{\alpha_{k}g_{k}\left( x \right)} \right)</script></li>
+</ol>
+<p><strong><em>注意：2.2.2 步骤得到的加权错误率如果足够小的话，可以考虑提前停止训练，但这样做往往不是最合理的选择（这点会在后文进行模型性能分析时进行较详细的说明）</em></strong></p>
+<p>我们在分配弱分类器的话语权时用到了一个公式：<script type="math/tex">\alpha_{k + 1} = \frac{1}{2}\ln\frac{1 - e_{k + 1}}{e_{k + 1}}</script>。在该公式中，话语权<script type="math/tex">\alpha_{k + 1}</script>会随着加权错误率<script type="math/tex">e_{k + 1} \in \lbrack 0,\ 1\rbrack</script>的增大而减小。它们之间的函数关系如下图所示：</p>
+<img src="/posts/f5f50863/p1.png" alt="p1.png" title="">
+<p>大多数情况我们训练出来的弱分类器的<script type="math/tex">e_{k} < 0.5</script>、对应着的是上图左半边的部分；不过即使我们的弱分类器非常差、以至于<script type="math/tex">e_{k} > 0.5</script>，由于此时<script type="math/tex">\alpha_{k} < 0</script>、亦即我们知道该分类器的表决应该反着来看、所以也不会出问题（有一种做法是如果训练到<script type="math/tex">e_{k} > 0.5</script>的话就停止训练，个人感觉也有道理）</p>
+<h1 id="弱模型的选择"><a href="#弱模型的选择" class="headerlink" title="弱模型的选择"></a>弱模型的选择</h1><p>看到这里，观众老爷们可能会产生这么一个疑问：如果我们不拘泥于对弱模型进行提升、转而对强模型或比较强的弱模型进行提升的话，会不会提升出更好的模型呢？从 Boosting 的思想来看、需要指出的是：用 Boosting 进行提升的弱模型的学习能力不宜太强，否则使用 Boosting 就没有太大的意义、甚至从原理上不太兼容。直观地说，Boosting 是为了让各个弱模型专注于“某一方面”、最后加权表决，如果使用了较强的弱模型，可能一个弱模型就包揽了好几方面，最后可能反而会模棱两可、起不到“提升”的效果。而且从迭代的角度来说，可以想象：如果使用较强弱模型的话，可能第一次产生的模型就已经达到“最优”、从而使得模型没有“提升空间”</p>
+<p><strong><em>注意：虽然笔者认为在 Boosting 中的弱模型就应该选择足够弱的模型，但确实亦有对强模型（如核 SVM）应用 Boosting 也很好的说法。详细而严谨的讨论会牵扯大量的数学理论、这里就不详细展开了</em></strong></p>
+<p>可能观众老爷们此时又会产生一个新的疑问：如果说 Boosting 中的弱模型不宜太强的话，是不是说 Bagging 中的个体模型也不宜太强呢？需要指出的是，虽然从理论上来说使用弱模型进行集成就已足以获得一个相当不错的最终模型，但使用较强的模型来进行集成从原理上是不太矛盾的。考虑到不同的场合，有时确实可以选用较强的模型来作为个体模型</p>
+<p>那么所谓的不太强的弱模型大概是个什么东西呢？一个比较直观的例子就是限制层数的决策树。极端的情况就是限定它只能有一层、亦即上一章我们提到过的“决策树桩”，对应的进行了提升后的模型就是相当有名的提升树（Boosting Tree），它被认为是统计学习中性能最好的方法之一、既可以用来做分类也可以拿来做回归，是个相当强力的模型</p>
+<h1 id="AdaBoost-的实现"><a href="#AdaBoost-的实现" class="headerlink" title="AdaBoost 的实现"></a>AdaBoost 的实现</h1><p>从第一节的算法讲解其实可以看出，虽然 AdaBoost 算法本身很不平凡，但它给出的步骤都是相当便于实现的，基本上一个步骤就对应着 Python 里面的一行代码。在实现的过程中，困难之处可能主要在于如何让实现出来的 AdaBoost 框架易于扩展并具有方便调用的接口，而不在于实现算法本身。同时，为了能够更好地理解 AdaBoost 算法，我们需要对其性能作一系列的分析</p>
+<p>由于 AdaBoost 是一个用于提升弱模型的算法，所以我们整体的实现思路大致是（不失一般性、我们先讨论二类分类问题）：</p>
+<ul>
+<li>搭建 AdaBoost 框架</li>
+<li>使用 sklearn 中的分类器对框架的正确性进行检验</li>
+<li>使用前两章实现的分类器进行对比实验</li>
+</ul>
+<p>所以我们要先把 AdaBoost 框架实现出来。为此，先来看 AdaBoost 框架的初始化步骤（其中<a href="https://github.com/carefree0910/MachineLearning/tree/master/_SKlearn" target="_blank" rel="external">_SKlearn</a>是我对 sklearn 中的模型做了一定程度的拓展后的模型包）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> math <span class="keyword">import</span> log</div><div class="line"><span class="comment"># 导入我们之前实现的朴素贝叶斯模型和决策树模型</span></div><div class="line"><span class="keyword">from</span> b_NaiveBayes.Vectorized.MultinomialNB <span class="keyword">import</span> MultinomialNB</div><div class="line"><span class="keyword">from</span> b_NaiveBayes.Vectorized.GaussianNB <span class="keyword">import</span> GaussianNB</div><div class="line"><span class="keyword">from</span> c_CvDTree.Tree <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span> _SKlearn.NaiveBayes <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span> _SKlearn.Tree <span class="keyword">import</span> *</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">AdaBoost</span>:</span></div><div class="line">    <span class="comment"># 弱分类器字典，如果想要测试新的弱分类器的话、只需将其加入该字典即可</span></div><div class="line">    _weak_clf = &#123;</div><div class="line">        <span class="string">"SKMNB"</span>: SKMultinomialNB,</div><div class="line">        <span class="string">"SKGNB"</span>: SKGaussianNB,</div><div class="line">        <span class="string">"SKTree"</span>: SKTree,</div><div class="line"></div><div class="line">        <span class="string">"MNB"</span>: MultinomialNB,</div><div class="line">        <span class="string">"GNB"</span>: GaussianNB,</div><div class="line">        <span class="string">"ID3"</span>: ID3Tree,</div><div class="line">        <span class="string">"C45"</span>: C45Tree,</div><div class="line">        <span class="string">"Cart"</span>: CartTree</div><div class="line">    &#125;</div><div class="line">    <span class="string">"""</span></div><div class="line">        AdaBoost框架的朴素实现</div><div class="line">        使用的弱分类器需要有如下两个方法：</div><div class="line">            1) 'fit'      方法，它需要支持输入样本权重</div><div class="line">            2) 'predict'  方法, 它用于返回预测的类别向量</div><div class="line">        初始化结构</div><div class="line">        self._clf：记录弱分类器名称的变量</div><div class="line">        self._clfs：记录弱分类器的列表</div><div class="line">        self._clfs_weights：记录弱分类器“话语权”的列表</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        self._clf, self._clfs, self._clfs_weights = <span class="string">""</span>, [], []</div></pre></td></tr></table></figure>
+<p>接下来就是训练和预测部分的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, sample_weight=None, clf=None, epoch=<span class="number">10</span>, eps=<span class="number">1e-12</span>, **kwargs)</span>:</span></div><div class="line">    <span class="comment"># 默认使用10个CART决策树桩作为弱分类器</span></div><div class="line">    <span class="keyword">if</span> clf <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">or</span> AdaBoost._weak_clf[clf] <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        clf = <span class="string">"Cart"</span></div><div class="line">        kwargs = &#123;<span class="string">"max_depth"</span>: <span class="number">1</span>&#125;</div><div class="line">    self._clf = clf</div><div class="line">    <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        sample_weight = np.ones(len(y)) / len(y)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        sample_weight = np.array(sample_weight)</div><div class="line">    <span class="comment"># AdaBoost算法的主循环，epoch为迭代次数</span></div><div class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">        <span class="comment"># 根据样本权重训练弱分类器</span></div><div class="line">        tmp_clf = AdaBoost._weak_clf[clf](**kwargs)</div><div class="line">        tmp_clf.fit(x, y, sample_weight)</div><div class="line">        <span class="comment"># 调用弱分类器的predict方法进行预测</span></div><div class="line">        y_pred = tmp_clf.predict(x)</div><div class="line">        <span class="comment"># 计算加权错误率；考虑到数值稳定性，在边值情况加了一个小的常数</span></div><div class="line">        em = min(max((y_pred != y).dot(self._sample_weight[:, <span class="keyword">None</span>])[<span class="number">0</span>], eps), <span class="number">1</span> - eps)</div><div class="line">        <span class="comment"># 计算该弱分类器的“话语权”</span></div><div class="line">        am = <span class="number">0.5</span> * log(<span class="number">1</span> / em - <span class="number">1</span>)</div><div class="line">        <span class="comment"># 更新样本权重并利用deepcopy将该弱分类器记录在列表中</span></div><div class="line">        sample_weight *= np.exp(-am * y * y_pred)</div><div class="line">        sample_weight /= np.sum(sample_weight)</div><div class="line">        self._clfs.append(deepcopy(tmp_clf))</div><div class="line">        self._clfs_weights.append(am)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x)</span>:</span></div><div class="line">    x = np.atleast_2d(x)</div><div class="line">    rs = np.zeros(len(x))</div><div class="line">    <span class="comment"># 根据各个弱分类器的“话语权”进行决策</span></div><div class="line">    <span class="keyword">for</span> clf, am <span class="keyword">in</span> zip(self._clfs, self._clfs_weights):</div><div class="line">        rs += am * clf.predict(x)</div><div class="line">    <span class="comment"># 将预测值大于0的判为类别1，小于0的判为类别-1</span></div><div class="line">    <span class="keyword">return</span> np.sign(rs)</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;由前文的讨论可知，问题的关键主要在如下两点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如何根据弱模型的表现更新训练集的权重&lt;/li&gt;
+&lt;li&gt;如何根据弱模型的表现决定弱模型的话语权&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;我们接下来就看看 AdaBoost 算法是怎样解决上述两个问题的。事实上，能够将这两个问题的解决方案有机地糅合在一起、正是 AdaBoost 的巧妙之处之一&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>随机森林算法</title>
+    <link href="http://www.carefree0910.com/posts/c0a9c025/"/>
+    <id>http://www.carefree0910.com/posts/c0a9c025/</id>
+    <published>2017-04-25T12:42:41.000Z</published>
+    <updated>2017-04-25T16:45:14.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>由前文讨论可知，我们在实现 RF 算法之前，需要先在决策树模型的生成过程中加一个参数、使得我们能够对特征选取加入随机性。这个过程相当平凡，下给出代码片段以进行粗略的说明。首先在<code>CvDBase</code>的<code>fit</code>方法中加入一个参数<code>feature_bound</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, sample_weight=None, alpha=None, eps=<span class="number">1e-8</span>,</span></span></div><div class="line">    cv_rate=<span class="number">0.2</span>, train_only=False, feature_bound=None):</div></pre></td></tr></table></figure>
+<p>然后在同一个方法里面、把这个参数传给<code>CvDNode</code>的<code>fit</code>方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">self.root.fit(x_train, y_train, _train_weights, feature_bound, eps)</div></pre></td></tr></table></figure>
+<p>在<code>CvDNode</code>的<code>fit</code>方法中，原始代码中有一个对可选特征空间的遍历：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> feat <span class="keyword">in</span> self.feats:</div></pre></td></tr></table></figure>
+<p>根据参数<code>feature_bound</code>对它加入随机性：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">feat_len = len(self.feats)</div><div class="line"><span class="comment"># 默认没有随机性</span></div><div class="line"><span class="keyword">if</span> feature_bound <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">    indices = range(<span class="number">0</span>, feat_len)</div><div class="line"><span class="keyword">elif</span> feature_bound == <span class="string">"log"</span>:</div><div class="line">    <span class="comment"># np.random.permutation(n)：将数组打乱后返回</span></div><div class="line">    indices = np.random.permutation(feat_len)[:max(<span class="number">1</span>, int(log2(feat_len)))]</div><div class="line"><span class="keyword">else</span>:</div><div class="line">    indices = np.random.permutation(feat_len)[:feature_bound]</div><div class="line">tmp_feats = [self.feats[i] <span class="keyword">for</span> i <span class="keyword">in</span> indices]</div><div class="line"><span class="keyword">for</span> feat <span class="keyword">in</span> tmp_feats:</div></pre></td></tr></table></figure>
+<p>然后要在同一个方法里面、把<code>feature_bound</code>传给<code>_gen_children</code>方法，而在<code>_gen_children</code>中、再把<code>feature_bound</code>传给子节点的<code>fit</code>方法即可</p>
+<p>以上所有实现细节可参见<a href="https://github.com/carefree0910/MachineLearning/tree/master/c_CvDTree" target="_blank" rel="external">这里</a>中的 Tree.py 和 Node.py</p>
+<p>有了这些准备，我们就可以来看看 RF 的算法陈述了（以分类问题为例）：</p>
+<a id="more"></a>
+<ol>
+<li><strong>输入</strong>：训练数据集（包含 N 个数据）、决策树模型、迭代次数 M</li>
+<li><strong>过程</strong>：<ol>
+<li>对<script type="math/tex">j=1,2,...,M</script>：<ol>
+<li>通过 Bootstrap 生成包含 N 个数据的数据集<script type="math/tex">D_k</script></li>
+<li>利用<script type="math/tex">D_j</script>和输入的决策树模型进行训练，注意不用对训练好的决策树模型<script type="math/tex">g_j</script>进行剪枝。同时需要注意的是，在训练决策树的过程中、每一步的生成都要对特征的选取加入随机性</li>
+</ol>
+</li>
+<li>对个体决策树进行简单组合。不妨用符号<script type="math/tex">\text{freq}(c_{k})</script>表示类别<script type="math/tex">c_{k}</script>在 M 个决策树模型的决策中出现的频率，那么：  <script type="math/tex; mode=display">
+g\left( x \right) = \arg{\max_{c_k}{\text{freq}(c_{k})}}</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：最终分类器<script type="math/tex">g(x)</script></li>
+</ol>
+<p>从算法即可看出随机森林算法的实现（在实现好决策树模型后）是相当平凡的，需要额外做的工作只有定义一个能够计算上述算法第 2.2 步中<script type="math/tex">\arg{\max_{c_k}{freq(c_{k})}}</script>的函数而已：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入我们自己实现的决策树模型</span></div><div class="line"><span class="keyword">from</span> c_CvDTree.Tree <span class="keyword">import</span> *</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RandomForest</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="comment"># 建立一个决策树字典，以便调用</span></div><div class="line">    _cvd_trees = &#123;</div><div class="line">        <span class="string">"id3"</span>: ID3Tree,</div><div class="line">        <span class="string">"c45"</span>: C45Tree,</div><div class="line">        <span class="string">"cart"</span>: CartTree</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(RandomForest, self).__init__()</div><div class="line">        self._trees = []</div><div class="line"></div><div class="line">    <span class="comment"># 实现计算的函数</span></div><div class="line"><span class="meta">    @staticmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">most_appearance</span><span class="params">(arr)</span>:</span></div><div class="line">        u, c = np.unique(arr, return_counts=<span class="keyword">True</span>)</div><div class="line">        <span class="keyword">return</span> u[np.argmax(c)]</div><div class="line"></div><div class="line">    <span class="comment"># 默认使用 10 棵 CART 树、默认 k = log(d)</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, sample_weight=None, tree=<span class="string">"cart"</span>, epoch=<span class="number">10</span>, feature_bound=<span class="string">"log"</span>,</span></span></div><div class="line">            *args, **kwargs):</div><div class="line">        x, y = np.atleast_2d(x), np.array(y)</div><div class="line">        n_sample = len(y)</div><div class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">            tmp_tree = RandomForest._cvd_trees[tree](*args, **kwargs)</div><div class="line">            _indices = np.random.randint(n_sample, size=n_sample)</div><div class="line">            <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">                _local_weight = <span class="keyword">None</span></div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                _local_weight = sample_weight[_indices]</div><div class="line">                _local_weight /= _local_weight.sum()</div><div class="line">            tmp_tree.fit(x[_indices], y[_indices],</div><div class="line">                sample_weight=_local_weight, feature_bound=feature_bound)</div><div class="line">            self._trees.append(deepcopy(tmp_tree))</div><div class="line"></div><div class="line">    <span class="comment"># 对个体决策树进行简单组合</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x)</span>:</span></div><div class="line">        _matrix = np.array([_tree.predict(x) <span class="keyword">for</span> _tree <span class="keyword">in</span> self._trees]).T</div><div class="line">        <span class="keyword">return</span> np.array([RandomForest.most_appearance(rs) <span class="keyword">for</span> rs <span class="keyword">in</span> _matrix])</div></pre></td></tr></table></figure>
+<p>需要指出的是，<code>most_appearance</code>函数用到了 Numpy 中的<code>unique</code>方法、它和标准库<code>collections</code>中的<code>Counter</code>具有差不多的用法。举个小栗子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">x = np.array([i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="string">"dcbabcd"</span>])</div><div class="line">np.unique(x, return_counts=<span class="keyword">True</span>)</div></pre></td></tr></table></figure>
+<p>这两行代码会返回：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">(</div><div class="line">    array([<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="string">'d'</span>], dtype=<span class="string">'&lt;U1'</span>),</div><div class="line">    array([<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>], dtype=int64)</div><div class="line">)</div></pre></td></tr></table></figure>
+<p>换句话说，<code>unique</code>方法能够提取出一个 Numpy 数组中出现过的元素并对它们计数、同时输出的 Numpy 数组是经过排序的</p>
+<p>以上就完成了一个简易可行的随机森林模型的实现，我们可以把对随机森林模型的评估与对 AdaBoost 的评估放在一起进行以便于对比、这里就先按下不表</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;由前文讨论可知，我们在实现 RF 算法之前，需要先在决策树模型的生成过程中加一个参数、使得我们能够对特征选取加入随机性。这个过程相当平凡，下给出代码片段以进行粗略的说明。首先在&lt;code&gt;CvDBase&lt;/code&gt;的&lt;code&gt;fit&lt;/code&gt;方法中加入一个参数&lt;code&gt;feature_bound&lt;/code&gt;：&lt;/p&gt;
+&lt;figure class=&quot;highlight python&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(self, x, y, sample_weight=None, alpha=None, eps=&lt;span class=&quot;number&quot;&gt;1e-8&lt;/span&gt;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    cv_rate=&lt;span class=&quot;number&quot;&gt;0.2&lt;/span&gt;, train_only=False, feature_bound=None)&lt;/span&gt;:&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;然后在同一个方法里面、把这个参数传给&lt;code&gt;CvDNode&lt;/code&gt;的&lt;code&gt;fit&lt;/code&gt;方法：&lt;/p&gt;
+&lt;figure class=&quot;highlight python&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;self.root.fit(x_train, y_train, _train_weights, feature_bound, eps)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;在&lt;code&gt;CvDNode&lt;/code&gt;的&lt;code&gt;fit&lt;/code&gt;方法中，原始代码中有一个对可选特征空间的遍历：&lt;/p&gt;
+&lt;figure class=&quot;highlight python&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; feat &lt;span class=&quot;keyword&quot;&gt;in&lt;/span&gt; self.feats:&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;根据参数&lt;code&gt;feature_bound&lt;/code&gt;对它加入随机性：&lt;/p&gt;
+&lt;figure class=&quot;highlight python&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;feat_len = len(self.feats)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 默认没有随机性&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; feature_bound &lt;span class=&quot;keyword&quot;&gt;is&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;None&lt;/span&gt;:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    indices = range(&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;, feat_len)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;elif&lt;/span&gt; feature_bound == &lt;span class=&quot;string&quot;&gt;&quot;log&quot;&lt;/span&gt;:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;comment&quot;&gt;# np.random.permutation(n)：将数组打乱后返回&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    indices = np.random.permutation(feat_len)[:max(&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;, int(log2(feat_len)))]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt;:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    indices = np.random.permutation(feat_len)[:feature_bound]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;tmp_feats = [self.feats[i] &lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; i &lt;span class=&quot;keyword&quot;&gt;in&lt;/span&gt; indices]&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; feat &lt;span class=&quot;keyword&quot;&gt;in&lt;/span&gt; tmp_feats:&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;然后要在同一个方法里面、把&lt;code&gt;feature_bound&lt;/code&gt;传给&lt;code&gt;_gen_children&lt;/code&gt;方法，而在&lt;code&gt;_gen_children&lt;/code&gt;中、再把&lt;code&gt;feature_bound&lt;/code&gt;传给子节点的&lt;code&gt;fit&lt;/code&gt;方法即可&lt;/p&gt;
+&lt;p&gt;以上所有实现细节可参见&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/tree/master/c_CvDTree&quot;&gt;这里&lt;/a&gt;中的 Tree.py 和 Node.py&lt;/p&gt;
+&lt;p&gt;有了这些准备，我们就可以来看看 RF 的算法陈述了（以分类问题为例）：&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>“集成”的思想</title>
+    <link href="http://www.carefree0910.com/posts/7081b0ee/"/>
+    <id>http://www.carefree0910.com/posts/7081b0ee/</id>
+    <published>2017-04-25T11:51:31.000Z</published>
+    <updated>2017-04-25T14:29:15.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文首先会介绍何谓“集成”、然后会介绍两种常见的集成学习方法：Bagging、AdaBoost 的基本定义。这些概念的背后有着深刻的数学理论，但是它们同时也拥有着很好的直观。获得对它们的直观有助于加深对各种模型的分类性能的理解、同时也有助于根据具体的数据集来挑选相应的、合适的模型来进行学习</p>
+<a id="more"></a>
+<h1 id="众擎易举"><a href="#众擎易举" class="headerlink" title="众擎易举"></a>众擎易举</h1><p>集成学习基于这样的思想：对于比较复杂的任务，综合许多人的意见来进行决策会比“一家独大”要更好。换句话说、就是通过适当的方式集成许多“个体模型”所得到的最终模型要比单独的“个体模型”的性能更优。我们可以通过下图来直观感知这个过程：</p>
+<img src="/posts/7081b0ee/p1.png" alt="p1.png" title="">
+<p>所以问题的关键转化为了两点：如何选择、生成弱分类器和如何对它们进行提升（集成）。在此基础上，通常有三种不同的思路：</p>
+<ul>
+<li>将不同类型的弱分类器进行提升</li>
+<li>将相同类型但参数不同的弱分类器进行提升</li>
+<li>将相同类型但训练集不同的弱分类器进行提升</li>
+</ul>
+<p>其中第一种思路的应用相对来说可能不太广泛，而第二、第三种思路则指导着两种常见的做法，这两种做法的区别主要体现在基本组成单元——弱分类器的生成方式：</p>
+<p>第一种做法期望各个弱分类器之间依赖性不强、可以同时进行生成。这种做法又称并行方法，其代表为 Bagging，而 Bagging 一个著名的拓展应用便是本系列的主题之一——随机森林（Random Forest，常简称为 RF）。</p>
+<p>第二种做法中弱分类器之间具有强依赖性、只能序列生成。这种做法又称串行方法，其代表为 Boosting，而 Boosting 族算法中的代表即是本系列的另一主题——AdaBoost</p>
+<h1 id="Bagging-与随机森林"><a href="#Bagging-与随机森林" class="headerlink" title="Bagging 与随机森林"></a>Bagging 与随机森林</h1><p>Bagging 是 1996 年由 Breiman 提出的，它的思想根源是数理统计中非常重要的 Bootstrap 理论。Bootstrap 可以翻译成“自举”，它通过模拟的方法来逼近样本的概率分布函数。可以想象这样一个场景：现在有一个包含 N 个样本的数据集<script type="math/tex">X = \{ x_{1},\ldots,x_{N}\}</script>，这 N 个样本是由随机变量<script type="math/tex">x</script>独立生成的。我们想要研究<script type="math/tex">x</script>的均值估计<script type="math/tex">\bar{x} = \frac{1}{N}\sum_{i = 1}^{N}x_{i}</script>的统计特性（误差、方差等等），但由于研究统计特性是需要大量样本的、而数据集<script type="math/tex">X</script>只能给我们提供一个<script type="math/tex">\bar{x}</script>的样本，从而导致无法进行研究</p>
+<p>在这种场景下，容易想到的一种解决方案是：通过<script type="math/tex">x</script>的分布生成出更多的数据集<script type="math/tex">X_{1},\ldots X_{M}</script>、每个数据集都包含 N 个样本。这 M 个数据集都能产生一个均值估计、从而就有了 M 个均值估计的样本。那么只要 M 足够大、我们就能研究<script type="math/tex">\bar{x}</script>的统计特性了</p>
+<p>当然这种解决方案的一个最大的困难就是：我们并不知道<script type="math/tex">x</script>的真实分布。Bootstrap 就是针对这个困难提出了一个解决办法：通过不断地“自采样”来模拟随机变量真实分布生成的数据集。具体而言，Bootstrap 的做法是：</p>
+<ul>
+<li>从<script type="math/tex">X</script>中随机抽出一个样本（亦即抽出<script type="math/tex">x_1,...,x_N</script>的概率相同）</li>
+<li>将该样本的拷贝放入数据集<script type="math/tex">X_j</script></li>
+<li>将该样本放回<script type="math/tex">X</script>中</li>
+</ul>
+<p>以上三个步骤将重复 N 次、从而使得<script type="math/tex">X_{j}</script>中有 N 个样本。这个过程将对<script type="math/tex">j = 1,\ldots,M</script>都进行一遍、从而我们最终能得到 M 个含有 N 个样本的数据集<script type="math/tex">X_{1},\ldots X_{M}</script></p>
+<p>简单来说的话、Bootstrap 其实就是一个有放回的随机抽样过程，所以原始数据<script type="math/tex">\{ x_{1},\ldots,x_{N}\}</script>中可能会在<script type="math/tex">X_{1},\ldots X_{M}</script>中重复出现、也有可能不出现在<script type="math/tex">X_{1},\ldots X_{M}</script>中。事实上，由于<script type="math/tex">X</script>中一个样本在 N 次采样中始终不被采到的概率为<script type="math/tex">\left( 1 - \frac{1}{N} \right)^{N}</script>、且：</p>
+<script type="math/tex; mode=display">
+\lim_{N\rightarrow\infty}\left( 1 - \frac{1}{N} \right)^{N} \rightarrow \frac{1}{e} \approx 0.368</script><p>所以在统计意义上可以认为、<script type="math/tex">X_{j}</script>中含有<script type="math/tex">X</script>中 63.2%的样本<script type="math/tex">\left( \forall j = 1,\ldots,M \right)</script></p>
+<p>这种模拟的方法在理论上是具有最优性的。事实上、这种模拟的本质和经验分布函数对真实分布函数的模拟几乎一致：</p>
+<ul>
+<li>Bootstrap 以<script type="math/tex">\frac 1N</script>的概率、有放回地从<script type="math/tex">X</script>中抽取 N 个样本作为数据集、并以之估计真实分布生成的具有 N 个样本的数据集</li>
+<li>经验分布函数则是在 N 个样本点上以每点的概率为<script type="math/tex">\frac 1N</script>作为概率密度函数、然后进行积分的函数</li>
+</ul>
+<p>经验分布函数的数学表达式为：</p>
+<script type="math/tex; mode=display">
+F_{N}\left( x \right) = \frac{1}{N}\sum_{i = 1}^{N}{I_{\left( - \infty,x \right\rbrack}(x_{i})}</script><p>可以看出、经验分布函数用到了频率估计概率的思想。用它来模拟真实分布函数是具有很好的优良性的，详细的讨论可参见<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></p>
+<p>知道 Bootstrap 是什么之后、我们就可以来看 Bagging 的具体定义了。Bagging 的全称是 Bootstrap Aggregating，其思想非常简单：</p>
+<ul>
+<li>用 Bootstrap 生成出 M 个数据集</li>
+<li>用这 M 个数据集训练出 M 个弱分类器</li>
+<li>最终模型即为这M个弱分类器的简单组合</li>
+</ul>
+<p>所谓简单组合就是：</p>
+<ul>
+<li>对于分类问题使用简单的投票表决</li>
+<li>对于回归问题则进行简单的取平均</li>
+</ul>
+<p>简单组合虽说简单、其背后仍然是有数学理论支撑的。考虑二分类问题：</p>
+<script type="math/tex; mode=display">
+y \in \{ - 1, + 1\}</script><p>假设样本空间到类别空间的真实映射为<script type="math/tex">f</script>、我们得到的 M 个弱分类器模型<script type="math/tex">G_{1},\ldots,G_{M}</script>所对应的映射为<script type="math/tex">g_{1},\ldots,g_{M}</script>，那么简单组合下的最终模型对应的映射即为：</p>
+<script type="math/tex; mode=display">
+g\left( x \right) = \text{sign}\left( \sum_{j = 1}^{M}{g_{j}\left( x \right)} \right)</script><p>这里的 sign 是符号函数、满足：</p>
+<script type="math/tex; mode=display">
+\text{sign}\left( x \right) = \left\{ \begin{matrix}
+ - 1,\ \ if\ x < 0 \\
+ + 1,\ \ if\ x > 0 \\
+\end{matrix} \right.\</script><p>其中，<script type="math/tex">\text{sign}(0)</script>则可为<script type="math/tex">-1</script>也可为<script type="math/tex">+1</script>，令其有 50%的概率输出<script type="math/tex">-</script>、<script type="math/tex">+1</script>也是可行的</p>
+<p>如果我们此时假设每个弱分类器的错误率为<script type="math/tex">\epsilon</script>：</p>
+<script type="math/tex; mode=display">
+p\left( g_{i}\left( x \right) \neq f\left( x \right) \right) = \epsilon</script><p>如果我们假设弱分类器的错误率相互独立，那么由霍夫丁不等式（Hoeffding’s Inequality）可以得知：</p>
+<script type="math/tex; mode=display">
+p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\lfloor \frac{M}{2} \right\rfloor}\left( \frac{M}{j} \right)\left( 1 - \epsilon \right)^{j}\epsilon^{M - j} \leq \exp\left( - \frac{1}{2}M\left( 1 - 2\epsilon \right)^{2} \right)</script><p>亦即最终模型的错误率随弱分类器的个数 M 的增加、将会以指数级下降并最终趋于 0</p>
+<p>虽说这个结果看上去很振奋人心，但需要注意的是、我们做了一个非常强的关键假设：假设弱分类器的错误率相互独立。这可以说是不可能做到的，因为这些弱分类器想要解决的都是同一个问题、且使用的训练集也都源自于同一份数据集</p>
+<p>但不管怎么说，以上的分析给了我们这样一个重要信息：弱分类器之间的“差异”似乎应该尽可能的大。基于此，结合 Bagging 的特点、我们可以得出这样一个结论：对于“不稳定”（或说对训练集敏感：若训练样本稍有改变，得到的从样本空间到类别空间的映射 g 就会产生较大的变化）的分类器，Bagging 能够显著地对其进行提升。这也是被大量实验结果所证实了的</p>
+<p>正如前文提过的，Bagging 有一个著名的拓展应用叫“随机森林”，从名字就容易想到、它是当个体模型为决策树时的 Bagging 算法。不过需要指出的是，随机森林算法不仅对样本进行 Bootstrap 采样，对每个 Node 调用生成算法时都会随机挑选出一个可选特征空间的子空间作为该决策树的可选特征空间；同时，生成好个体决策树后不进行剪枝、而是保持原始的形式。换句话说、随机森林算法流程大致如下：</p>
+<ul>
+<li>用 Bootstrap 生成出 M 个数据集</li>
+<li>用这 M 个数据集训练出 M 颗不进行后剪枝决策树，且在每颗决策树的生成过程中，每次对 Node 进行划分时、都从可选特征（比如说有 d 个）中随机挑选出 k 个（<script type="math/tex">k\le d</script>）特征，然后依信息增益的定义从这 k 个特征中选出信息增益最大的特征作为划分标准</li>
+<li>最终模型即为这 M 个弱分类器的简单组合</li>
+</ul>
+<p><strong><em>注意：有一种说法是随机森林中的个体决策树模型只能使用 CART 树</em></strong></p>
+<p>也就是说，除了和一般 Bagging 算法那样对样本进行随机采样以外、随机森林还对特征进行了某种意义上的随机采样。这样做的意义是直观的：通过对特征引入随机扰动，可以使个体模型之间的差异进一步增加、从而提升最终模型的泛化能力。而这个特征选取的随机性，恰恰被上述算法第二步中的参数k所控制：</p>
+<ul>
+<li>若<script type="math/tex">k=d</script>，那么训练出来的决策树和一般意义下的决策树别无二致、亦即特征选取这一部分不具有随机性</li>
+<li>若<script type="math/tex">k=1</script>，那么生成决策树的每一步都是在随机选择属性、亦即特征选取的随机性达到最大</li>
+</ul>
+<p>Breiman 在提出随机森林算法的同时指出，一般情况下、推荐取<script type="math/tex">k=\log_2{d}</script></p>
+<h1 id="PAC-框架与-Boosting"><a href="#PAC-框架与-Boosting" class="headerlink" title="PAC 框架与 Boosting"></a>PAC 框架与 Boosting</h1><p>虽然同属集成学习方法，但 Boosting 和 Bagging 的数学理论根基不尽相同：Boosting 产生于计算学习理论（Computational Learning Theory）[Valiant, 1984]。一般而言，如果只是应用机器学习的话、我们无需对它进行太多的了解（甚至可以说对它一知半解反而有害），所以本小节只打算对其最基本的概率近似正确（PAC）学习理论中的“可学习性（PAC Learnability）”进行简要的介绍</p>
+<p>PAC 学习整体来说是一个比较纯粹的数学理论。有一种说法是、PAC 学习是统计学家研究机器学习的方式，它关心模型的可解释性、然而机器学习专家通常更关心模型的预测能力。这也正是为何说无需太过了解它，因为我们的目的终究不是成为统计的专家、而是更希望成为一个能够应用机器学习的人。不过幸运的是，虽然为了叙述 Boosting、PAC 学习中“可学习性”的概念难以避开，但其本身却是具有很直观的解释的。下面我们就来看看这个直观解释：</p>
+<p>PAC 提出的一个主要的假设、就是它要求数据是从某个稳定的概率分布中产生。直观地说，就是样本在样本空间中的分布状况不能随时间的变化而变化、否则就失去了学习的意义（因为学习到的永远只是“某个时间”的分布，如果未知数据所处时间的分布状况和该时间数据的分布状况不同的话、模型就直接失效了）。然后所谓的PAC可学习性，就是看学习的算法是否能够在合理的时间（多项式时间）内、以足够高的概率输出一个错误率足够低的模型。由此，所谓的“强可学习”和“弱可学习”的概念就很直观了：</p>
+<ul>
+<li>若存在一个多项式算法可以学习出准确率很高的模型，则称为强可学习</li>
+<li>若在在一个多项式算法可以学习但准确率仅仅略高于随机猜测，则称为弱可学习</li>
+</ul>
+<p><strong><em>注意：由于进行机器学习时、我们只能针对训练数据集进行学习、所以和真实情况相比肯定是有偏差的。这正是需要提出 PAC 可学习这个概念的原因之一</em></strong></p>
+<p>虽然我们区分定义了这两个概念，不过神奇之处在于，这两个概念在PAC学习框架下是完全等价的[Schapire, 1990]。这意味着对于一个学习问题，只要我们找到了一个“弱学习算法”，就可以把它变成一个“强学习算法”。这当然是意义深刻的，因为往往比较粗糙的“弱学习算法”比较好找、而相对精确的“强学习算法”却难得一求</p>
+<p>那么具体而言应该怎么做呢？这里就需要用到所谓的 Boosting（提升方法）了。提升方法可以定义为用于将由“弱学习算法”生成的“弱模型”、提升成和“强学习算法”所生成的“强模型”性能差不多的模型的方法，它的基本组成单元是许许多多的“弱模型”、然后通过某种手段把它们集成为最终模型。虽然该过程听上去和上一小节介绍的 Bagging 差不多、但它们的思想和背后的数学理论却有较大区别，加以辨析是有必要的</p>
+<p>需要指出的是，Boosting 事实上是一族算法、该族算法有一个类似的框架：</p>
+<ul>
+<li>根据当前的数据训练出一个弱模型</li>
+<li>根据该弱模型的表现调整数据的样本权重。具体而言：<ul>
+<li>让该弱模型做错的样本在后续训练中获得更多的关注</li>
+<li>让该弱模型做对的样本在后续训练中获得较少的关注</li>
+</ul>
+</li>
+<li>最后再根据该弱模型的表现决定该弱模型的“话语权”、亦即投票表决时的“可信度”。自然、表现越好就越有话语权</li>
+</ul>
+<p>可以证明，当训练样本有无穷多时、Boosting 能让弱模型集成出一个对训练样本集的准确率任意高的模型。然而实际任务中训练样本当然不可能有无穷多，所以问题就转为了如何在固定的训练集上应用 Boosting 方法。而在 1996 年，Freund 和 Schapire 所提出的 AdaBoost（Adaptive Boosting）正是一个相当不错的解决方案，在理论和实验上均有优异的表现。虽然 AdaBoost 背后的理论深究起来可能会有些繁复、但它的思想并没有脱离 Boosting 族算法的那一套框架。值得一提的是、Boosting 还有一套比较有意思的解释方法；我们会在后文详细讨论其中的代表性算法——AdaBoost 的解释、这里就先按下不表</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文首先会介绍何谓“集成”、然后会介绍两种常见的集成学习方法：Bagging、AdaBoost 的基本定义。这些概念的背后有着深刻的数学理论，但是它们同时也拥有着很好的直观。获得对它们的直观有助于加深对各种模型的分类性能的理解、同时也有助于根据具体的数据集来挑选相应的、合适的模型来进行学习&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+    
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>集成学习综述</title>
+    <link href="http://www.carefree0910.com/posts/d8e97c87/"/>
+    <id>http://www.carefree0910.com/posts/d8e97c87/</id>
+    <published>2017-04-25T09:27:57.000Z</published>
+    <updated>2017-04-25T11:50:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>目前为止我们已经讲过了若干的分类器了。从它们的复杂程度可以感受到，它们有些是比较“强”的、有些是比较“弱”的。这一章我们将会阐述所谓的“强”与“弱”的定义、它们之间的联系以及阐述如何将一个“弱分类器”通过集成学习来集成出一个“强分类器”。而由于集成学习有许多种具体的方法，我们会挑选出其中的随机森林和 AdaBoost 来作比较详细的说明</p>
+<p>以下是目录：</p>
+<ul>
+<li><a href="/posts/7081b0ee/" title="“集成”的思想">“集成”的思想</a></li>
+<li><a href="/posts/c0a9c025/" title="随机森林算法">随机森林算法</a></li>
+<li><a href="/posts/f5f50863/" title="AdaBoost 算法">AdaBoost 算法</a></li>
+<li><a href="/posts/fb0d2f02/" title="集成模型的性能分析">集成模型的性能分析</a></li>
+<li><a href="/posts/707464b/" title="AdaBoost 算法的解释">AdaBoost 算法的解释</a></li>
+<li><a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></li>
+<li><a href="/posts/48a0211a/" title="“集成学习”小结">“集成学习”小结</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;目前为止我们已经讲过了若干的分类器了。从它们的复杂程度可以感受到，它们有些是比较“强”的、有些是比较“弱”的。这一章我们将会阐述所谓的“强”与“弱”的定义、它们之间的联系以及阐述如何将一个“弱分类器”通过集成学习来集成出一个“强分类器”。而由于集成学习有许多种具体的方法，我
+    
+    </summary>
+    
+      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
+    
+    
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+    
+      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
+    
+  </entry>
   
   <entry>
     <title>“决策树”小结</title>
@@ -899,12 +1474,11 @@ f\left( x_{i} \right) = \sum_{m = 1}^{M}{c_{m}I\left( x_{i} \in R_{m} \right)}</
     <link href="http://www.carefree0910.com/posts/2ce87ace/"/>
     <id>http://www.carefree0910.com/posts/2ce87ace/</id>
     <published>2017-04-22T11:29:24.000Z</published>
-    <updated>2017-04-23T02:54:16.000Z</updated>
+    <updated>2017-04-25T12:17:05.000Z</updated>
     
     <content type="html"><![CDATA[<p>本文首先简要地说明一下决策树生成算法背后的数学基础和思想、然后再叙述具体的算法。往大了说、决策树的生成可以算是信息论的一个应用，但它其实只用到了信息论中一小部分的思想。不过，先对信息论有个概括性的认知还是有必要的、因为这样我们就可以有个更宽的视野</p>
 <a id="more"></a>
-<h1 id="信息论简介"><a href="#信息论简介" class="headerlink" title="信息论简介"></a>信息论简介</h1><p><strong>（注：本节有许多内容节选、修改、总结自维基百科）</strong></p>
-<p>被誉为信息论创始人的是克劳德·艾尔伍德·香农（Claude Elwood Shannon，1916.4.30－2001.2.26），他是美国数学家、电子工程师和密码学家，是密歇根大学学士、麻省理工学院博士。他在 1948 年发表的划时代的论文——“通信的数学原理”奠定了现代信息论的基础</p>
+<h1 id="信息论简介"><a href="#信息论简介" class="headerlink" title="信息论简介"></a>信息论简介</h1><p>（注：本节有许多内容节选、修改、总结自维基百科）<br>被誉为信息论创始人的是克劳德·艾尔伍德·香农（Claude Elwood Shannon，1916.4.30－2001.2.26），他是美国数学家、电子工程师和密码学家，是密歇根大学学士、麻省理工学院博士。他在 1948 年发表的划时代的论文——“通信的数学原理”奠定了现代信息论的基础</p>
 <p>信息论（Information Theory）涉及的领域相当多，包括但不限于信息的量化、存储和通信、统计推断、自然语言处理、密码学等等。信息论的主要内容可以类比人类最广泛的交流手段——语言来阐述。一种简洁的语言（以英语为例）通常有如下两个重要特点：</p>
 <ul>
 <li>最常用的一些词汇（比如“a”、“the”、“I”）应该要比相对而言不太常用的词（比如“Python”、“Machine”、“Learning”）要短一些</li>
@@ -919,11 +1493,11 @@ f\left( x_{i} \right) = \sum_{m = 1}^{M}{c_{m}I\left( x_{i} \in R_{m} \right)}</
 H\left( y \right) = - \sum_{k = 1}^{K}{p_{k}\log p_{k}}</script><p>对于具体的、随机变量<script type="math/tex">y</script>生成的数据集<script type="math/tex">D = \{ y_{1},\ldots,y_{N}\}</script>而言，在实际操作中通常会利用经验熵来估计真正的信息熵：</p>
 <script type="math/tex; mode=display">
 H\left( y \right) = H\left( D \right) = - \sum_{k = 1}^{K}{\frac{|C_{k}|}{|D|}\log\frac{|C_{k}|}{|D|}}</script><p>这里假设随机变量<script type="math/tex">y</script>的取值空间为<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script>，<script type="math/tex">p_{k}</script>表示<script type="math/tex">y</script>取<script type="math/tex">c_{k}</script>的概率：<script type="math/tex">p_{k} = p(y = c_{k})</script>；<script type="math/tex">|C_{k}|</script>代表由随机变量<script type="math/tex">y</script>中类别为<script type="math/tex">c_{k}</script>的样本的个数、<script type="math/tex">|D|</script>代表<script type="math/tex">D</script>的总样本个数（亦即<script type="math/tex">\left| D \right| = N</script>）。可以看到，经验公式背后的思想其实就是“频率估计概率”</p>
-<p>通常来说，公式中对数的底会取为2、此时信息熵<script type="math/tex">H(y)</script>的单位叫作比特（bit）；如果把底取为<script type="math/tex">e</script>（亦即取自然对数）的话，<script type="math/tex">H(y)</script>的单位就称作纳特（nat）</p>
+<p>通常来说，公式中对数的底会取为 2、此时信息熵<script type="math/tex">H(y)</script>的单位叫作比特（bit）；如果把底取为<script type="math/tex">e</script>（亦即取自然对数）的话，<script type="math/tex">H(y)</script>的单位就称作纳特（nat）</p>
 <p>接下来说明为何上式能够度量数据的不确定性。可以证明（详细推导可参见<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>），当：</p>
 <script type="math/tex; mode=display">
 p_{1} = p_{2} = \ldots = p_{K} = \frac{1}{K}</script><p>时，<script type="math/tex">H(y)</script>达到最大值<script type="math/tex">- \log\frac{1}{K}</script>、亦即<script type="math/tex">\log K</script>。由于<script type="math/tex">p_{k} = p(y = c_{k})</script>，上式即意味着随机变量<script type="math/tex">y</script>取每一个类的概率都是一样的、亦即<script type="math/tex">y</script>完全没有规律可循，想要预测它的取值只能靠运气。换句话说，由<script type="math/tex">y</script>生成出来的数据<script type="math/tex">\{ y_{1},\ldots,y_{N}\}</script>的不确定性是在取值空间为<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script>、样本数为 N 的数据中最大的（想象预测 N 次正 K 面体骰子的结果）</p>
-<p>我们的目的是想让<script type="math/tex">y</script>的不确定性减小、亦即想让<script type="math/tex">y</script>变得有规律以方便我们预测。稍微严谨地来说，就是<script type="math/tex">y</script>取某个类的概率特别大、取其它类的概率都特别小。极端的例子自然就是存在某个<script type="math/tex">k^{*}</script>、使得<script type="math/tex">p\left( {y = c}_{k^{*}} \right) = 1</script>、<script type="math/tex">p\left( y = c_{k} \right) = 0,\forall k \neq k^{*}</script>、亦即<script type="math/tex">y</script>生成的样本总属于<script type="math/tex">c_{k^{*}}</script>类。带入<script type="math/tex">H(y)</script>的定义式，可以发现此时<script type="math/tex">H\left( y \right) = 0</script>、亦即<script type="math/tex">y</script>生成的样本没有不确定性</p>
+<p>我们的目的是想让<script type="math/tex">y</script>的不确定性减小、亦即想让<script type="math/tex">y</script>变得有规律以方便我们预测。稍微严谨地来说，就是<script type="math/tex">y</script>取某个类的概率特别大、取其它类的概率都特别小。极端的例子自然就是存在某个<script type="math/tex">k^{*}</script>、使得<script type="math/tex">p\left( {y = c}_{k^{*}} \right) = 1</script>、<script type="math/tex">p\left( y = c_{k} \right) = 0,\forall k \neq k^{*}</script>、亦即<em>y</em>生成的样本总属于<script type="math/tex">c_{k^{*}}</script>类。带入<script type="math/tex">H(y)</script>的定义式，可以发现此时<script type="math/tex">H\left( y \right) = 0</script>、亦即<script type="math/tex">y</script>生成的样本没有不确定性</p>
 <p><strong><em>注意：由于<script type="math/tex">p\log p \rightarrow 0\ (p \rightarrow 0)</script>、所以认为<script type="math/tex">0\log 0 = 0</script></em></strong></p>
 <p>特殊的情况就是二类问题、亦即<script type="math/tex">K = 2</script>的情况。先不妨设<script type="math/tex">y</script>只取 0、1 二值，再设：</p>
 <script type="math/tex; mode=display">
@@ -938,7 +1512,7 @@ H\left( y \right) = - \operatorname{plog}p - \left( 1 - p \right)\log{(1 - p)}</
 <script type="math/tex; mode=display">
 H\left( y \right) = - p\left( y \in Y_{1} \right)\log{p\left( y \in Y_{1} \right)} - p\left( y \in Y_{2} \right)\log{p(y \in Y_{2})}</script><p>且易知：</p>
 <script type="math/tex; mode=display">
-p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>如无特殊说明，今后谈及二类问题时讨论的范围都包括推广后的二类问题</p>
+p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>如无特殊说明，今后谈及二类问题时讨论的范围都包括推广后的二类问题。</p>
 <p>以上的叙述说明了，<script type="math/tex">y</script>越乱意味着<script type="math/tex">H(y)</script>越大、<script type="math/tex">y</script>越有规律意味着<script type="math/tex">H(y)</script>越小，亦即<script type="math/tex">H(y)</script>确实可以作为不确定性的度量标准</p>
 <h2 id="基尼系数"><a href="#基尼系数" class="headerlink" title="基尼系数"></a>基尼系数</h2><p>基尼系数的定义会更简洁一些：</p>
 <script type="math/tex; mode=display">
@@ -960,24 +1534,24 @@ p\left( y \in Y_{1} \right) + p\left( y \in Y_{2} \right) = 1</script><p>以上�
 <ul>
 <li>所谓条件熵，就是根据特征<script type="math/tex">A</script>的不同取值<script type="math/tex">\{ a_{1},\ldots,a_{m}\}</script>对<script type="math/tex">y</script>进行限制后，先对这些被限制的<script type="math/tex">y</script>分别计算信息熵、再把这些信息熵（一共有 m 个）根据特征取值本身的概率加权求和、从而得到总的条件熵。换句话说，条件熵是由被<script type="math/tex">A</script>不同取值限制的各个部分的<script type="math/tex">y</script>的不确定性以取值本身的概率作为权重加总得到的</li>
 </ul>
-<p>所以，条件熵<script type="math/tex">H(y|A)</script>越小、意味着<script type="math/tex">y</script>被<script type="math/tex">A</script>限制后的总的不确定性越小、从而意味着<script type="math/tex">A</script>更能够帮助我们做出决策</p>
+<p>所以，条件熵<script type="math/tex">H(y|A)</script>越小、意味着<script type="math/tex">y</script>被<script type="math/tex">A</script>限制后的总的不确定性越小、从而意味着<em>A</em>更能够帮助我们做出决策</p>
 <p>接下来就是数学定义：</p>
 <script type="math/tex; mode=display">
 H\left( y \middle| A \right) = \sum_{j = 1}^{m}{p\left( A = a_{j} \right)H(y|A = a_{j})}</script><p>其中</p>
 <script type="math/tex; mode=display">
 H\left( y \middle| A = a_{j} \right) = - \sum_{k = 1}^{K}{p\left( y = c_{k} \middle| A = a_{j} \right)\log{p(y = c_{k}|A = a_{j})}}</script><p>同样可以用经验条件熵来估计真正的条件熵：</p>
 <script type="math/tex; mode=display">
-H\left( y \middle| A \right) = H\left( y \middle| D \right) = \sum_{j = 1}^{m}{\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}{\frac{|D_{jk}|}{|D_{j}|}\log\frac{|D_{jk}|}{|D_{j}|}}}</script><p>这里的<script type="math/tex">D_{j}</script>表示在<script type="math/tex">A = a_{j}</script>限制下的数据集。通常可以记<script type="math/tex">D_{j}</script>中的样本<script type="math/tex">y_{i}</script>满足<script type="math/tex">y_{i}^{A} = a_{j}</script>，亦即：</p>
+H\left( y \middle| A \right) = H\left( y \middle| D \right) = \sum_{j = 1}^{m}{\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}{\frac{|D_{\text{jk}}|}{|D_{j}|}\log\frac{|D_{\text{jk}}|}{|D_{j}|}}}</script><p>这里的<script type="math/tex">D_{j}</script>表示在<script type="math/tex">A = a_{j}</script>限制下的数据集。通常可以记<script type="math/tex">D_{j}</script>中的样本<script type="math/tex">y_{i}</script>满足<script type="math/tex">y_{i}^{A} = a_{j}</script>，亦即：</p>
 <script type="math/tex; mode=display">
-y_{i}^{A} = a_{j} \Leftrightarrow \left( A_{i},y_{i} \right) \in Y_{j} \Leftrightarrow A_{i} = a_{j}</script><p>而公式中的<script type="math/tex">|D_{jk}|</script>则代表着<script type="math/tex">D_{j}</script>中第 k 类样本的个数。</p>
+y_{i}^{A} = a_{j} \Leftrightarrow \left( A_{i},y_{i} \right) \in Y_{j} \Leftrightarrow A_{i} = a_{j}</script><p>而公式中的<script type="math/tex">|D_{\text{jk}}|</script>则代表着<script type="math/tex">D_{j}</script>中第 k 类样本的个数</p>
 <p>从条件熵的直观含义，信息的增益就可以自然地定义为：</p>
 <script type="math/tex; mode=display">
-g\left( y,A \right) = H\left( y \right) - H(y|A)</script><p>这里的<script type="math/tex">g(y,A)</script>常被称为互信息（Mutual Information），决策树中的 ID3 算法即是利用它来作为特征选取的标准的（相关定义会在后文给出）。但是，如果简单地以<script type="math/tex">g(y,A)</script>作为标准的话，会存在偏向于选择取值较多的特征、也就是 m 比较大的特征的问题。我们仍然可以从直观上去理解为什么会偏向于选取 m 较大的特征以及为什么这样做是不尽合理的：</p>
+g\left( y,A \right) = H\left( y \right) - H(y|A)</script><p>这里的<script type="math/tex">g(y,A)</script>常被称为互信息（Mutual<br>Information），决策树中的 ID3 算法即是利用它来作为特征选取的标准的（相关定义会在后文给出）。但是，如果简单地以<script type="math/tex">g(y,A)</script>作为标准的话，会存在偏向于选择取值较多的特征、也就是 m 比较大的特征的问题。我们仍然可以从直观上去理解为什么会偏向于选取 m 较大的特征以及为什么这样做是不尽合理的：</p>
 <ul>
 <li>我们希望得到的决策树应该是比较深（又不会太深）的决策树，从而它可以基于多个方面而不是片面地根据某些特征来判断</li>
 <li>如果单纯以<script type="math/tex">g(y,A)</script>作为标准，由于<script type="math/tex">g(y,A)</script>的直观意义是<script type="math/tex">y</script>被<script type="math/tex">A</script>划分后不确定性的减少量，可想而知，当<script type="math/tex">A</script>的取值很多时，<script type="math/tex">y</script>会被<script type="math/tex">A</script>划分成很多份、于是其不确定性自然会减少很多、从而 ID3 算法会倾向于选择<script type="math/tex">A</script>作为划分依据。但如果这样做的话，可以想象、我们最终得到的决策树将会是一颗很胖很矮的决策树，这并不是我们想要的</li>
 </ul>
-<p>为解决该问题、我们可以给 m 一个惩罚，由此我们可以得到信息增益比（Information Gain Ratio）的概念，该概念对应着 C4.5 算法：</p>
+<p>为解决该问题、我们可以给 m 一个惩罚，由此我们可以得到信息增益比（Information<br>Gain Ratio）的概念，该概念对应着 C4.5 算法：</p>
 <script type="math/tex; mode=display">
 g_{R}(y,A) = \frac{g(y,A)}{H_{A}(y)}</script><p>其中<script type="math/tex">H_{A}(y)</script>是<script type="math/tex">y</script>关于<script type="math/tex">A</script>的熵，它的定义为：</p>
 <script type="math/tex; mode=display">
@@ -990,13 +1564,9 @@ H_{A}\left( y \right) = H_{A}\left( D \right) = - \sum_{j = 1}^{m}{\frac{\left| 
 <script type="math/tex; mode=display">
 \text{Gini}\left( y \middle| A = a_{j} \right) = 1 - \sum_{k = 1}^{K}{p^{2}\left( y = c_{k} \middle| A = a_{j} \right)}</script><p>同样可以用经验条件基尼系数来进行估计：</p>
 <script type="math/tex; mode=display">
-\begin{align}
-\text{Gini}\left( y \middle| A \right) = \text{Gini}(y|D) &= \sum_{j = 1}^{m}{\frac{\left| D_{i} \right|}{\left| D \right|}\left\lbrack 1 - \sum_{k = 1}^{K}\left( \frac{\left| D_{jk} \right|}{\left| D_{j} \right|} \right)^{2} \right\rbrack} \\
-
-&= 1 - \sum_{j = 1}^{m}\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}\left( \frac{\left| D_{jk} \right|}{\left| D_{j} \right|} \right)^{2}
-\end{align}</script><p>信息的增益则自然地定义为（不妨称之为“基尼增益”）：</p>
+{\text{Gini}\left( y \middle| A \right) = \text{Gini}(y|D) = \sum_{j = 1}^{m}{\frac{\left| D_{i} \right|}{\left| D \right|}\left\lbrack 1 - \sum_{k = 1}^{K}\left( \frac{\left| D_{\text{jk}} \right|}{\left| D_{j} \right|} \right)^{2} \right\rbrack}\backslash n}{= 1 - \sum_{j = 1}^{m}\frac{\left| D_{j} \right|}{\left| D \right|}\sum_{k = 1}^{K}\left( \frac{\left| D_{\text{Jk}} \right|}{\left| D_{j} \right|} \right)^{2}}</script><p>信息的增益则自然地定义为（不妨称之为“基尼增益”）：</p>
 <script type="math/tex; mode=display">
-g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\left( y \middle| A \right)</script><p>决策树算法中的 CART 算法通常会应用这种定义</p>
+g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\left( y \middle| A \right)</script><p>决策树算法中的CART算法通常会应用这种定义</p>
 ]]></content>
     
     <summary type="html">
@@ -1078,957 +1648,6 @@ g_{\text{Gini}}\left( y,A \right) = \text{Gini}\left( y \right) - \text{Gini}\le
     
     
       <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>推导与推广</title>
-    <link href="http://www.carefree0910.com/posts/e312d61a/"/>
-    <id>http://www.carefree0910.com/posts/e312d61a/</id>
-    <published>2017-04-20T11:10:17.000Z</published>
-    <updated>2017-04-20T13:51:11.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>本文旨在解决如下两个问题：</p>
-<ul>
-<li>为何后验概率最大化是贝叶斯决策？</li>
-<li>如何导出离散型朴素贝叶斯的算法？</li>
-</ul>
-<p>以及旨在叙述一些朴素贝叶斯的推广。具体而言、我们会简要介绍：</p>
-<ul>
-<li>半朴素贝叶斯</li>
-<li>贝叶斯网</li>
-</ul>
-<a id="more"></a>
-<h1 id="朴素贝叶斯与贝叶斯决策"><a href="#朴素贝叶斯与贝叶斯决策" class="headerlink" title="朴素贝叶斯与贝叶斯决策"></a>朴素贝叶斯与贝叶斯决策</h1><p>可以证明，应用朴素贝叶斯算法得到的模型所做的决策就是 0-1 损失函数下的贝叶斯决策。这里先说一个直观：在损失函数为 0-1 损失函数的情况下，决策风险、亦即训练集的损失的期望就是示性函数某种线性组合的期望、从而就是相对应的概率；朴素贝叶斯本身就是运用相应的概率做决策、所以可以想象它们很有可能等价</p>
-<p>下给出推导过程，首先我们要叙述一个定理：令<script type="math/tex">\rho(x_1,...,x_n)</script>满足：</p>
-<script type="math/tex; mode=display">
-\rho\left( x_{1},\ldots,x_{n} \right) = \inf_{a\in A}{\int_{\Theta}^{}{L\left( \theta,a \right)\xi\left( \theta \middle| x_{1},\ldots,x_{n} \right)\text{d}\theta}}</script><p>亦即<script type="math/tex">\rho(x_1,...,x_n)</script>是已知训练集<script type="math/tex">\tilde X=(x_1,...,x_n)</script>的最小后验期望损失。那么如果一个决策<script type="math/tex">\delta^*(x_1,...,x_n)</script>能能使任意一个含有 n 个样本的训练集的后验期望损失达到最小、亦即：</p>
-<script type="math/tex; mode=display">
-\int_{\Theta}^{}{L\left( \theta,\delta^{*}\left( x_{1},\ldots,x_{n} \right) \right)\xi\left( \theta \middle| x_{1},\ldots,x_{n} \right)d\theta = \rho\left( x_{1},\ldots,x_{n} \right)}\ (\forall x_{1},\ldots,x_{n})</script><p>的话，那么<script type="math/tex">\delta^*</script>就是贝叶斯决策。该定理的数学证明要用到比较深的数学知识、这里从略，但从直观上来说是可以理解的</p>
-<p>是故如果我们想证明朴素贝叶斯算法能导出贝叶斯决策、我们只需证明它能使任一个训练集<script type="math/tex">\tilde X</script>上的后验期望损失<script type="math/tex">R\left( \theta,\delta(\tilde X)\right)</script>最小即可。为此，需要先计算<script type="math/tex">R\left( \theta,\delta(\tilde X)\right)</script>：</p>
-<p><strong><em>注意：这里的期望是对联合分布取的，所以可以取成条件期望</em></strong></p>
-<script type="math/tex; mode=display">
-R\left( \theta,\delta(\tilde{X}) \right) = EL\left( \theta,\delta\left( \tilde{X} \right) \right) = E_{X}\sum_{k = 1}^{K}{\tilde{L}(c_{k},f\left( X \right))p(c_{k}|X)}</script><p>为了使上式达到最小，我们只需逐个对<script type="math/tex">X=x</script>最小化，从而有：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-  f\left( x \right) &= \arg{\min_{y\in S}{\sum_{k = 1}^{K}{\tilde{L}\left( c_{k},y \right)p\left( c_{k} \middle| X = x \right)}}} \\
-
-  &= \arg{\min_{y\in S}{\sum_{k = 1}^{K}{p\left( y \neq c_{k} \middle| X = x \right)}}} \\
-
-  &= \arg{\min_{c_k}\left\lbrack 1 - p\left( c_{k} \middle| X = x \right) \right\rbrack} \\
-
-  &= \arg{\max_{c_k}{p\left( c_{k} \middle| X = x \right)}}
-\end{align}</script><p>此即后验概率最大化准则、也就是朴素贝叶斯所采用的原理</p>
-<h1 id="离散型朴素贝叶斯算法的推导"><a href="#离散型朴素贝叶斯算法的推导" class="headerlink" title="离散型朴素贝叶斯算法的推导"></a>离散型朴素贝叶斯算法的推导</h1><p>离散型朴素贝叶斯算法的推导相对简单但比较繁琐，核心的思想是利用示性函数将对数似然函数写成比较“整齐”的形式、再运用拉格朗日方法进行求解</p>
-<p>在正式推导前，我们先说明一下符号约定：</p>
-<ul>
-<li>记已有的数据为<script type="math/tex">\tilde X=(x_1,x_2,...,x_N)</script>，其中：  <script type="math/tex; mode=display">
-x_{i} = \left( x_{i}^{\left( 1 \right)},x_{i}^{\left( 2 \right)},\cdots,x_{i}^{\left( n \right)} \right)^{T}\ (i = 1,2,\cdots,N)</script></li>
-<li><script type="math/tex">X^{\left( j \right)}</script>表示生成数据<script type="math/tex">x^{\left( j \right)}</script>的随机变量</li>
-<li>随机变量<script type="math/tex">X^{\left( j \right)}</script>的取值限制在集合<script type="math/tex">K_{j} = \{ a_{j1},a_{j2},\ldots,a_{jS_j}\}\ (j = 1,2,\cdots,n)</script>中</li>
-<li>类别<script type="math/tex">Y</script>的可能取值集合为<script type="math/tex">S = \{ c_{1},c_{2},\ldots,c_{K}\}</script></li>
-<li>用<script type="math/tex">\theta^{c_{k}}(k = 1,2,\ldots,K)</script>表示先验概率<script type="math/tex">p(Y = c_{k})</script></li>
-<li>用<script type="math/tex">\theta_{j,a_{jl}}^{c_{k}}</script>表示条件概率<script type="math/tex">p(X^{\left( j \right)} = a_{jl}|Y = c_{k})\ (j \in \left\{ 1,\ldots,n \right\},l \in \{ 1,\ldots,S_{j}\},k \in \{ 1,\ldots,K\}</script></li>
-</ul>
-<p>接下来就可以开始算法推导了：</p>
-<h2 id="计算对数似然函数"><a href="#计算对数似然函数" class="headerlink" title="计算对数似然函数"></a>计算对数似然函数</h2><script type="math/tex; mode=display">
-\begin{align}
-  \ln L &= \ln{\prod_{i = 1}^{N}\left( \theta^{y_{i}} \cdot \prod_{j = 1}^{n}{\theta_{j,x_{i}^{\left( j \right)}}^{y_{i}}\ } \right)} \\
-
-  &= \sum_{k = 1}^{K}{n_{k}\ln{\theta^{k} + \sum_{j = 1}^{n}{\sum_{k = 1}^{K}{\sum_{l = 1}^{S_{j}}{n_{j,l}^{k}\ln\theta_{j,a_{jl}}^{c_{k}}}\ }}}}
-\end{align}</script><p>其中</p>
-<script type="math/tex; mode=display">
-\begin{align}
-  n_{s} &= \sum_{i = 1}^{N}{I\left( y_{i} = c_{s} \right)} \\
-
-  n_{j,l}^{k} &= \sum_{i = 1}^{N}{I\left( x_{i}^{\left( j \right)} = a_{jl}{,y}_{i} = c_{k} \right)}
-\end{align}</script><h2 id="极大化似然函数"><a href="#极大化似然函数" class="headerlink" title="极大化似然函数"></a>极大化似然函数</h2><p>为此，只需分别最大化</p>
-<script type="math/tex; mode=display">
-f_{1} = \sum_{k = 1}^{K}{n_{k}\ln\theta^{k}}</script><p>和</p>
-<script type="math/tex; mode=display">
-f_{2} = \sum_{j = 1}^{n}{\sum_{k = 1}^{K}{\sum_{l = 1}^{S_{j}}{n_{j,l}^{k}\ln\theta_{j,a_{jl}}^{c_{k}}}\ }}</script><p>对于后者，由条件独立性假设可知、我们只需要对<script type="math/tex">j=1,2,...,n</script>分别最大化：</p>
-<script type="math/tex; mode=display">f_{2}^{\left( j \right)} = \sum_{k = 1}^{K}{\sum_{l = 1}^{S_{j}}{n_{j,l}^{k}\ln\theta_{j,a_{jl}}^{c_{k}}}\ }</script><p>即可。我们利用拉格朗日方法来求解该问题，用到的约束条件是：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-  \sum_{k = 1}^{K}\theta^{k} &= \sum_{k = 1}^{K}{p\left( Y = c_{k} \right)} = 1 \\
-
-  \sum_{l = 1}^{S_{j}}{\theta_{j,l}^{k}} &= \sum_{l = 1}^{S_{j}}{p\left( X^{\left( j \right)} = a_{jl} \middle| Y = c_{k} \right) = 1\ \left( \forall k \in \left\{ 1,\ldots,K \right\},j \in \left\{ 1,\ldots,n \right\} \right)}
-\end{align}</script><p>从而可知</p>
-<script type="math/tex; mode=display">
-L_{1} = \sum_{k = 1}^{K}{n_{k}\ln{\theta^{k} + \alpha\left( \sum_{k = 1}^{K}{\theta^{k} - 1} \right)}}</script><p>由一阶条件</p>
-<script type="math/tex; mode=display">
-\frac{\partial L_{1}}{\partial\theta_{k}} = \frac{\partial L_{1}}{\partial\alpha} = 0</script><p>可以解得</p>
-<script type="math/tex; mode=display">
-p\left( Y = c_{k} \right) = \theta^{k} = \frac{n_{k}}{N} = \frac{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}{N}</script><p>同理，对<script type="math/tex">f_2^{(j)}</script>应用拉格朗日方法，可以得到</p>
-<script type="math/tex; mode=display">
-p\left( X^{\left( j \right)} = a_{jl} \middle| Y = c_{k} \right) = \theta_{j,l}^{k} = \frac{n_{j,l}^{k}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}} = \frac{\sum_{i = 1}^{N}{I(x_{i}^{\left( j \right)} = a_{jl},y_{i} = c_{k})}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}</script><p>以上，我们完成了离散型朴素贝叶斯算法的推导</p>
-<h1 id="半朴素贝叶斯"><a href="#半朴素贝叶斯" class="headerlink" title="半朴素贝叶斯"></a>半朴素贝叶斯</h1><p>由于提出条件独立性假设的原因正是联合概率难以求解，所以在弱化假设的时候同样应该避免引入过多的联合概率，这也正是半朴素贝叶斯的基本想法。比较常见的半朴素贝叶斯算法有如下三种：</p>
-<h2 id="ODE-算法（One-Dependent-Estimator，可译为“独依赖估计”）"><a href="#ODE-算法（One-Dependent-Estimator，可译为“独依赖估计”）" class="headerlink" title="ODE 算法（One-Dependent Estimator，可译为“独依赖估计”）"></a>ODE 算法（One-Dependent Estimator，可译为“独依赖估计”）</h2><p><del>（常微分方程：？？？）</del><br>顾名思义，在该算法中、各个维度的特征至多依赖一个其它维度的特征。从公式上来说，它在描述条件概率时会多出一个条件：</p>
-<script type="math/tex; mode=display">
-p\left( c_{k} \middle| X = x \right) = p\left( y = c_{k} \right)\prod_{i = 1}^{n}{p\left( X^{\left( j \right)} = x^{\left( j \right)} \middle| Y = c_{k},X^{\left( pa_{j} \right)} = x^{\left( pa_{j} \right)} \right)}</script><p>这里的<script type="math/tex">\text{pa}_{j}</script>代表着维度 j 所“独依赖”的维度</p>
-<h2 id="SPODE-算法（Super-Parent-ODE，可译为“超父独依赖估计”）"><a href="#SPODE-算法（Super-Parent-ODE，可译为“超父独依赖估计”）" class="headerlink" title="SPODE 算法（Super-Parent ODE，可译为“超父独依赖估计”）"></a>SPODE 算法（Super-Parent ODE，可译为“超父独依赖估计”）</h2><p>这是 ODE 算法的一个特例。在该算法中，所有维度的特征都独依赖于同一个维度的特征，这个被共同依赖的特征就叫“超父（Super-Parent）”。若它的维度是第 pa 维，知：</p>
-<script type="math/tex; mode=display">
-p\left( c_{k} \middle| X = x \right) = p\left( y = c_{k} \right)\prod_{i = 1}^{n}{p\left( X^{\left( j \right)} = x^{\left( j \right)} \middle| Y = c_{k},X^{\left( \text{pa} \right)} = x^{\left( \text{pa} \right)} \right)}</script><p>一般而言，会选择通过交叉验证来选择超父</p>
-<h2 id="AODE-算法（Averaged-One-Dependent-Estimator，可译为“集成独依赖估计”）"><a href="#AODE-算法（Averaged-One-Dependent-Estimator，可译为“集成独依赖估计”）" class="headerlink" title="AODE 算法（Averaged One-Dependent Estimator，可译为“集成独依赖估计”）"></a>AODE 算法（Averaged One-Dependent Estimator，可译为“集成独依赖估计”）</h2><p>这种算法背后有提升方法的思想。AODE 算法会利用 SPODE 算法并尝试把许多个训练后的、有足够的训练数据量支撑的SPODE模型集成在一起来构建最终的模型。一般来说，AODE 会以所有维度的特征作为超父训练 n 个 SPODE 模型、然后线性组合出最终的模型</p>
-<h1 id="贝叶斯网"><a href="#贝叶斯网" class="headerlink" title="贝叶斯网"></a>贝叶斯网</h1><p>贝叶斯网又称“信念网（Belief Network）”，比起朴素贝叶斯来说、它背后还蕴含了图论的思想。贝叶斯网有许多奇妙的性质，详细的讨论不可避免地要使用到图论的术语，这里仅拟对其做一个直观的介绍。 贝叶斯网既然带了“网”字，它的结构自然可以直观地想成是一张网络，其中：</p>
-<ul>
-<li>网络的节点就是单一样本的各个维度上的随机变量<script type="math/tex">X^{(1)},...,X^{(n)}</script> </li>
-<li>连接节点的边就是节点之间的依赖关系</li>
-</ul>
-<p>需要注意的是，贝叶斯网一般要求这些边是“有方向的”、同时整张网络中不能出现“环”。无向的贝叶斯网通常是由有向贝叶斯网无向化得到的，此时它被称为 moral graph（除了把所有有向边改成无向边以外，moral graph 还需要将有向网络中不相互独立的随机变量之间连上一条无向边，细节不表），基于它能够非常直观、迅速地看出变量间的条件独立性</p>
-<p>显然，有了代表各个维度随机变量的节点和代表这些节点之间的依赖关系的边之后，各个随机变量之间的条件依赖关系都可以通过这张网络表示出来。类似的东西在条件随机场中也有用到，可以说是一个适用范围非常宽泛的思想</p>
-<p>贝叶斯网的学习在网络结构已经确定的情况下相对简单，其思想和朴素贝叶斯相去无多：只需要对训练集相应的条件进行“计数”即可，所以贝叶斯网的学习任务主要归结于如何找到最恰当的网络结构。常见的做法是定义一个用来打分的函数并基于该函数通过某种搜索手段来决定结构，但正如同很多最优化算法一样、在所有可能的结构空间中搜索最优结构是一个 NP 问题、无法在合理的时间内求解，所以一般会使用替代的方法求近似最优解。常见的方法有两种，一种是贪心法、比如：先定下一个初始的网络结构并从该结构出发，每次增添一条边、删去一条边或调整一条边的方向，期望通过这些手段能够使评分函数的值变大；另一种是直接限定假设空间、比如假设要求的贝叶斯网一定是一个树形的结构</p>
-<p>相比起学习方法来说，贝叶斯网的决策方法相对来说显得比较不平凡。虽说最理想的情况是直接根据贝叶斯网的结构所决定的联合概率密度来计算后验概率，但是这样的计算被证明了是 NP 问题 [Cooper, 1990]。换句话说，只要贝叶斯网稍微复杂一点，这种精确的计算就无法在合理的时间内做完。所以我们同样要借助近似法求解，一种常见的做法是吉布斯采样（Gibbs Sampling），它的定义涉及到马尔科夫链相关的<del>（我还没有学的）</del>知识，这里就不详细展开了</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本文旨在解决如下两个问题：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;为何后验概率最大化是贝叶斯决策？&lt;/li&gt;
-&lt;li&gt;如何导出离散型朴素贝叶斯的算法？&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;以及旨在叙述一些朴素贝叶斯的推广。具体而言、我们会简要介绍：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;半朴素贝叶斯&lt;/li&gt;
-&lt;li&gt;贝叶斯网&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MergedNB 的实现</title>
-    <link href="http://www.carefree0910.com/posts/7c13f69c/"/>
-    <id>http://www.carefree0910.com/posts/7c13f69c/</id>
-    <published>2017-04-20T09:02:35.000Z</published>
-    <updated>2017-04-20T13:30:40.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/b_NaiveBayes/Vectorized/MergedNB.py" target="_blank" rel="external">这里</a>）</p>
-<p>本文主要介绍混合型朴素贝叶斯—— MergedNB 的实现。（我知道的）混合型朴素贝叶斯算法主要有两种提法：</p>
-<ul>
-<li>用某种分布的密度函数算出训练集中各个样本连续型特征相应维度的密度之后，根据这些密度的情况将该维度离散化、最后再训练离散型朴素贝叶斯模型</li>
-<li>直接结合离散型朴素贝叶斯和连续型朴素贝叶斯：  <script type="math/tex; mode=display">
-y = f(x^{*}) = \arg{\max_{c_k}{p\left( y = c_{k} \right)\prod_{j \in S_{1}}^{}{p(X^{\left( j \right)} = {x^{*}}^{\left( j \right)}|y = c_{k})}\prod_{j \in S_{2}}^{}{p(X^{j} = {x^{*}}^{\left( j \right)}|y = c_{k})}}}</script></li>
-</ul>
-<p>从直观可以看出、第二种提法可能会比第一种提法要“激进”一些，因为如果某个连续型维度采用的分布特别“大起大落”的话、该维度可能就会直接“主导”整个决策。但是考虑到实现的简洁和直观（……），我们还是演示第二种提法的实现。感兴趣的观众老爷可以尝试实现第一种提法，思路和过程都是没有太本质的区别的、只是会繁琐不少</p>
-<a id="more"></a>
-<p>我们可以对气球数据集 1.0 稍作变动、将“气球大小”这个特征改成“气球直径”，然后我们再手动做一次分类以加深对混合型朴素贝叶斯算法的理解。新数据集如下表所示（不妨称之为气球数据集 2.0）：</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>颜色</th>
-<th>直径</th>
-<th>测试人员</th>
-<th>测试动作</th>
-<th>结果</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>  黄色</td>
-<td>10</td>
-<td>成人</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>15</td>
-<td>成人</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>9</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>9</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>19</td>
-<td>成人</td>
-<td>用手打</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>21</td>
-<td>成人</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>16</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>22</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>10</td>
-<td>成人</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>12</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>22</td>
-<td>成人</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>21</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>该数据集的电子版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/balloon2.0.txt" target="_blank" rel="external">这里</a>。我们想预测的是样本：</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>颜色</th>
-<th>大小</th>
-<th>测试人员</th>
-<th>测试动作</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>  紫色</td>
-<td>10</td>
-<td>小孩</td>
-<td>用脚踩</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>除了“大小”变成了“直径”、其余特征都一点未变，所以我们只需再计算直径的条件概率（密度）即可。由 GaussianNB 的算法可知：</p>
-<script type="math/tex; mode=display">{\hat{\mu}}_{不爆炸} = \frac{10 + 9 + 9 + 16 + 10 + 12}{6} = 11</script><script type="math/tex; mode=display">{\hat{\mu}}_{爆炸} = \frac{15 + 19 + 21 + 22 + 22 + 21}{6} = 20</script><script type="math/tex; mode=display">{\hat{\sigma}}_{不爆炸} = \frac{1}{6}\left\lbrack \left( 10 - {\hat{\mu}}_{不爆炸} \right)^{2} + \ldots + \left( 12 - {\hat{\mu}}_{不爆炸} \right)^{2} \right\rbrack = 6</script><script type="math/tex; mode=display">{\hat{\sigma}}_{爆炸} = \frac{1}{6}\left\lbrack \left( 15 - {\hat{\mu}}_{爆炸} \right)^{2} + \ldots + \left( 21 - {\hat{\mu}}_{爆炸} \right)^{2} \right\rbrack = 6</script><p>从而</p>
-<script type="math/tex; mode=display">
-\hat{p}\left( 不爆炸\right) = \frac{1}{\sqrt{2\pi}{\hat{\sigma}}_{不爆炸}}e^{- \frac{\left( 10 - {\hat{\mu}}_{不爆炸} \right)^{2}}{2{\hat{\sigma}}^{2}_{不爆炸}}} \times p\left( 小孩\middle| 不爆炸\right) \times p\left( 用脚踩\middle| 不爆炸\right) \approx 0.0073</script><script type="math/tex; mode=display">
-\hat{p}\left( 爆炸\right) = \frac{1}{\sqrt{2\pi}{\hat{\sigma}}_{爆炸}}e^{- \frac{\left( 10 - {\hat{\mu}}_{爆炸} \right)^{2}}{2{\hat{\sigma}}^{2}_{爆炸}}} \times p\left( 小孩\middle| 爆炸\right) \times p\left( 用脚踩\middle| 爆炸\right) \approx 0.0046</script><p>因此我们应该认为给定样本所导致的结果是“不爆炸”，这和直观大体相符。接下来看看具体应该如何进行实现，首先是初始化：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> b_NaiveBayes.Original.Basic <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span> b_NaiveBayes.Original.MultinomialNB <span class="keyword">import</span> MultinomialNB</div><div class="line"><span class="keyword">from</span> b_NaiveBayes.Original.GaussianNB <span class="keyword">import</span> GaussianNB</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MergedNB</span><span class="params">(NaiveBayes)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._whether_discrete：记录各个维度的变量是否是离散型变量</div><div class="line">        self._whether_continuous：记录各个维度的变量是否是连续型变量</div><div class="line">        self._multinomial、self._gaussian：离散型、连续型朴素贝叶斯模型</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, whether_continuous)</span>:</span></div><div class="line">        self._multinomial, self._gaussian = (</div><div class="line">            MultinomialNB(), GaussianNB()</div><div class="line">        <span class="keyword">if</span> whether_continuous <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            self._whether_discrete = self._whether_continuous = <span class="keyword">None</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self._whether_continuous = np.array(whether_continuous)</div><div class="line">            self._whether_discrete = ~self._whether_continuous</div></pre></td></tr></table></figure>
-<p>然后是和模型的训练相关的实现，这一块将会大量重用之前在 MultinomialNB 和 GaussianNB 里面写过的东西：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_data</span><span class="params">(self, x, y, sample_weight=None)</span>:</span></div><div class="line">    <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        sample_weight = np.array(sample_weight)</div><div class="line">    x, y, wc, features, feat_dics, label_dic = DataUtil.quantize_data(</div><div class="line">        x, y, wc=self._whether_continuous, separate=<span class="keyword">True</span>)</div><div class="line">    <span class="comment"># 若没有指定哪些维度连续，则用 quantize_data 中朴素的方法判定哪些维度连续</span></div><div class="line">    <span class="keyword">if</span> self._whether_continuous <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        self._whether_continuous = wc</div><div class="line">        <span class="comment"># 通过Numpy中对逻辑非的支持进行快速运算</span></div><div class="line">        self._whether_discrete = ~self._whether_continuous</div><div class="line">    <span class="comment"># 计算通用变量</span></div><div class="line">    self.label_dic = label_dic</div><div class="line">    discrete_x, continuous_x = x</div><div class="line">    cat_counter = np.bincount(y)</div><div class="line">    self._cat_counter = cat_counter</div><div class="line">    labels = [y == value <span class="keyword">for</span> value <span class="keyword">in</span> range(len(cat_counter))]</div><div class="line">    <span class="comment"># 训练离散型朴素贝叶斯</span></div><div class="line">    labelled_x = [discrete_x[ci].T <span class="keyword">for</span> ci <span class="keyword">in</span> labels]</div><div class="line">    self._multinomial._x, self._multinomial._y = x, y</div><div class="line">    self._multinomial._labelled_x, self._multinomial._label_zip = (</div><div class="line">        labelled_x, list(zip(labels, labelled_x)))</div><div class="line">    self._multinomial._cat_counter = cat_counter</div><div class="line">    self._multinomial._feat_dics = [_dic</div><div class="line">        <span class="keyword">for</span> i, _dic <span class="keyword">in</span> enumerate(feat_dics) <span class="keyword">if</span> self._whether_discrete[i]]</div><div class="line">    self._multinomial._n_possibilities = [len(feats)</div><div class="line">        <span class="keyword">for</span> i, feats <span class="keyword">in</span> enumerate(features) <span class="keyword">if</span> self._whether_discrete[i]]</div><div class="line">    self._multinomial.label_dic = label_dic</div><div class="line">    <span class="comment"># 训练连续型朴素贝叶斯</span></div><div class="line">    labelled_x = [continuous_x[label].T <span class="keyword">for</span> label <span class="keyword">in</span> labels]</div><div class="line">    self._gaussian._x, self._gaussian._y = continuous_x.T, y</div><div class="line">    self._gaussian._labelled_x, self._gaussian._label_zip = labelled_x, labels</div><div class="line">    self._gaussian._cat_counter, self._gaussian.label_dic = cat_counter, label_dic</div><div class="line">    <span class="comment"># 处理样本权重</span></div><div class="line">    self._feed_sample_weight(sample_weight)</div><div class="line"></div><div class="line"><span class="comment"># 分别利用 MultinomialNB 和 GaussianNB 处理样本权重的方法来处理样本权重</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_sample_weight</span><span class="params">(self, sample_weight=None)</span>:</span></div><div class="line">    self._multinomial.feed_sample_weight(sample_weight)</div><div class="line">    self._gaussian.feed_sample_weight(sample_weight)</div><div class="line"></div><div class="line"><span class="comment"># 分别利用 MultinomialNB 和 GaussianNB 的训练函数来进行训练</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_fit</span><span class="params">(self, lb)</span>:</span></div><div class="line">    self._multinomial.fit()</div><div class="line">    self._gaussian.fit()</div><div class="line">    p_category = self._multinomial.get_prior_probability(lb)</div><div class="line">    discrete_func, continuous_func = (</div><div class="line">        self._multinomial[<span class="string">"func"</span>], self._gaussian[<span class="string">"func"</span>])</div><div class="line">    <span class="comment"># 将 MultinomialNB 和 GaussianNB 的决策函数直接合成最终决策函数</span></div><div class="line">    <span class="comment"># 由于这两个决策函数都乘了先验概率、我们需要除掉一个先验概率</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(input_x, tar_category)</span>:</span></div><div class="line">        input_x = np.array(input_x)</div><div class="line">        <span class="keyword">return</span> discrete_func(</div><div class="line">            input_x[self._whether_discrete].astype(</div><div class="line">                np.int), tar_category) * continuous_func(</div><div class="line">            input_x[self._whether_continuous], tar_category) / p_category[tar_category]</div><div class="line">    <span class="keyword">return</span> func</div></pre></td></tr></table></figure>
-<p><del>（又臭又长啊喂)</del></p>
-<p>上述实现有一个显而易见的可以优化的地方：我们一共在代码中重复计算了三次先验概率、但其实只用计算一次就可以。考虑到这一点不是性能瓶颈，为了代码的连贯性和可读性、我们就没有进行这个优化<del>（？？？）</del></p>
-<p>数据转换函数则相对而言要复杂一点，因为我们需要跳过连续维度、将离散维度挑出来进行数值化：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 实现转换混合型数据的方法，要注意利用 MultinomialNB 的相应变量</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_transfer_x</span><span class="params">(self, x)</span>:</span></div><div class="line">    _feat_dics = self._multinomial[<span class="string">"feat_dics"</span>]</div><div class="line">    idx = <span class="number">0</span></div><div class="line">    <span class="keyword">for</span> d, discrete <span class="keyword">in</span> enumerate(self._whether_discrete):</div><div class="line">        <span class="comment"># 如果是连续维度，直接调用 float 方法将其转为浮点数</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> discrete:</div><div class="line">            x[d] = float(x[d])</div><div class="line">        <span class="comment"># 如果是离散维度，利用转换字典进行数值化</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            x[d] = _feat_dics[idx][x[d]]</div><div class="line">        <span class="keyword">if</span> discrete:</div><div class="line">            idx += <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> x</div></pre></td></tr></table></figure>
-<p>至此，混合型朴素贝叶斯模型就搭建完毕了。为了比较合理地对它进行评估，我们不妨采用 UCI 上一个我认为有些病态的数据集进行测试。问题的描述大概可以概括如下：</p>
-<p>“训练数据包含了某银行一项业务的目标客户的信息、电话销售记录以及后来他是否购买了这项业务的信息。我们希望做到：根据客户的基本信息和历史联系记录，预测他是否会购买这项业务”。UCI 上的原问题描述则如下图所示：</p>
-<img src="/posts/7c13f69c/p1.png" alt="p1.png" title="">
-<p>概括其主要内容、就是它是一个有 17 个属性的二类分类问题。之所以我认为它是病态的，是因为我发现即使是 17 个属性几乎完全一样的两个人，他们选择是否购买业务的结果也会截然相反。事实上从心理学的角度来说，想要很好地预测人的行为确实是一项非常困难的事情、尤其是当该行为直接牵扯到较大的利益时</p>
-<p>完整的数据集可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/bank1.0.txt" target="_blank" rel="external">这里</a>（最后一列数据是类别）。按照数据的特性、我们可以通过和之前用来评估 MultinomialNB 的代码差不多的代码（注意额外定义一个记录离散型维度的数组即可）得出如下图所示的结果：</p>
-<img src="/posts/7c13f69c/p2.png" alt="p2.png" title="">
-<p>虽然准确率达到了 89%左右，但其实该问题不应该用准确率作为评判的标准。因为如果我们观察数据就会发现、数据存在着严重的非均衡现象。事实上，88%的客户最终都是没有购买这个业务的、但我们更关心的是那一小部分购买了业务的客户，这种情况我们通常会用 F1-score 来衡量模型的好坏。此外，该问题非常需要人为进行数据清洗、因为其原始数据非常杂乱。此外，我们可以对该问题中的各个离散维度进行可视化。该数据共 9 个离散维度，我们可以将它们合并在同一个图中以方便获得该数据离散部分的直观（如下图所示；由于各个特征的各个取值通常比较长（比如”manager”之类的），为整洁、我们直接将横坐标置为等差数列而没有进行转换）：</p>
-<img src="/posts/7c13f69c/p3.png" alt="p3.png" title="">
-<p>其中天蓝色代表类别 yes、亦即购买了业务；橙色则代表 no、亦即没有购买业务。可以看到、所有离散维度的特征都是前面所说的“无足轻重”的特征</p>
-<p>连续维度的可视化是几乎同理的，唯一的差别在于它不是柱状图而是正态分布密度函数的函数曲线。具体的代码实现从略、感兴趣的观众老爷们可以尝试动手实现一下，这里仅放出程序运行的结果。该数据共 7 个连续维度，我们同样把它们放在同一个图中：</p>
-<img src="/posts/7c13f69c/p4.png" alt="p4.png" title="">
-<p>其中，天蓝色曲线代表类别 yes、橙色曲线代表类别 no。可以看到，两种类别的数据在各个维度上的正态分布的均值、方差都几乎一致</p>
-<p>从以上的分析已经可以比较直观地感受到、该问题确实相当病态。特别地，考虑到朴素贝叶斯的算法、不难想象此时的混合型朴素贝叶斯模型基本就只是根据各类别的先验概率来进行分类决策</p>
-<p>至此，朴素贝叶斯算法的理论、实现就差不多都说了一遍。作为收尾，下篇文章会补上之前没有展开叙述的一些细节、同时也会简要地介绍一下其余的贝叶斯分类器</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/b_NaiveBayes/Vectorized/MergedNB.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
-&lt;p&gt;本文主要介绍混合型朴素贝叶斯—— MergedNB 的实现。（我知道的）混合型朴素贝叶斯算法主要有两种提法：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;用某种分布的密度函数算出训练集中各个样本连续型特征相应维度的密度之后，根据这些密度的情况将该维度离散化、最后再训练离散型朴素贝叶斯模型&lt;/li&gt;
-&lt;li&gt;直接结合离散型朴素贝叶斯和连续型朴素贝叶斯：  &lt;script type=&quot;math/tex; mode=display&quot;&gt;
-y = f(x^{*}) = \arg{\max_{c_k}{p\left( y = c_{k} \right)\prod_{j \in S_{1}}^{}{p(X^{\left( j \right)} = {x^{*}}^{\left( j \right)}|y = c_{k})}\prod_{j \in S_{2}}^{}{p(X^{j} = {x^{*}}^{\left( j \right)}|y = c_{k})}}}&lt;/script&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;从直观可以看出、第二种提法可能会比第一种提法要“激进”一些，因为如果某个连续型维度采用的分布特别“大起大落”的话、该维度可能就会直接“主导”整个决策。但是考虑到实现的简洁和直观（……），我们还是演示第二种提法的实现。感兴趣的观众老爷可以尝试实现第一种提法，思路和过程都是没有太本质的区别的、只是会繁琐不少&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>GaussianNB 的实现</title>
-    <link href="http://www.carefree0910.com/posts/c836ba35/"/>
-    <id>http://www.carefree0910.com/posts/c836ba35/</id>
-    <published>2017-04-20T07:34:35.000Z</published>
-    <updated>2017-04-20T13:51:56.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/b_NaiveBayes/Vectorized/GaussianNB.py" target="_blank" rel="external">这里</a>）</p>
-<p>本文主要介绍连续型朴素贝叶斯——GaussianNB 的实现。在有了实现离散型朴素贝叶斯的经验后，实现连续型朴素贝叶斯模型其实只是个触类旁通的活了</p>
-<a id="more"></a>
-<p>不过在介绍实现之前，我们还是需要先要知道连续型朴素贝叶斯的算法是怎样的。处理连续型变量有一个最直观的方法：使用小区间切割、直接使其离散化。由于这种方法较难控制小区间的大小、而且对训练集质量的要求比较高，所以我们选用第二种方法：假设该变量服从正态分布（或称高斯分布，Gaussian Distribution）、再利用极大似然估计来计算该变量的“条件概率”。具体而言、GaussianNB 通过如下公式计算“条件概率”<script type="math/tex">p(X^{\left( j \right)} = a_{jl}|y = c_{k})</script>：</p>
-<script type="math/tex; mode=display">
-p\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{1}{\sqrt{2\pi}\sigma_{jk}}e^{- \frac{\left( a_{jl} - \mu_{jk} \right)^{2}}{2\sigma_{jk}^{2}}}</script><p>这里有两个参数：<script type="math/tex">\mu_{jk}</script>、<script type="math/tex">\sigma_{jk}</script>，它们可以用极大似然估计法定出：</p>
-<script type="math/tex; mode=display">
-{\hat{\sigma}}_{jk}^{2} = \frac{1}{N_{k}}\sum_{i = 1}^{N}{\left( x_{i}^{\left( j \right)} - \mu_{jk} \right)^{2}I(y_{i} = c_{k})}</script><script type="math/tex; mode=display">
-{\hat{\mu}}_{jk} = \frac{1}{N_{k}}\sum_{i = 1}^{N}{x_{i}^{\left( j \right)}I(y_{i} = c_{k})}</script><p>其中，<script type="math/tex">N_{k} = \sum_{i = 1}^{N}{I(y_{i} = c_{k})}</script>是类别<script type="math/tex">c_{k}</script>的样本数。需要注意的是，这里的“条件概率”其实是“条件概率密度”，真正的条件概率其实是 0（因为连续型变量单点概率为 0）。这样做的合理性涉及到了比较深的概率论知识，此处不表<del>（其实我想表也表不出来）</del></p>
-<p>所以在实现 GaussianNB 之前、我们需要先实现一个能够计算正态分布密度和进行正态分布极大似然估计的类：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">from</span> math <span class="keyword">import</span> pi, exp</div><div class="line"></div><div class="line"><span class="comment"># 记录常量以避免重复运算</span></div><div class="line">sqrt_pi = (<span class="number">2</span> * pi) ** <span class="number">0.5</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NBFunctions</span>:</span></div><div class="line">    <span class="comment"># 定义正态分布的密度函数</span></div><div class="line"><span class="meta">    @staticmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">gaussian</span><span class="params">(x, mu, sigma)</span>:</span></div><div class="line">    <span class="keyword">return</span> np.exp(</div><div class="line">            -(x - mu) ** <span class="number">2</span> / (<span class="number">2</span> * sigma)) / (sqrt_pi * sigma ** <span class="number">0.5</span>)</div><div class="line"></div><div class="line">    <span class="comment"># 定义进行极大似然估计的函数</span></div><div class="line">    <span class="comment"># 它能返回一个存储着计算条件概率密度的函数的列表</span></div><div class="line"><span class="meta">    @staticmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">gaussian_maximum_likelihood</span><span class="params">(labelled_x, n_category, dim)</span>:</span></div><div class="line">        mu = [np.sum(</div><div class="line">            labelled_x[c][dim]) / </div><div class="line">            len(labelled_x[c][dim]) <span class="keyword">for</span> c <span class="keyword">in</span> range(n_category)]</div><div class="line">        sigma = [np.sum(</div><div class="line">            (labelled_x[c][dim]-mu[c])**<span class="number">2</span>) / </div><div class="line">            len(labelled_x[c][dim]) <span class="keyword">for</span> c <span class="keyword">in</span> range(n_category)]</div><div class="line">        <span class="comment"># 利用极大似然估计得到的和、定义生成计算条件概率密度的函数的函数 func</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(_c)</span>:</span></div><div class="line">            <span class="function"><span class="keyword">def</span> <span class="title">sub</span><span class="params">(xx)</span>:</span></div><div class="line">                <span class="keyword">return</span> NBFunctions.gaussian(xx, mu[_c], sigma[_c])</div><div class="line">            <span class="keyword">return</span> sub</div><div class="line">        <span class="comment"># 利用 func 返回目标列表</span></div><div class="line">        <span class="keyword">return</span> [func(_c=c) <span class="keyword">for</span> c <span class="keyword">in</span> range(n_category)]</div></pre></td></tr></table></figure>
-<p>对于 GaussianNB 本身，由于算法中只有条件概率相关的定义变了、所以只需要将相关的函数重新定义即可。此外，由于输入数据肯定是数值数据、所以数据预处理会简单不少（至少不用因为要对输入进行特殊的数值化处理而记录其转换字典了）。考虑到上一章说明 MultinomialNB 的实现时已经基本把我们框架的思想都说明清楚了，在接下来的 GaussianNB 的代码实现中、我们会适当地减少注释以提高阅读流畅度<del>（其实主要还是为了偷懒）</del>：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> b_NaiveBayes.Original.Basic <span class="keyword">import</span> *</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">GaussianNB</span><span class="params">(NaiveBayes)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">feed_data</span><span class="params">(self, x, y, sample_weight=None)</span>:</span></div><div class="line">        <span class="comment"># 简单地调用 Python 自带的 float 方法将输入数据数值化</span></div><div class="line">        x = np.array([list(map(</div><div class="line">            <span class="keyword">lambda</span> c: float(c), sample)) <span class="keyword">for</span> sample <span class="keyword">in</span> x])</div><div class="line">        <span class="comment"># 数值化类别向量</span></div><div class="line">        labels = list(set(y))</div><div class="line">        label_dic = &#123;label: i <span class="keyword">for</span> i, label <span class="keyword">in</span> enumerate(labels)&#125;</div><div class="line">        y = np.array([label_dic[yy] <span class="keyword">for</span> yy <span class="keyword">in</span> y])</div><div class="line">        cat_counter = np.bincount(y)</div><div class="line">        labels = [y == value <span class="keyword">for</span> value <span class="keyword">in</span> range(len(cat_counter))]</div><div class="line">        labelled_x = [x[label].T <span class="keyword">for</span> label <span class="keyword">in</span> labels]</div><div class="line">        <span class="comment"># 更新模型的各个属性</span></div><div class="line">        self._x, self._y = x.T, y</div><div class="line">        self._labelled_x, self._label_zip = labelled_x, labels</div><div class="line">        self._cat_counter, self.label_dic = (</div><div class="line">            cat_counter, &#123;i: _l <span class="keyword">for</span> _l, i <span class="keyword">in</span> label_dic.items()&#125;</div><div class="line">        self.feed_sample_weight(sample_weight)</div></pre></td></tr></table></figure>
-<p>可以看到，数据预处理这一步确实要轻松很多。接下来只需要再定义训练用的代码就行，它们和 MultinomialNB 中的实现也大同小异： </p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义处理样本权重的函数</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_sample_weight</span><span class="params">(self, sample_weight=None)</span>:</span></div><div class="line">    <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        local_weights = sample_weight * len(sample_weight)</div><div class="line">        <span class="keyword">for</span> i, label <span class="keyword">in</span> enumerate(self._label_zip):</div><div class="line">            self._labelled_x[i] *= local_weights[label]</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_fit</span><span class="params">(self, lb)</span>:</span></div><div class="line">    n_category = len(self._cat_counter)</div><div class="line">    p_category = self.get_prior_probability(lb)</div><div class="line">    <span class="comment"># 利用极大似然估计获得计算条件概率的函数、使用数组变量 data 进行存储</span></div><div class="line">    data = [</div><div class="line">        NBFunctions.gaussian_maximum_likelihood(</div><div class="line">            self._labelled_x, n_category, dim)</div><div class="line">                <span class="keyword">for</span> dim <span class="keyword">in</span> range(len(self._x))]</div><div class="line">    self._data = data</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(input_x, tar_category)</span>:</span></div><div class="line">        <span class="comment"># 将输入转换成二维数组（矩阵）</span></div><div class="line">        input_x = np.atleast_2d(input_x).T</div><div class="line">        rs = np.ones(input_x.shape[<span class="number">1</span>])</div><div class="line">        <span class="keyword">for</span> d, xx <span class="keyword">in</span> enumerate(input_x):</div><div class="line">            rs *= data[d][tar_category](xx)</div><div class="line">        <span class="keyword">return</span> rs * p_category[tar_category]</div><div class="line"></div><div class="line"><span class="comment"># 由于数据本身就是数值的，所以数据转换函数只需直接返回输入值即可</span></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_transfer_x</span><span class="params">(x)</span>:</span></div><div class="line">    <span class="keyword">return</span> x</div></pre></td></tr></table></figure>
-<p>至此，连续型朴素贝叶斯模型就搭建完毕了</p>
-<p>连续型朴素贝叶斯同样能够进行和离散型朴素贝叶斯类似的可视化，不过由于我们接下来就要实现适用范围最广的朴素贝叶斯模型：混合型朴素贝叶斯了，所以我们这里不打算进行 GaussianNB 合理的评估、而打算把它归结到对混合型朴素贝叶斯的评估中</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/b_NaiveBayes/Vectorized/GaussianNB.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
-&lt;p&gt;本文主要介绍连续型朴素贝叶斯——GaussianNB 的实现。在有了实现离散型朴素贝叶斯的经验后，实现连续型朴素贝叶斯模型其实只是个触类旁通的活了&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MultinomialNB 的实现</title>
-    <link href="http://www.carefree0910.com/posts/74647589/"/>
-    <id>http://www.carefree0910.com/posts/74647589/</id>
-    <published>2017-04-20T06:50:30.000Z</published>
-    <updated>2017-04-20T13:53:28.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/b_NaiveBayes/Vectorized/MultinomialNB.py" target="_blank" rel="external">这里</a>）</p>
-<p>本文主要介绍离散型朴素贝叶斯——MultinomialNB 的实现。对于离散型朴素贝叶斯模型的实现，由于核心算法都是在进行“计数”工作、所以问题的关键就转换为了如何进行计数。幸运的是、Numpy 中的一个方法：<code>bincount</code>就是专门用来计数的，它能够非常快速地数出一个数组中各个数字出现的频率；而且由于它是 Numpy 自带的方法，其速度比 Python 标准库<code>collections</code>中的计数器<code>Counter</code>还要快上非常多。不幸的是、该方法有如下两个缺点：</p>
-<ul>
-<li>只能处理非负整数型中数组</li>
-<li>向量中的最大值即为返回的数组的长度，换句话说，如果用<code>bincount</code>方法对一个长度为 1、元素为 1000 的数组计数的话，返回的结果就是 999 个 0 加 1 个 1</li>
-</ul>
-<p>所以我们做数据预处理时就要充分考虑到这两点</p>
-<a id="more"></a>
-<p>在综述中我们曾经提到过在<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py#L189" target="_blank" rel="external">这里</a>可以找到将数据进行数值化的具体实现，该数据数值化的方法其实可以说是为<code>bincount</code>方法“量身定做”的。举个栗子，当原始数据形如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">x, s, n, t, p, f</div><div class="line">x, s, y, t, a, f</div><div class="line">b, s, w, t, l, f</div><div class="line">x, y, w, t, p, f</div><div class="line">x, s, g, f, n, f</div></pre></td></tr></table></figure>
-<p>时，调用上述数值化数据的方法将会把数据数值化为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">0, 0, 0, 0, 0, 0</div><div class="line">0, 0, 1, 0, 1, 0</div><div class="line">1, 0, 2, 0, 2, 0</div><div class="line">0, 1, 2, 0, 0, 0</div><div class="line">0, 0, 3, 1, 3, 0</div></pre></td></tr></table></figure>
-<p>单就实现这个功能而言、实现是平凡的：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">quantize_data</span><span class="params">(x)</span>:</span></div><div class="line">    features = [set(feat) <span class="keyword">for</span> feat <span class="keyword">in</span> xt]</div><div class="line">    feat_dics = [&#123;</div><div class="line">        _l: i <span class="keyword">for</span> i, _l <span class="keyword">in</span> enumerate(feats)</div><div class="line">    &#125; <span class="keyword">if</span> <span class="keyword">not</span> wc[i] <span class="keyword">else</span> <span class="keyword">None</span> <span class="keyword">for</span> i, feats <span class="keyword">in</span> enumerate(features)]</div><div class="line">    x = np.array([[</div><div class="line">        feat_dics[i][_l] <span class="keyword">for</span> i, _l <span class="keyword">in</span> enumerate(sample)]</div><div class="line">            <span class="keyword">for</span> sample <span class="keyword">in</span> x])</div><div class="line">    <span class="keyword">return</span> x, feat_dics</div></pre></td></tr></table></figure>
-<p>不过考虑到离散型朴素贝叶斯需要的东西比这要多很多，所以才有了<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py#L189" target="_blank" rel="external">这里</a>所实现的、相对而言繁复很多的版本。建议观众老爷们在看接下来的实现之前先把那个<code>quantize_data</code>函数的完整版看一遍、因为我接下来会直接用<del>（那你很棒棒哦）</del></p>
-<p>当然，考虑到朴素贝叶斯的相关理论还是比较多的、我就不把实现一股脑扔出来了，那样估计大部分人<del>（包括我自己在内）</del>都看不懂……所以我决定把离散型朴素贝叶斯算法和对应的实现进行逐一讲解 ( σ’ω’)σ</p>
-<h1 id="计算先验概率"><a href="#计算先验概率" class="headerlink" title="计算先验概率"></a>计算先验概率</h1><p>这倒是在将框架时就已经讲过了、但我还是打算重讲一遍以加深理解。首先把实现放出来：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_prior_probability</span><span class="params">(self, lb=<span class="number">1</span>)</span>:</span></div><div class="line">    <span class="keyword">return</span> [(_c_num + lb) / (len(self._y) + lb * len(self._cat_counter))</div><div class="line">        <span class="keyword">for</span> _c_num <span class="keyword">in</span> self._cat_counter]</div></pre></td></tr></table></figure>
-<p>其中的<code>lb</code>为平滑系数（默认为 1、亦即拉普拉斯平滑），这对应的公式其实是带平滑项的、先验概率的极大似然估计：</p>
-<script type="math/tex; mode=display">
-p_\lambda(y=c_k)=\frac{\sum_{i=1}^NI(y_i=c_k)+\lambda}{N+K\lambda},k=1,2,...,K</script><p>所以代码中的<code>self._cat_counter</code>的意义就很明确了——它存储着 K 个<script type="math/tex">\sum_{i=1}^NI(y_i=c_k)</script></p>
-<p>（cat counter 是 category counter 的简称）<del>（我知道我命名很差所以不要打我）</del></p>
-<h1 id="计算条件概率"><a href="#计算条件概率" class="headerlink" title="计算条件概率"></a>计算条件概率</h1><p>同样先看核心实现：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">data = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> range(n_dim)]</div><div class="line"><span class="keyword">for</span> dim, n_possibilities <span class="keyword">in</span> enumerate(self._n_possibilities):</div><div class="line">    data[dim] = [[</div><div class="line">        (self._con_counter[dim][c][p] + lb) / (</div><div class="line">            self._cat_counter[c] + lb * n_possibilities)</div><div class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> range(n_possibilities)] <span class="keyword">for</span> c <span class="keyword">in</span> range(n_category)]</div><div class="line">self._data = [np.array(dim_info) <span class="keyword">for</span> dim_info <span class="keyword">in</span> data]</div></pre></td></tr></table></figure>
-<p>这对应的公式其实就是带平滑项（<code>lb</code>）的条件概率的极大似然估计：</p>
-<script type="math/tex; mode=display">
-p_{\lambda}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I\left( x_{i}^{\left( j \right)} = a_{jl},y_{i} = c_{k} \right) + \lambda}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})} + S_{j}\lambda}</script><p>其中</p>
-<script type="math/tex; mode=display">
-k=1,...,K;\ \ j=1,...,n;\ \ l=1,...,S_j</script><p>可以看到我们利用到了<code>self._cat_counter</code>属性来计算<script type="math/tex">\sum_{i=1}^NI(y_i=c_k)</script>。同时可以看出：</p>
-<ul>
-<li><code>n_category</code>即为 K </li>
-<li><code>self._n_possibilities</code>储存着 n 个<script type="math/tex">S_j</script></li>
-<li><code>self._con_counter</code>储存的即是各个<script type="math/tex">\sum_{i=1}^NI(x_i^{(j)}=a_{jl}, y_i=c_k)</script>的值。具体而言：  <script type="math/tex; mode=display">
-\text{self._con_counter[d][c][p]}=p_\lambda(X^{(d)}=p|y=c)</script></li>
-</ul>
-<p>至于<code>self._data</code>、就只是为了向量化算法而存在的一个变量而已，它将<code>data</code>中的每一个列表都转成了 Numpy 数组、以便在计算后验概率时利用 Numpy 数组的 Fancy Indexing 来加速算法</p>
-<p>聪明的观众老爷可能已经发现、其实<code>self._con_counter</code>才是计算条件概率的关键，事实上这里也正是<code>bincount</code>大放异彩的地方。以下为计算<code>self._con_counter</code>的函数的实现：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_sample_weight</span><span class="params">(self, sample_weight=None)</span>:</span></div><div class="line">    self._con_counter = []</div><div class="line">    <span class="keyword">for</span> dim, _p <span class="keyword">in</span> enumerate(self._n_possibilities):</div><div class="line">        <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            self._con_counter.append([</div><div class="line">                np.bincount(xx[dim], minlength=_p) <span class="keyword">for</span> xx <span class="keyword">in</span></div><div class="line">                    self._labelled_x])</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self._con_counter.append([</div><div class="line">                np.bincount(xx[dim], weights=sample_weight[</div><div class="line">                    label] / sample_weight[label].mean(), minlength=_p)</div><div class="line">                <span class="keyword">for</span> label, xx <span class="keyword">in</span> self._label_zip])</div></pre></td></tr></table></figure>
-<p>可以看到、<code>bincount</code>方法甚至能帮我们处理样本权重的问题</p>
-<p>代码中有两个我们还没进行说明的属性：<code>self._labelled_x</code>和<code>self._label_zip</code>，不过从代码上下文不难推断出、它们储存的是应该是不同类别所对应的数据。具体而言：</p>
-<ul>
-<li><code>self._labelled_x</code>：记录按类别分开后的、输入数据的数组</li>
-<li><code>self._label_zip</code>：比<code>self._labelled_x</code>多记录了个各个类别的数据所对应的下标</li>
-</ul>
-<p>这里就提前将它们的实现放出来以帮助理解吧：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 获得各类别数据的下标</span></div><div class="line">labels = [y == value <span class="keyword">for</span> value <span class="keyword">in</span> range(len(cat_counter))]</div><div class="line"><span class="comment"># 利用下标获取记录按类别分开后的输入数据的数组</span></div><div class="line">labelled_x = [x[ci].T <span class="keyword">for</span> ci <span class="keyword">in</span> labels]</div><div class="line">self._labelled_x, self._label_zip = labelled_x, list(zip(labels, labelled_x))</div></pre></td></tr></table></figure>
-<h1 id="计算后验概率"><a href="#计算后验概率" class="headerlink" title="计算后验概率"></a>计算后验概率</h1><p>仍然先看核心实现：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(input_x, tar_category)</span>:</span></div><div class="line">    input_x = np.atleast_2d(input_x).T</div><div class="line">    rs = np.ones(input_x.shape[<span class="number">1</span>])</div><div class="line">    <span class="keyword">for</span> d, xx <span class="keyword">in</span> enumerate(input_x):</div><div class="line">        rs *= self._data[d][tar_category][xx]</div><div class="line">    <span class="keyword">return</span> rs * p_category[tar_category]</div></pre></td></tr></table></figure>
-<p>这对应的公式其实就是决策公式：</p>
-<script type="math/tex; mode=display">
-y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)</script><p>所以不难看出代码中的<code>p_category</code>存储着 K 个<script type="math/tex">\hat p(y=c_k)</script></p>
-<h1 id="整合封装模型"><a href="#整合封装模型" class="headerlink" title="整合封装模型"></a>整合封装模型</h1><p>最后要做的、无非就是把上述三个步骤进行封装而已，首先是数据预处理：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">feed_data</span><span class="params">(self, x, y, sample_weight=None)</span>:</span></div><div class="line">    <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        sample_weight = np.array(sample_weight)</div><div class="line">    <span class="comment"># 调用 quantize_data 函数获得诸多信息</span></div><div class="line">    x, y, _, features, feat_dics, label_dic = DataUtil.quantize_data(</div><div class="line">        x, y, wc=np.array([<span class="keyword">False</span>] * len(x[<span class="number">0</span>])))</div><div class="line">    <span class="comment"># 利用 bincount 函数直接获得 self._cat_counter</span></div><div class="line">    cat_counter = np.bincount(y)</div><div class="line">    <span class="comment"># 利用 features 变量获取各个维度的特征个数 Sj</span></div><div class="line">    n_possibilities = [len(feats) <span class="keyword">for</span> feats <span class="keyword">in</span> features]</div><div class="line">    <span class="comment"># 获得各类别数据的下标</span></div><div class="line">    labels = [y == value <span class="keyword">for</span> value <span class="keyword">in</span> range(len(cat_counter))]</div><div class="line">    <span class="comment"># 利用下标获取记录按类别分开后的输入数据的数组</span></div><div class="line">    labelled_x = [x[ci].T <span class="keyword">for</span> ci <span class="keyword">in</span> labels]</div><div class="line">    <span class="comment"># 更新模型的各个属性</span></div><div class="line">    self._x, self._y = x, y</div><div class="line">    self._labelled_x, self._label_zip = labelled_x, list(</div><div class="line">        zip(labels, labelled_x))</div><div class="line">    self._cat_counter, self._feat_dics, self._n_possibilities = cat_counter, feat_dics, n_possibilities</div><div class="line">    self.label_dic = label_dic</div><div class="line">    self.feed_sample_weight(sample_weight)</div></pre></td></tr></table></figure>
-<p>然后利用上一章我们定义的框架的话、只需定义核心训练函数即可：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_fit</span><span class="params">(self, lb)</span>:</span></div><div class="line">    n_dim = len(self._n_possibilities)</div><div class="line">    n_category = len(self._cat_counter)</div><div class="line">    p_category = self.get_prior_probability(lb)</div><div class="line"></div><div class="line">    data = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> range(n_dim)]</div><div class="line">    <span class="keyword">for</span> dim, n_possibilities <span class="keyword">in</span> enumerate(self._n_possibilities):</div><div class="line">        data[dim] = [[</div><div class="line">            (self._con_counter[dim][c][p] + lb) / (</div><div class="line">                self._cat_counter[c] + lb * n_possibilities)</div><div class="line">            <span class="keyword">for</span> p <span class="keyword">in</span> range(n_possibilities)] <span class="keyword">for</span> c <span class="keyword">in</span> range(n_category)]</div><div class="line">    self._data = [np.array(dim_info) <span class="keyword">for</span> dim_info <span class="keyword">in</span> data]</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(input_x, tar_category)</span>:</span></div><div class="line">        input_x = np.atleast_2d(input_x).T</div><div class="line">        rs = np.ones(input_x.shape[<span class="number">1</span>])</div><div class="line">        <span class="keyword">for</span> d, xx <span class="keyword">in</span> enumerate(input_x):</div><div class="line">            rs *= self._data[d][tar_category][xx]</div><div class="line">        <span class="keyword">return</span> rs * p_category[tar_category]</div><div class="line">    <span class="keyword">return</span> func</div></pre></td></tr></table></figure>
-<p>最后，我们需要定义一个将测试数据转化为模型所需的、数值化数据的方法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_transfer_x</span><span class="params">(self, x)</span>:</span></div><div class="line">    <span class="keyword">for</span> i, sample <span class="keyword">in</span> enumerate(x):</div><div class="line">        <span class="keyword">for</span> j, char <span class="keyword">in</span> enumerate(sample):</div><div class="line">            x[i][j] = self._feat_dics[j][char]</div><div class="line">    <span class="keyword">return</span> x</div></pre></td></tr></table></figure>
-<p>至此，离散型朴素贝叶斯就全部实现完毕了<del>（鼓掌！）</del></p>
-<h1 id="评估与可视化"><a href="#评估与可视化" class="headerlink" title="评估与可视化"></a>评估与可视化</h1><p>我们可以先拿之前的气球数据集 1.0、1.5 来简单地评估一下我们的模型。首先我们要定义一个能够将文件中的数据转化为 Python 数组的类：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">DataUtil</span>:</span></div><div class="line">    <span class="comment"># 定义一个方法使其能从文件中读取数据</span></div><div class="line">    <span class="comment"># 该方法接受五个参数：</span></div><div class="line">        数据集的名字、数据集的路径、训练样本数、类别所在列、是否打乱数据</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_dataset</span><span class="params">(name, path, train_num=None, tar_idx=None, shuffle=True)</span>:</span></div><div class="line">        x = []</div><div class="line">        <span class="comment"># 将编码设为utf8以便读入中文等特殊字符</span></div><div class="line">        <span class="keyword">with</span> open(path, <span class="string">"r"</span>, encoding=<span class="string">"utf8"</span>) <span class="keyword">as</span> file:</div><div class="line">            <span class="comment"># 如果是气球数据集的话、直接依逗号分割数据即可</span></div><div class="line">            <span class="keyword">if</span> <span class="string">"balloon"</span> <span class="keyword">in</span> name:</div><div class="line">                <span class="keyword">for</span> sample <span class="keyword">in</span> file:</div><div class="line">                    x.append(sample.strip().split(<span class="string">","</span>))</div><div class="line">        <span class="comment"># 默认打乱数据</span></div><div class="line">        <span class="keyword">if</span> shuffle:</div><div class="line">            np.random.shuffle(x)</div><div class="line">        <span class="comment"># 默认类别在最后一列</span></div><div class="line">        tar_idx = <span class="number">-1</span> <span class="keyword">if</span> tar_idx <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">else</span> tar_idx</div><div class="line">        y = np.array([xx.pop(tar_idx) <span class="keyword">for</span> xx <span class="keyword">in</span> x])</div><div class="line">        x = np.array(x)</div><div class="line">        <span class="comment"># 默认全都是训练样本</span></div><div class="line">        <span class="keyword">if</span> train_num <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            <span class="keyword">return</span> x, y</div><div class="line">        <span class="comment"># 若传入了训练样本数，则依之将数据集切分为训练集和测试集</span></div><div class="line">        <span class="keyword">return</span> (x[:train_num], y[:train_num]), (x[train_num:], y[train_num:])</div></pre></td></tr></table></figure>
-<p>需要指出的是，今后获取各种数据的过程都会放在上述<code>DataUtil</code>中的这个<code>get_dataset</code>方法中，其完整版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py#L94" target="_blank" rel="external">这里</a>。下面就放出 MultinomialNB 的评估用代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    <span class="comment"># 导入标准库time以计时，导入DataUtil类以获取数据</span></div><div class="line">    <span class="keyword">import</span> time</div><div class="line">    <span class="keyword">from</span> Util <span class="keyword">import</span> DataUtil</div><div class="line">    <span class="comment"># 遍历1.0、1.5两个版本的气球数据集</span></div><div class="line">    <span class="keyword">for</span> dataset <span class="keyword">in</span> (<span class="string">"balloon1.0"</span>, <span class="string">"balloon1.5"</span>):</div><div class="line">        <span class="comment"># 读入数据</span></div><div class="line">        _x, _y = DataUtil.get_dataset(dataset, <span class="string">"../../_Data/&#123;&#125;.txt"</span>.format(dataset))</div><div class="line">        <span class="comment"># 实例化模型并进行训练、同时记录整个过程花费的时间</span></div><div class="line">        learning_time = time.time()</div><div class="line">        nb = MultinomialNB()</div><div class="line">        nb.fit(_x, _y)</div><div class="line">        learning_time = time.time() - learning_time</div><div class="line">        <span class="comment"># 评估模型的表现，同时记录评估过程花费的时间</span></div><div class="line">        estimation_time = time.time()</div><div class="line">        nb.evaluate(_x, _y)</div><div class="line">        estimation_time = time.time() - estimation_time</div><div class="line">        <span class="comment"># 将记录下来的耗时输出</span></div><div class="line">        print(</div><div class="line">            <span class="string">"Model building  : &#123;:12.6&#125; s\n"</span></div><div class="line">            <span class="string">"Estimation      : &#123;:12.6&#125; s\n"</span></div><div class="line">            <span class="string">"Total           : &#123;:12.6&#125; s"</span>.format(</div><div class="line">                learning_time, estimation_time,</div><div class="line">                learning_time + estimation_time</div><div class="line">            )</div><div class="line">        )</div></pre></td></tr></table></figure>
-<p>上面这段代码的运行结果如下图所示：</p>
-<img src="/posts/74647589/p4.png" alt="p4.png" title="">
-<p>由于数据量太少、所以建模和评估的过程耗费的时间已是可以忽略不计的程度。同时正如前文所提及的，气球数据集1.5是“不太均衡”的数据集，所以朴素贝叶斯在其上的表现会比较差</p>
-<p>仅仅在虚构的数据集上进行评估可能不太有说服力，我们可以拿 UCI 上一个比较出名<del>（简单）</del>的“蘑菇数据集（Mushroom Data Set）”来评估一下我们的模型。该数据集的大致描述如下：它有 8124 个样本、22 个属性，类别取值有两个：“能吃”或“有毒”；该数据每个单一样本都占一行、属性之间使用逗号隔开。选择该数据集的原因是它无需进行额外的数据预处理、样本量和属性量都相对合适、二类分类问题也相对来说具有代表性。更重要的是，它所有维度的特征取值都是离散的、从而非常适合用来测试我们的 MultinomialNB 模型</p>
-<p>完整的数据集可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/mushroom.txt" target="_blank" rel="external">这里</a>（第一列数据是类别），我们的模型在其上的表现则如下图所示： </p>
-<img src="/posts/74647589/p1.png" alt="p1.png" title="">
-<p>其中第一、二行分别是训练集、测试集上的准确率，接下来三行则分别是建立模型、评估模型和总花费时间的记录</p>
-<p>当然，仅仅看一个结果没有什么意思、也完全无法知道模型到底干了什么。为了获得更好的直观，我们可以进行一定的可视化，比如说将极大似然估计法得到的条件概率画出（如综述所示的那样）。可视化的代码实现如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入 matplotlib 库以进行可视化</span></div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line"><span class="comment"># 进行一些设置使得 matplotlib 能够显示中文</span></div><div class="line"><span class="keyword">from</span> pylab <span class="keyword">import</span> mpl</div><div class="line"><span class="comment"># 将字体设为“仿宋”</span></div><div class="line">mpl.rcParams[<span class="string">'font.sans-serif'</span>] = [<span class="string">'FangSong'</span>]</div><div class="line">mpl.rcParams[<span class="string">'axes.unicode_minus'</span>] = <span class="keyword">False</span></div><div class="line"><span class="comment"># 利用 MultinomialNB 搭建过程中记录的变量获取条件概率</span></div><div class="line">data = nb[<span class="string">"data"</span>]</div><div class="line"><span class="comment"># 定义颜色字典，将类别 e（能吃）设为天蓝色、类别 p（有毒）设为橙色</span></div><div class="line">colors = &#123;<span class="string">"e"</span>: <span class="string">"lightSkyBlue"</span>, <span class="string">"p"</span>: <span class="string">"orange"</span>&#125;</div><div class="line"><span class="comment"># 利用转换字典定义其“反字典”，后面可视化会用上</span></div><div class="line">_rev_feat_dics = [&#123;_val: _key <span class="keyword">for</span> _key, _val <span class="keyword">in</span> _feat_dic.items()&#125; </div><div class="line">    <span class="keyword">for</span> _feat_dic <span class="keyword">in</span> self._feat_dics]</div><div class="line"><span class="comment"># 遍历各维度进行可视化</span></div><div class="line"><span class="comment"># 利用 MultinomialNB 搭建过程中记录的变量，获取画图所需的信息</span></div><div class="line"><span class="keyword">for</span> _j <span class="keyword">in</span> range(nb[<span class="string">"x"</span>].shape[<span class="number">1</span>]):</div><div class="line">    sj = nb[<span class="string">"n_possibilities"</span>][_j]</div><div class="line">    tmp_x = np.arange(<span class="number">1</span>, sj+<span class="number">1</span>)</div><div class="line">    <span class="comment"># 利用 matplotlib 对 LaTeX 的支持来写标题，两个 $ 之间的即是 LaTeX 语句</span></div><div class="line">    title = <span class="string">"$j = &#123;&#125;; S_j = &#123;&#125;$"</span>.format(_j+<span class="number">1</span>, sj)</div><div class="line">    plt.figure()</div><div class="line">    plt.title(title)</div><div class="line">    <span class="comment"># 根据条件概率的大小画出柱状图</span></div><div class="line">    <span class="keyword">for</span> _c <span class="keyword">in</span> range(len(nb.label_dic)):</div><div class="line">        plt.bar(tmp_x<span class="number">-0.35</span>*_c, data[_j][_c, :], width=<span class="number">0.35</span>,</div><div class="line">                facecolor=colors[nb.label_dic[_c]], edgecolor=<span class="string">"white"</span>, </div><div class="line">                label=<span class="string">"class: &#123;&#125;"</span>.format(nb.label_dic[_c]))</div><div class="line">    <span class="comment"># 利用上文定义的“反字典”将横坐标转换成特征的各个取值</span></div><div class="line">    plt.xticks([i <span class="keyword">for</span> i <span class="keyword">in</span> range(sj + <span class="number">2</span>)], [<span class="string">""</span>] + [_rev_dic[i] <span class="keyword">for</span> i <span class="keyword">in</span> range(sj)] + [<span class="string">""</span>])</div><div class="line">    plt.ylim(<span class="number">0</span>, <span class="number">1.0</span>)</div><div class="line">    plt.legend()</div><div class="line">    <span class="comment"># 保存画好的图像</span></div><div class="line">    plt.savefig(<span class="string">"d&#123;&#125;"</span>.format(j+<span class="number">1</span>))</div></pre></td></tr></table></figure>
-<p>由于蘑菇数据一共有 22 维，所以上述代码会生成 22 张图，从这些图可以非常清晰地看出训练数据集各维度特征的分布。下选出几组有代表性的图片进行说明</p>
-<p>一般来说，一组数据特征中会有相对“重要”的特征和相对“无足轻重”的特征，通过以上实现的可视化可以比较轻松地辨析出在离散型朴素贝叶斯中这两者的区别。比如说，在离散型朴素贝叶斯里、相对重要的特征的表现会如下图所示（左图对应第 5 维、右图对应第 19 维）：</p>
-<img src="/posts/74647589/p2.png" alt="“优秀”的特征" title="“优秀”的特征">
-<p>可以看出，蘑菇数据集在第 19 维上两个类别各自的“优势特征”都非常明显、第 5 维上两个类别各自特征的取值更是基本没有交集。可以想象，即使只根据第 5 维的取值来进行类别的判定、最后的准确率也一定会非常高</p>
-<p>那么与之相反的、在 MultinomialNB 中相对没那么重要的特征的表现则会形如下图所示（左图对应第 3 维、右图对应第 16 维）：</p>
-<img src="/posts/74647589/p3.png" alt="“无用”的特征" title="“无用”的特征">
-<p>可以看出，蘑菇数据集在第 3 维上两个类的特征取值基本没有什么差异、第 16 维数据更是似乎完全没有存在的价值。像这样的数据就可以考虑直接剔除掉</p>
-<p>看到这里的观众老爷如果再回过头去看上一篇文章所讲的框架、想必会有些新的体会吧 ( σ’ω’)σ</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/b_NaiveBayes/Vectorized/MultinomialNB.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
-&lt;p&gt;本文主要介绍离散型朴素贝叶斯——MultinomialNB 的实现。对于离散型朴素贝叶斯模型的实现，由于核心算法都是在进行“计数”工作、所以问题的关键就转换为了如何进行计数。幸运的是、Numpy 中的一个方法：&lt;code&gt;bincount&lt;/code&gt;就是专门用来计数的，它能够非常快速地数出一个数组中各个数字出现的频率；而且由于它是 Numpy 自带的方法，其速度比 Python 标准库&lt;code&gt;collections&lt;/code&gt;中的计数器&lt;code&gt;Counter&lt;/code&gt;还要快上非常多。不幸的是、该方法有如下两个缺点：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;只能处理非负整数型中数组&lt;/li&gt;
-&lt;li&gt;向量中的最大值即为返回的数组的长度，换句话说，如果用&lt;code&gt;bincount&lt;/code&gt;方法对一个长度为 1、元素为 1000 的数组计数的话，返回的结果就是 999 个 0 加 1 个 1&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;所以我们做数据预处理时就要充分考虑到这两点&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>框架的实现</title>
-    <link href="http://www.carefree0910.com/posts/fa51e28/"/>
-    <id>http://www.carefree0910.com/posts/fa51e28/</id>
-    <published>2017-04-20T06:31:53.000Z</published>
-    <updated>2017-04-20T12:50:15.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>（本文会用到的所有代码都在<a href="https://github.com/carefree0910/MachineLearning/blob/master/b_NaiveBayes/Vectorized/Basic.py" target="_blank" rel="external">这里</a>）</p>
-<p>对于我个人而言、光看这么一个框架是非常容易摸不着头脑的<br>毕竟之前花了许多时间在数学部分讲的那些算法完全没有体现在这个框架中、取而代之的是一些我抽象出来的和算法无关的结构性部分……<br>虽然从逻辑上来说应该先说明如何搭建这个框架，但从容易理解的角度来说、个人建议先不看这章的内容而是先看后续的实现具体算法的章节<br>然后如果那时有不懂的定义、再对照这一章的相关部分来看<br>不过如果是对朴素贝叶斯算法非常熟悉的观众老爷的话、直接看本章的抽象会引起一些共鸣也说不定 ( σ’ω’)σ</p>
-<a id="more"></a>
-<p>所谓的框架、自然是指三种朴素贝叶斯模型（离散、连续、混合）共性的抽象了。由于贝叶斯决策论就摆在那里、不难知道如下功能是通用的：</p>
-<ul>
-<li>计算类别的先验概率</li>
-<li>训练出一个能输出后验概率的决策函数</li>
-<li>利用该决策函数进行预测和评估</li>
-</ul>
-<p>虽说朴素贝叶斯大体上来说只是简单的计数、但是想以比较高的效率做好这件事却比想象中的要麻烦不少<del>（说实话麻烦到我有些不想讲的程度了）</del></p>
-<p>总之先来看看这个框架的初始化步骤吧<del>（前方高能）</del></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NaiveBayes</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._x, self._y：记录训练集的变量</div><div class="line">        self._data：核心数组，存储实际使用的条件概率的相关信息</div><div class="line">        self._func：模型核心——决策函数，能够根据输入的x、y输出对应的后验概率</div><div class="line">        self._n_possibilities：记录各个维度特征取值个数的数组</div><div class="line">        self._labelled_x：记录按类别分开后的输入数据的数组</div><div class="line">        self._label_zip：记录类别相关信息的数组，视具体算法、定义会有所不同</div><div class="line">        self._cat_counter：核心数组，记录第i类数据的个数（cat是category的缩写）</div><div class="line">        self._con_counter：核心数组，用于记录数据条件概率的原始极大似然估计</div><div class="line">        self.label_dic：核心字典，用于记录数值化类别时的转换关系</div><div class="line">        self._feat_dics：核心字典，用于记录数值化各维度特征（feat）时的转换关系</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        self._x = self._y = <span class="keyword">None</span></div><div class="line">        self._data = self._func = <span class="keyword">None</span></div><div class="line">        self._n_possibilities = <span class="keyword">None</span></div><div class="line">        self._labelled_x = self._label_zip = <span class="keyword">None</span></div><div class="line">        self._cat_counter = self._con_counter = <span class="keyword">None</span></div><div class="line">        self.label_dic = self._feat_dics = <span class="keyword">None</span></div></pre></td></tr></table></figure>
-<p>其中、<code>self._con_counter[d][c][p]</code><script type="math/tex">=\hat p(x^{(d)}=p|y=c)</script>（con 是 conditional 的缩写）</p>
-<img src="/posts/fa51e28/p1.jpg" alt="注释比代码还多是想闹哪样？？？(╯‵□′)╯︵┻━┻" title="注释比代码还多是想闹哪样？？？(╯‵□′)╯︵┻━┻">
-<p>总之和我一样陷入了茫然的观众老爷们可以先不太在意这一坨是什么玩意儿，毕竟这些东西是抽象程度比较高的属性……等结合具体算法时、这些属性的意义可能就会明确得多</p>
-<p>下面进入正题……首先来看怎么计算先验概率（直接利用上面的<code>self._cat_counter</code>属性即可）</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_prior_probability</span><span class="params">(self, lb=<span class="number">1</span>)</span>:</span></div><div class="line">    <span class="keyword">return</span> [(_c_num + lb) / (len(self._y) + lb * len(self._cat_counter))</div><div class="line">            <span class="keyword">for</span> _c_num <span class="keyword">in</span> self._cat_counter]</div></pre></td></tr></table></figure>
-<p>其中参数<code>lb</code>即为平滑项，默认为 1 意味着默认使用拉普拉斯平滑 </p>
-<p>然后看看训练步骤能如何进行抽象</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x=None, y=None, sample_weight=None, lb=<span class="number">1</span>)</span>:</span></div><div class="line">    <span class="keyword">if</span> x <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> y <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        self.feed_data(x, y, sample_weight)</div><div class="line">    self._func = self._fit(lb)</div></pre></td></tr></table></figure>
-<p><del>（岂可修不就只是调用了一下<code>feed_data</code>方法而已嘛还说成抽象什么的行不行啊）</del></p>
-<p>其中用到的<code>feed_data</code>方法是留给各个子类定义的、进行数据预处理的方法；然后<code>self._fit</code>可说是核心训练函数、它会返回我们的决策函数<code>self._func</code></p>
-<p>最后看看怎样利用<code>self._func</code>来预测未知数据</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x, get_raw_result=False)</span>:</span></div><div class="line">    <span class="comment"># 调用相应方法进行数据预处理（这在离散型朴素贝叶斯中尤为重要）</span></div><div class="line">    x = self._transfer_x(x)</div><div class="line">    <span class="comment"># 只有将算法进行向量化之后才能做以下的步骤</span></div><div class="line">    m_arg, m_probability = np.zeros(len(x), dtype=np.int8), np.zeros(len(x))</div><div class="line">    <span class="comment"># len(self._cat_counter) 其实就是类别个数</span></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(self._cat_counter)):</div><div class="line">        <span class="comment"># 注意这里的 x 其实是矩阵、p 是对应的“后验概率矩阵”：p = p(y=i|x)</span></div><div class="line">        <span class="comment"># 这意味着决策函数 self._func 需要支持矩阵运算</span></div><div class="line">        p = self._func(x, i)</div><div class="line">        <span class="comment"># 利用 Numpy 进行向量化操作</span></div><div class="line">        _mask = p &gt; m_probability</div><div class="line">        m_arg[_mask], m_probability[_mask] = i, p[_mask]</div><div class="line">    <span class="comment"># 利用转换字典 self.label_dic 输出决策</span></div><div class="line">    <span class="comment"># 参数 get_raw_result 控制该函数是输出预测的类别还是输出相应的后验概率</span></div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> get_raw_result:</div><div class="line">        <span class="keyword">return</span> np.array([self.label_dic[arg] <span class="keyword">for</span> arg <span class="keyword">in</span> m_arg])</div><div class="line">    <span class="keyword">return</span> m_probability</div></pre></td></tr></table></figure>
-<p>其中<code>self.label_dic</code>大概是这个德性的：比如训练集的类别空间为 {red, green, blue} 然后第一个样本的类别是 red 且第二个样本的类别是 blue、那么就有</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">self.label_dic = np.array([<span class="string">"red"</span>, <span class="string">"blue"</span>, <span class="string">"green"</span>])</div></pre></td></tr></table></figure>
-<p>以上就是朴素贝叶斯模型框架的搭建，下一篇文章则会在该框架的基础上实现离散型朴素贝叶斯模型</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;（本文会用到的所有代码都在&lt;a href=&quot;https://github.com/carefree0910/MachineLearning/blob/master/b_NaiveBayes/Vectorized/Basic.py&quot;&gt;这里&lt;/a&gt;）&lt;/p&gt;
-&lt;p&gt;对于我个人而言、光看这么一个框架是非常容易摸不着头脑的&lt;br&gt;毕竟之前花了许多时间在数学部分讲的那些算法完全没有体现在这个框架中、取而代之的是一些我抽象出来的和算法无关的结构性部分……&lt;br&gt;虽然从逻辑上来说应该先说明如何搭建这个框架，但从容易理解的角度来说、个人建议先不看这章的内容而是先看后续的实现具体算法的章节&lt;br&gt;然后如果那时有不懂的定义、再对照这一章的相关部分来看&lt;br&gt;不过如果是对朴素贝叶斯算法非常熟悉的观众老爷的话、直接看本章的抽象会引起一些共鸣也说不定 ( σ’ω’)σ&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>朴素贝叶斯算法</title>
-    <link href="http://www.carefree0910.com/posts/ea9b7d09/"/>
-    <id>http://www.carefree0910.com/posts/ea9b7d09/</id>
-    <published>2017-04-20T04:15:21.000Z</published>
-    <updated>2017-04-22T12:53:28.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>首先要叙述朴素贝叶斯算法的基本假设：</p>
-<ul>
-<li><strong>独立性假设</strong>：假设单一样本<script type="math/tex">X_i</script>的 n 个维度<script type="math/tex">X_i^{(1)},...,X_i^{(n)}</script>彼此之间在各种意义上相互独立</li>
-</ul>
-<p>这当然是很强的假设，在现实任务中也大多无法满足该假设。由此会衍生出所谓的半朴素贝叶斯和贝叶斯网，这里先按下不表</p>
-<p>然后就是算法。我们打算先只叙述它的基本思想和各个公式，相关的定义和证明会放在后面的文章中。不过其实仅对着接下来的公式敲代码的话、就已经可以实现一个朴素贝叶斯模型了：</p>
-<ul>
-<li>基本思想：<strong>后验概率最大化</strong>、然后通过贝叶斯公式转换成先验概率乘条件概率最大化</li>
-<li>各个公式（假设输入有 N 个、单个样本是 n 维的、一共有 K 类：<script type="math/tex">c_1,...,c_K</script>）<ul>
-<li>计算先验概率的极大似然估计：  <script type="math/tex; mode=display">
-\hat p(y=c_k)=\frac{\sum_{i=1}^NI(y_i=c_k)}{N},k=1,2,...,K</script></li>
-<li>计算条件概率的极大似然估计：  <script type="math/tex; mode=display">
-\hat p(x^{(j)}=a_{jl}|y=c_k)=\frac{\sum_{i=1}^NI(x_i^{(j)}=a_{jl},y_i=c_k)}{\sum_{i=1}^NI(y_i=c_k)}</script>其中样本<script type="math/tex">x_i</script>第 j 维<script type="math/tex">x_i^{(j)}</script>的取值集合为<script type="math/tex">\{a_{j1},...,a_{jS_j}\}</script></li>
-</ul>
-</li>
-<li>得到最终的分类器：  <script type="math/tex; mode=display">
-y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)</script></li>
-</ul>
-<p>在朴素贝叶斯算法思想下、一般来说会衍生出以下三种不同的模型：</p>
-<ul>
-<li>离散型朴素贝叶斯（MultinomialNB）：所有维度的特征都是离散型随机变量</li>
-<li>连续型朴素贝叶斯（GaussianNB）：所有维度的特征都是连续型随机变量</li>
-<li>混合型朴素贝叶斯（MergedNB）：各个维度的特征有离散型也有连续型</li>
-</ul>
-<p>接下来就简单<del>（并不简单啊喂）</del>讲讲朴素贝叶斯的数学背景。由浅入深，我们会用离散型朴素贝叶斯来说明一些普适性的概念，连续型和混合型的相关定义是类似的</p>
-<a id="more"></a>
-<h1 id="朴素贝叶斯与贝叶斯决策论的联系"><a href="#朴素贝叶斯与贝叶斯决策论的联系" class="headerlink" title="朴素贝叶斯与贝叶斯决策论的联系"></a>朴素贝叶斯与贝叶斯决策论的联系</h1><p>朴素贝叶斯的模型参数即是类别的选择空间：</p>
-<script type="math/tex; mode=display">
-\Theta = \left\{ y = c_{1},{y = c}_{2},\ldots,{y = c}_{K} \right\}</script><p>朴素贝叶斯总的参数空间<script type="math/tex">\tilde{\Theta}</script>本应包括模型参数的先验概率<script type="math/tex">p\left( \theta_{k} \right) = p(y = c_{k})</script>、样本空间在模型参数下的条件概率<script type="math/tex">p\left( X \middle| \theta_{k} \right) = p(X|y = c_{k})</script>和样本空间本身的概率<script type="math/tex">p(X)</script>；但由于我们采取样本空间的子集<script type="math/tex">\tilde{X}</script>作为训练集，所以在给定的<script type="math/tex">\tilde{X}</script>下、<script type="math/tex">p\left( X \right) = p(\tilde{X})</script>是常数，因此可以把它从参数空间中删去。换句话说，我们关心的东西只有模型参数的先验概率和样本空间在模型参数下的条件概率</p>
-<script type="math/tex; mode=display">
-\tilde{\Theta} = \left\{ p\left( \theta \right),p\left( X \middle| \theta \right):\theta \in \Theta \right\}</script><p>行动空间<script type="math/tex">A</script>就是朴素贝叶斯总的参数空间<script type="math/tex">\tilde{\Theta}</script></p>
-<p>决策就是后验概率最大化（在<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>里，我们会证明该决策为贝叶斯决策）</p>
-<script type="math/tex; mode=display">
-\delta\left( \tilde{X} \right) = \hat{\theta} = \arg{\max_{\tilde\theta\in\tilde\Theta}{p\left( \tilde{\theta} \middle| \tilde{X} \right)}}</script><p>在<script type="math/tex">\hat{\theta}</script>确定后，模型的决策就可以具体写成（这一步用到了独立性假设）</p>
-<script type="math/tex; mode=display">
-\begin{align}
-  f\left( x^{*} \right) &= \arg{\max_{c_k}{\hat{p}\left( c_{k} \middle| X = x^{*} \right)}} \\
-  &= \arg{\max_{c_k}{\hat{p}\left( y = c_{k} \right)\prod_{j = 1}^{n}{\hat{p}\left( X^{\left( j \right)} = {x^{*}}^{\left( j \right)} \middle| y = c_{k} \right)}}}
-\end{align}</script><p>损失函数会随模型的不同而不同。在离散型朴素贝叶斯中，损失函数就是比较简单的 0-1 损失函数</p>
-<script type="math/tex; mode=display">
-L\left( \theta,\delta\left( \tilde{X} \right) \right) = \sum_{i = 1}^{N}{\tilde{L}\left( y_{i},f\left( x_{i} \right) \right) =}\sum_{i = 1}^{N}{I(}y_{i} \neq f\left( x_{i} \right))</script><p>这里的<script type="math/tex">I</script>是示性函数，它满足：</p>
-<script type="math/tex; mode=display">
-I\left( y_{i} \neq f\left( x_{i} \right) \right) = \left\{ \begin{matrix}
-1,\ if\ y_{i} \neq f\left( x_{i} \right) \\
-0,if\ y_{i} \neq f\left( x_{i} \right) \\
-\end{matrix} \right.\</script><p>从上述定义出发、可以利用<a href="/posts/d007d6bc/" title="上一篇文章">上一篇文章</a>中讲解的两种参数估计方法导出离散型朴素贝叶斯的算法（详见<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>）：</p>
-<ol>
-<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script></li>
-<li><strong>过程</strong>（利用 ML 估计导出模型的具体参数）：<ol>
-<li>计算先验概率<script type="math/tex">p(y = c_{k})</script>的极大似然估计：  <script type="math/tex; mode=display">
-\hat{p}\left( y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}{N},\ k = 1,2,\ldots,K</script></li>
-<li>计算条件概率<script type="math/tex">p(X^{\left( j \right)} = a_{jl}|y = c_{k})</script>的极大似然估计（设每一个单独输入的 n 维向量<script type="math/tex">x_{i}</script>的第 j 维特征<script type="math/tex">x^{\left( j \right)}</script>可能的取值集合为<script type="math/tex">\{ a_{j1},\ldots,a_{jS_{j}}\}</script>）：  <script type="math/tex; mode=display">
-\hat{p}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I(x_{i}^{\left( j \right)} = a_{jl},y_{i} = c_{k})}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})}}</script></li>
-</ol>
-</li>
-<li><strong>输出</strong>（利用 MAP 估计进行决策）：朴素贝叶斯模型，能够估计数据<script type="math/tex">x^{*} = \left( {x^{*}}^{\left( 1 \right)},\ldots,{x^{*}}^{\left( n \right)} \right)^{T}</script>的类别：  <script type="math/tex; mode=display">
-y = f(x^{*}) = \arg{\max_{c_k}{\hat{p}\left( y = c_{k} \right)\prod_{j = 1}^{n}{\hat{p}(X^{\left( j \right)} = {x^{*}}^{\left( j \right)}|y = c_{k})}}}</script></li>
-</ol>
-<p>由上述算法可以清晰地梳理出朴素贝叶斯算法背后的数学思想：</p>
-<ul>
-<li>使用极大似然估计导出模型的具体参数（先验概率、条件概率）</li>
-<li>使用极大后验概率估计作为模型的决策（输出使得数据后验概率最大化的类别）</li>
-</ul>
-<h1 id="离散型朴素贝叶斯实例"><a href="#离散型朴素贝叶斯实例" class="headerlink" title="离散型朴素贝叶斯实例"></a>离散型朴素贝叶斯实例</h1><p>接下来我们在一个简单、虚拟的数据集上应用离散型朴素贝叶斯算法以加深对算法的理解，该数据集（不妨称之为气球数据集 1.0）如下表所示（参考了 UCI 上相应的数据集）：</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>颜色</th>
-<th>大小</th>
-<th>测试人员</th>
-<th>测试动作</th>
-<th>结果</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>成人</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>成人</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>大</td>
-<td>成人</td>
-<td>用手打</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>大</td>
-<td>成人</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>大</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>大</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>小</td>
-<td>成人</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>大</td>
-<td>成人</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>大</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>该数据集的电子版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/balloon1.0.txt" target="_blank" rel="external">这里</a>。我们想预测的是样本：</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>颜色</th>
-<th>大小</th>
-<th>测试人员</th>
-<th>测试动作</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>  紫色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用脚踩</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>所导致的结果。容易观察到的是、气球的颜色对结果不起丝毫影响，所以在算法中该项特征可以直接去掉。因此从直观上来说，该样本所导致的结果应该是“不爆炸”，我们用离散型朴素贝叶斯算法来看看是否确实如此。首先我们需要计算类别的先验概率，易得：</p>
-<script type="math/tex; mode=display">
-p\left( 不爆炸\right) = p\left( 爆炸\right) = 0.5</script><p>亦即类别的先验概率也对决策不起作用。继而我们需要依次求出第2、3、4个特征（大小、测试人员、测试动作）的条件概率，它们才是决定新样本所属类别的关键。易得：</p>
-<script type="math/tex; mode=display">p\left( 小气球\middle| 不爆炸\right) = \frac{5}{6},\ \ p\left( 大气球\middle| 不爆炸\right) = \frac{1}{6}</script><script type="math/tex; mode=display">p\left( 小气球\middle| 爆炸\right) = \frac{1}{6},\ \ p\left( 大气球\middle| 爆炸\right) = \frac{5}{6}</script><script type="math/tex; mode=display">p\left( 成人\middle| 不爆炸\right) = \frac{1}{3},\ \ p\left( 小孩\middle| 不爆炸\right) = \frac{2}{3}</script><script type="math/tex; mode=display">p\left( 成人\middle| 爆炸\right) = \frac{2}{3},\ \ p\left( 小孩\middle| 爆炸\right) = \frac{1}{3}</script><script type="math/tex; mode=display">p\left( 用手打\middle| 不爆炸\right) = \frac{5}{6},\ \ p\left( 用脚踩\middle| 不爆炸\right) = \frac{1}{6}</script><script type="math/tex; mode=display">p\left( 用手打\middle| 爆炸\right) = \frac{1}{6},\ \ p\left( 用脚踩\middle| 爆炸\right) = \frac{5}{6}</script><p>那么在条件“紫色小气球、小孩用脚踩”下，知（注意我们可以忽略颜色和先验概率）：</p>
-<script type="math/tex; mode=display">\hat{p}\left( 不爆炸\right) = p\left( 小气球\middle| 不爆炸\right) \times p\left( 小孩\middle| 不爆炸\right) \times p\left( 用脚踩\middle| 不爆炸\right) = \frac{5}{54}</script><script type="math/tex; mode=display">\hat{p}\left( 爆炸\right) = p\left( 小气球\middle| 爆炸\right) \times p\left( 小孩\middle| 爆炸\right) \times p\left( 用脚踩\middle| 爆炸\right) = \frac{5}{108}</script><p>所以我们确实应该认为给定样本所导致的结果是“不爆炸”。</p>
-<h1 id="不足与改进"><a href="#不足与改进" class="headerlink" title="不足与改进"></a>不足与改进</h1><p>需要指出的是，目前为止的算法存在一个问题：如果训练集中某个类别<script type="math/tex">c_{k}</script>的数据没有涵盖第 j 维特征的第 l 个取值的话、相应估计的条件概率<script type="math/tex">\hat{p}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right)</script>就是 0、从而导致模型可能会在测试集上的分类产生误差。解决这个问题的办法是在各个估计中加入平滑项（也有这种做法就叫贝叶斯估计的说法）：</p>
-<ul>
-<li>过程：<ul>
-<li>计算先验概率<script type="math/tex">p_{\lambda}(y = c_{k})</script>：  <script type="math/tex; mode=display">
-p_{\lambda}\left( y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I\left( y_{i} = c_{k} \right) + \lambda}}{N + K\lambda},\ k = 1,2,\ldots,K</script></li>
-<li>计算条件概率<script type="math/tex">p_{\lambda}(X^{\left( j \right)} = a_{jl}|y = c_{k})</script>：  <script type="math/tex; mode=display">
-p_{\lambda}\left( X^{\left( j \right)} = a_{jl} \middle| y = c_{k} \right) = \frac{\sum_{i = 1}^{N}{I\left( x_{i}^{\left( j \right)} = a_{jl},y_{i} = c_{k} \right) + \lambda}}{\sum_{i = 1}^{N}{I(y_{i} = c_{k})} + S_{j}\lambda}</script></li>
-</ul>
-</li>
-</ul>
-<p>可见当<script type="math/tex">\lambda = 0</script>时就是极大似然估计，而当<script type="math/tex">\lambda = 1</script>时、一般可以称之为拉普拉斯平滑（Laplace Smoothing）。拉普拉斯平滑是常见的做法、我们的实现中也会默认使用它。可以将气球数据集 1.0 稍作变动以彰显加入平滑项的重要性（新数据集如下表所示，不妨称之为气球数据集 1.5）：</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>颜色</th>
-<th>大小</th>
-<th>测试人员</th>
-<th>测试动作</th>
-<th>结果</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>成人</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>成人</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>大</td>
-<td>成人</td>
-<td>用手打</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>大</td>
-<td>成人</td>
-<td>用脚踩</td>
-<td>爆炸</td>
-</tr>
-<tr>
-<td>  黄色</td>
-<td>大</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>小</td>
-<td>成人</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>小</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-<tr>
-<td>  紫色</td>
-<td>大</td>
-<td>小孩</td>
-<td>用手打</td>
-<td>不爆炸</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>该数据集的电子版本可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/_Data/balloon1.5.txt" target="_blank" rel="external">这里</a>。可以看到这个数据集是“不太均衡”的：它对样本“黄色小气球，小孩用脚踩”重复进行了三次实验、而对所有紫色气球样本实验的结果都是“不爆炸”。如果我们此时想预测“紫色小气球，小孩用脚踩”的结果，虽然从直观上来说应该是“爆炸”，但我们会发现、此时由于</p>
-<script type="math/tex; mode=display">
-p\left( 用脚踩| 不爆炸\right) = p\left( 紫色| 爆炸\right) = 0</script><p>所以会直接导致</p>
-<script type="math/tex; mode=display">
-\hat{p}\left( 不爆炸\right) = \hat{p}\left( 爆炸\right) = 0</script><p>从而我们只能随机进行决策，这不是一个令人满意的结果。此时加入平滑项就显得比较重要了，我们以拉普拉斯平滑为例、知（注意类别的先验概率仍然不造成影响）：</p>
-<script type="math/tex; mode=display">p\left( 黄色\middle| 不爆炸\right) = \frac{3 + 1}{6 + 2},\ \ p\left( 紫色\middle| 不爆炸\right) = \frac{3 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 黄色\middle| 爆炸\right) = \frac{6 + 1}{6 + 2},\ \ p\left( 紫色\middle| 爆炸\right) = \frac{0 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 小气球\middle| 不爆炸\right) = \frac{4 + 1}{6 + 2},\ \ p\left( 大气球\middle| 不爆炸不爆炸\right) = \frac{2 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 小气球\middle| 爆炸\right) = \frac{4 + 1}{6 + 2},\ \ p\left( 大气球\middle| 爆炸\right) = \frac{2 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 成人\middle| 不爆炸\right) = \frac{2 + 1}{6 + 2},\ \ p\left( 小孩\middle| 不爆炸\right) = \frac{4 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 成人\middle| 爆炸\right) = \frac{3 + 1}{6 + 2},\ \ p\left( 小孩\middle| 爆炸\right) = \frac{3 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 用手打\middle| 不爆炸\right) = \frac{6 + 1}{6 + 2},\ \ p\left( 用脚踩\middle| 不爆炸\right) = \frac{0 + 1}{6 + 2}</script><script type="math/tex; mode=display">p\left( 用手打\middle| 爆炸\right) = \frac{1 + 1}{6 + 2},\ \ p\left( 用脚踩\middle| 爆炸\right) = \frac{5 + 1}{6 + 2}</script><p>从而可算得：</p>
-<script type="math/tex; mode=display">\hat{p}\left( 不爆炸\right) = \frac{25}{1024},\ \ \hat{p}\left( 爆炸\right) = \frac{15}{512}</script><p>因此我们确实应该认为给定样本所导致的结果是“爆炸”</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;首先要叙述朴素贝叶斯算法的基本假设：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;独立性假设&lt;/strong&gt;：假设单一样本&lt;script type=&quot;math/tex&quot;&gt;X_i&lt;/script&gt;的 n 个维度&lt;script type=&quot;math/tex&quot;&gt;X_i^{(1)},...,X_i^{(n)}&lt;/script&gt;彼此之间在各种意义上相互独立&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;这当然是很强的假设，在现实任务中也大多无法满足该假设。由此会衍生出所谓的半朴素贝叶斯和贝叶斯网，这里先按下不表&lt;/p&gt;
-&lt;p&gt;然后就是算法。我们打算先只叙述它的基本思想和各个公式，相关的定义和证明会放在后面的文章中。不过其实仅对着接下来的公式敲代码的话、就已经可以实现一个朴素贝叶斯模型了：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;基本思想：&lt;strong&gt;后验概率最大化&lt;/strong&gt;、然后通过贝叶斯公式转换成先验概率乘条件概率最大化&lt;/li&gt;
-&lt;li&gt;各个公式（假设输入有 N 个、单个样本是 n 维的、一共有 K 类：&lt;script type=&quot;math/tex&quot;&gt;c_1,...,c_K&lt;/script&gt;）&lt;ul&gt;
-&lt;li&gt;计算先验概率的极大似然估计：  &lt;script type=&quot;math/tex; mode=display&quot;&gt;
-\hat p(y=c_k)=\frac{\sum_{i=1}^NI(y_i=c_k)}{N},k=1,2,...,K&lt;/script&gt;&lt;/li&gt;
-&lt;li&gt;计算条件概率的极大似然估计：  &lt;script type=&quot;math/tex; mode=display&quot;&gt;
-\hat p(x^{(j)}=a_{jl}|y=c_k)=\frac{\sum_{i=1}^NI(x_i^{(j)}=a_{jl},y_i=c_k)}{\sum_{i=1}^NI(y_i=c_k)}&lt;/script&gt;其中样本&lt;script type=&quot;math/tex&quot;&gt;x_i&lt;/script&gt;第 j 维&lt;script type=&quot;math/tex&quot;&gt;x_i^{(j)}&lt;/script&gt;的取值集合为&lt;script type=&quot;math/tex&quot;&gt;\{a_{j1},...,a_{jS_j}\}&lt;/script&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;得到最终的分类器：  &lt;script type=&quot;math/tex; mode=display&quot;&gt;
-y=f(x^*)=\arg\max_{c_k}\hat p(y=c_k)\prod_{i=1}^n\hat p(x^{(i)}=x^{*(i)}|y=c_k)&lt;/script&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;在朴素贝叶斯算法思想下、一般来说会衍生出以下三种不同的模型：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;离散型朴素贝叶斯（MultinomialNB）：所有维度的特征都是离散型随机变量&lt;/li&gt;
-&lt;li&gt;连续型朴素贝叶斯（GaussianNB）：所有维度的特征都是连续型随机变量&lt;/li&gt;
-&lt;li&gt;混合型朴素贝叶斯（MergedNB）：各个维度的特征有离散型也有连续型&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;接下来就简单&lt;del&gt;（并不简单啊喂）&lt;/del&gt;讲讲朴素贝叶斯的数学背景。由浅入深，我们会用离散型朴素贝叶斯来说明一些普适性的概念，连续型和混合型的相关定义是类似的&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
-    
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>参数估计</title>
-    <link href="http://www.carefree0910.com/posts/d007d6bc/"/>
-    <id>http://www.carefree0910.com/posts/d007d6bc/</id>
-    <published>2017-04-20T03:52:09.000Z</published>
-    <updated>2017-04-20T13:22:34.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>无论是贝叶斯学派还是频率学派，一个无法避开的问题就是如何从已有的样本中获取信息并据此估计目标模型的参数。比较有名的“频率近似概率”其实就是（基于大数定律的）相当合理的估计之一，本章所叙述的两种参数估计方法在最后也通常会归结于它</p>
-<a id="more"></a>
-<h1 id="极大似然估计（ML-估计）"><a href="#极大似然估计（ML-估计）" class="headerlink" title="极大似然估计（ML 估计）"></a>极大似然估计（ML 估计）</h1><p>如果把模型描述成一个概率模型的话，一个自然的想法是希望得到的模型参数<script type="math/tex">\theta</script>能够使得在训练集<script type="math/tex">\tilde{X}</script>作为输入时、模型输出的概率达到极大。这里就有一个似然函数的概念，它能够输出<script type="math/tex">\tilde{X} = \left( x_{1},\ldots,x_{N} \right)^{T}</script>在模型参数为<script type="math/tex">\theta</script>下的概率：</p>
-<script type="math/tex; mode=display">
-p\left( \tilde{X} \middle| \theta \right) = \prod_{i = 1}^{N}{p(x_{i}|\theta)}</script><p>我们希望找到的<script type="math/tex">\hat{\theta}</script>就是使得似然函数在<script type="math/tex">\tilde{X}</script>作为输入时达到极大的参数：</p>
-<script type="math/tex; mode=display">
-\hat{\theta} = \arg{\max_\theta{p\left( \tilde{X} \middle| \theta \right) = \arg{\max_\theta{\prod_{i = 1}^{N}{p(x_{i}|\theta)}}}}}</script><p>举个栗子：假设一个暗箱中有白球、黑球共两个，虽然不知道具体的颜色分布情况、但是知道这两个球是完全一样的。现在有放回地从箱子里抽了 2 个球，发现两次抽出来的结果是 1 黑 1 白，那么该如何估计箱子里面球的颜色？从直观上来说似乎箱子中也是 1 黑 1 白会比较合理，下面我们就来说明“1 黑 1 白”这个估计就是极大似然估计。</p>
-<p>在这个问题中，模型的参数<script type="math/tex">\theta</script>可以设为从暗箱中抽出黑球的概率，样本<script type="math/tex">x_{i}</script>可以描述为第i次取出的球是否是黑球；如果是就取 1、否则取 0。这样的话，似然函数就可以描述为：</p>
-<script type="math/tex; mode=display">
-p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \theta \right)^{2 - x_{1} - x_{2}}</script><p>直接对它求极大值（虽然可行但是）不太方便，通常的做法是将似然函数取对数之后再进行极大值的求解：</p>
-<script type="math/tex; mode=display">
-\ln{p\left( \tilde{X} \middle| \theta \right) = \left( x_{1} + x_{2} \right)\ln{\theta + \left( 2 - x_{1} - x_{2} \right)\ln{(1 - \theta)}}} \Rightarrow \frac{\partial\ln p}{\partial\theta} = \frac{x_{1} + x_{2}}{\theta} - \frac{2 - x_{1} - x_{2}}{1 - \theta}</script><p>从而可知：</p>
-<script type="math/tex; mode=display">
-\frac{\partial\ln p}{\partial\theta} = 0 \Rightarrow \theta = \frac{x_{1} + x_{2}}{2}</script><p>由于<script type="math/tex">x_{1} + x_{2} = 1</script>，所以得<script type="math/tex">\hat{\theta} = 0.5</script>、亦即应该估计从暗箱中抽出黑球的概率是 50%；进一步地、既然暗箱中的两个球完全一样，我们应该估计暗箱中的颜色分布为 1 黑 1 白。</p>
-<p>从以上的讨论可以看出，极大似然估计视待估参数为一个未知但固定的量、不考虑“观察者”的影响（亦即不考虑先验知识的影响），是传统的频率学派的做法</p>
-<h1 id="极大后验概率估计（MAP估计）"><a href="#极大后验概率估计（MAP估计）" class="headerlink" title="极大后验概率估计（MAP估计）"></a>极大后验概率估计（MAP估计）</h1><p>相比起极大似然估计，极大后验概率估计是更贴合贝叶斯学派思想的做法；事实上、甚至也有不少人直接称其为“贝叶斯估计”（注：贝叶斯估计的定义有许多，本人接触到的就有 3、4 种；囿于实力，本人无法辨析哪种才是真正的贝叶斯估计、所以我们不会进行相关的讨论）</p>
-<p>在讨论 MAP 估计之前，我们有必要先知道何为后验概率<script type="math/tex">p(\theta|\tilde{X})</script>：它可以理解为参数<script type="math/tex">\theta</script>在训练集<script type="math/tex">\tilde{X}</script>下所谓的“真实的出现概率”，能够利用参数的先验概率<script type="math/tex">p\left( \theta \right)</script>、样本的先验概率<script type="math/tex">p(\tilde{X})</script>和条件概率<script type="math/tex">p\left( \tilde{X}|\theta \right) = \prod_{i = 1}^{N}{p\left( x_{i}|\theta \right)}</script>通过贝叶斯公式导出（详见<a href="/posts/e312d61a/" title="推导与推广">推导与推广</a>）</p>
-<p>而 MAP 估计的核心思想、就是将待估参数<script type="math/tex">\theta</script>看成是一个随机变量、从而引入了极大似然估计里面没有引入的、参数<script type="math/tex">\theta</script>的先验分布。MAP 估计<script type="math/tex">{\hat{\theta}}_{\text{MAP}}</script>的定义为：</p>
-<script type="math/tex; mode=display">
-{\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{p(\theta|\tilde{X}) = \arg{\max_\theta{p(\theta)\prod_{i = 1}^{N}{p(x_{i}|\theta)}}}}}</script><p>同样的，为了计算简洁，我们通常对上式取对数：</p>
-<script type="math/tex; mode=display">
-{\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{\ln{p(\theta|\tilde{X})} = \arg{\max_\theta\left\lbrack \ln{p\left( \theta \right)} + \sum_{i = 1}^{N}{\ln{p\left( x_{i} \middle| \theta \right)}} \right\rbrack}}}</script><p>可以看到，从形式上、极大后验概率估计只比极大似然估计多了<script type="math/tex">\ln{p(\theta)}</script>这一项，不过它们背后的思想却相当不同。不过有意思的是，在下一节具体讨论朴素贝叶斯算法时我们会看到、朴素贝叶斯在估计参数时选用了极大似然估计法、但是在做决策时则选用了 MAP 估计</p>
-<p>和极大似然估计相比，MAP 估计的一个显著优势在于它可以引入所谓的“先验知识”，这正是贝叶斯学派的精髓。当然这个优势同时也伴随着劣势：它我们对模型参数有相对较好的认知、否则会相当大地影响到结果的合理性</p>
-<p>既然先验分布如此重要，那么是否有比较合理的、先验分布的选取方法呢？事实上，如何确定先验分布这个问题，正是贝叶斯统计中最困难、最具有争议性却又必须解决的问题。虽然这个问题确实有许多现代的研究成果，但遗憾的是，尚未能有一个圆满的理论和普适的方法。这里拟介绍“协调性假说”这个相对而言拥有比较好的直观的理论：</p>
-<ul>
-<li>我们选择的参数<script type="math/tex">\theta</script>的先验分布、应该与由它和训练集确定的后验分布属同一类型</li>
-</ul>
-<p>此时先验分布又叫共轭先验分布。这里面所谓的“同一类型”其实又是难有恰当定义的概念，但是我们可以直观地理解为：概率性质相似的所有分布归为“同一类型”。比如，所有的正态分布都是“同一类型”的</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;无论是贝叶斯学派还是频率学派，一个无法避开的问题就是如何从已有的样本中获取信息并据此估计目标模型的参数。比较有名的“频率近似概率”其实就是（基于大数定律的）相当合理的估计之一，本章所叙述的两种参数估计方法在最后也通常会归结于它&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>贝叶斯决策论</title>
-    <link href="http://www.carefree0910.com/posts/a0e8b2e/"/>
-    <id>http://www.carefree0910.com/posts/a0e8b2e/</id>
-    <published>2017-04-20T03:13:19.000Z</published>
-    <updated>2017-04-20T12:50:04.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>贝叶斯决策论是在概率框架下进行决策的基本方法之一、更是统计模式识别的主要方法之一。从名字也许能看出来，贝叶斯决策论其实是贝叶斯统计学派进行决策的方法。为了更加深刻地理解贝叶斯分类器，我们需要先对贝叶斯学派和其决策理论有一个大致的认知</p>
-<a id="more"></a>
-<h1 id="贝叶斯学派与频率学派"><a href="#贝叶斯学派与频率学派" class="headerlink" title="贝叶斯学派与频率学派"></a>贝叶斯学派与频率学派</h1><p>贝叶斯学派强调概率的“主观性”，这一点和传统的、我们可能比较熟悉的频率学派不同。详细的论述牵扯到许多概率论和数理统计的知识，这里只说一个直观：</p>
-<ul>
-<li>频率学派强调频率的“自然属性”，认为应该使用事件在重复试验中发生的频率作为其发生的概率的估计</li>
-<li>贝叶斯学派不强调事件的“客观随机性”，认为仅仅只是“观察者”不知道事件的结果。换句话说，贝叶斯学派认为：事件之所以具有随机性仅仅是因为“观察者”的知识不完备，对于“知情者”来说、该事件其实不具备随机性。随机性的根源不在于事件，而在于“观察者”对该事件的知识状态</li>
-</ul>
-<p>举个栗子：假设一个人抛了一枚均匀硬币到地上并迅速将其踩在脚底而在他面前从近到远坐了三个人。他本人看到了硬币是正面朝上的，而其他三个人也多多少少看到了一些信息，但显然坐得越远、看得就越模糊。频率学派会认为，该硬币是正是反、各自的概率都应该是 50%；但是贝叶斯学派会认为，对抛硬币的人来说、硬币是正面的概率就是 100%，然后可能对离他最近的人来说是 80%、对离他最远的人来说就可能还是 50%</p>
-<p>所以相比起把模型参数固定、注重样本的随机性的频率学派而言，贝叶斯学派将样本视为是固定的、把模型的参数视为关键。在上面这个例子里面，样本就是抛出去的那枚硬币，模型的参数就是每个人从中获得的“信息”。对于频率学派而言，每个人获得的“信息”不应该有不同，所以自然会根据“均匀硬币抛出正面的概率是 50%”这个“样本的信息”来导出“硬币是正面的概率为 50%”这个结论。但是对贝叶斯学派而言，硬币抛出去就抛出去了，问题的关键在于模型的参数、亦即“观察者”从中获得的信息，所以会导出“对于抛硬币的人而言，硬币是正面的概率是 100%”这一类的结论</p>
-<h1 id="贝叶斯决策论"><a href="#贝叶斯决策论" class="headerlink" title="贝叶斯决策论"></a>贝叶斯决策论</h1><p>大致知道贝叶斯学派的思想后，我们就可以介绍贝叶斯决策论了。这里不可避免地要牵扯到概率论和数理统计的相关定义和知识，但幸运的是它们都是比较基础且直观的部分、无需太多数学背景就可以知道它们的含义：</p>
-<h2 id="行动空间"><a href="#行动空间" class="headerlink" title="行动空间"></a>行动空间</h2><p>行动空间（通常用<script type="math/tex">A</script>来表示）是某项实际工作中可能采取的各种“行动”所构成的集合。正如前文所提到的、贝叶斯学派注重的是模型参数，所以通常而言我们想要做出的“行动”是“决定模型的参数”。因此我们通常会将行动空间取为参数空间，亦即<script type="math/tex">A=\Theta</script></p>
-<h2 id="决策"><a href="#决策" class="headerlink" title="决策"></a>决策</h2><p>决策（通常用<script type="math/tex">\delta(\tilde X)</script>来表示）是样本空间<script type="math/tex">X</script>到行动空间<script type="math/tex">A</script>的一个映射。换句话说，对于一个单一的样本<script type="math/tex">\tilde X</script>（<script type="math/tex">\tilde X\in X</script>），决策函数可以利用它得到<script type="math/tex">A</script>中的一个行动。需要注意的是，这里的样本<script type="math/tex">\tilde X</script>通常是高维的随机向量：<script type="math/tex">\tilde X=(x_1,...,x_N)^T</script>；尤其需要分清的是，这个（以及本小节之后的所有）<script type="math/tex">\tilde X</script>其实是一般意义上的“训练集”、<script type="math/tex">x_i</script>才是一般意义上的“样本”。这是因为本小节主要在叙述数理统计相关知识，所以在术语上和机器学习术语会有所冲突，需要分辨清它们的关系</p>
-<h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>损失函数（通常用<script type="math/tex">L(\theta,a)=L(\theta,\delta(\tilde X))</script>来表示）用于衡量当参数是<script type="math/tex">\theta</script>（<script type="math/tex">\theta\in\Theta</script>，<script type="math/tex">\Theta</script>是参数空间）时采取行动<script type="math/tex">a(a\in A)</script>所引起的损失</p>
-<h2 id="决策风险"><a href="#决策风险" class="headerlink" title="决策风险"></a>决策风险</h2><p>决策风险（通常用<script type="math/tex">R(\theta,\delta)</script>来表示）是损失函数的期望：<script type="math/tex">R(\theta,\delta)=EL(\theta,\delta(\tilde X))</script></p>
-<h2 id="先验分布"><a href="#先验分布" class="headerlink" title="先验分布"></a>先验分布</h2><p>先验分布描述了参数<script type="math/tex">\theta</script>在已知样本<script type="math/tex">\tilde X</script>中的分布</p>
-<h2 id="平均风险"><a href="#平均风险" class="headerlink" title="平均风险"></a>平均风险</h2><p>平均风险（通常用<script type="math/tex">\rho(\delta)</script>来表示）定义为决策风险<script type="math/tex">R(\theta,\delta)</script>在先验分布下的期望：</p>
-<script type="math/tex; mode=display">
-\rho(\delta) = E_\xi R(\theta,\delta)</script><h2 id="贝叶斯决策"><a href="#贝叶斯决策" class="headerlink" title="贝叶斯决策"></a>贝叶斯决策</h2><p>贝叶斯决策（通常用<script type="math/tex">\delta^*</script>来表示）满足：</p>
-<script type="math/tex; mode=display">
-\rho(\delta^*)=\inf_\delta\rho(\delta)</script><p>换句话说，贝叶斯决策<script type="math/tex">\delta^*</script>是在某个先验分布下使得平均风险最小的决策</p>
-<p>寻找一般意义下的贝叶斯决策是相当不平凡的数学问题，为简洁、我们需要结合具体的机器学习算法来推导相应的贝叶斯决策。相关的讨论会在<a href="/posts/ea9b7d09/" title="说明朴素贝叶斯算法的文章">说明朴素贝叶斯算法的文章</a>中进行，这里就暂时先按下不表</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;贝叶斯决策论是在概率框架下进行决策的基本方法之一、更是统计模式识别的主要方法之一。从名字也许能看出来，贝叶斯决策论其实是贝叶斯统计学派进行决策的方法。为了更加深刻地理解贝叶斯分类器，我们需要先对贝叶斯学派和其决策理论有一个大致的认知&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="朴素贝叶斯" scheme="http://www.carefree0910.com/categories/%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"/>
-    
-    
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
