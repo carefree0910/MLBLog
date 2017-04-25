@@ -2748,7 +2748,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
 <li><a href="/posts/a0837b26/" title="Python 与机器学习绪论（Introduction）">Python 与机器学习绪论（Introduction）</a></li>
 <li><a href="/posts/1607712a/" title="朴素贝叶斯（Naive Bayes）">朴素贝叶斯（Naive Bayes）</a></li>
 <li><a href="/posts/dd35ec8b/" title="决策树（Decision Tree）">决策树（Decision Tree）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/d_Ensemble" target="_blank" rel="external">集成学习（Ensemble Learning）</a></li>
+<li><a href="/posts/d8e97c87/" title="集成学习（Ensemble Learning）">集成学习（Ensemble Learning）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/e_SVM" target="_blank" rel="external">支持向量机（Support Vector Machine）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/f_NN" target="_blank" rel="external">神经网络（Neural Network）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/g_CNN" target="_blank" rel="external">卷积神经网络（Convolutional Neural Network）</a></li>
