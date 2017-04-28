@@ -1,0 +1,1031 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="有了上一篇文章的诸多准备、我们就能以之为基础实现核感知机和 SVM 了。不过需要指出的是，由于我们实现的 SVM 是一个朴素的版本、所以如果是要在实际任务中应用 SVM 的话，还是应该使用由前人开发、维护并经过长年考验的成熟的库（比如 LibSVM 等）；这些库能够处理更大的数据和更多的边值情况、运行的速度也会快上很多，这是因为它们通常都使用了底层语言来实现核心算法、且在算法上也做了许多数值稳定性">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="核模型的实现与评估">
+<meta property="og:url" content="http://www.carefree0910.com/posts/917ccef9/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="有了上一篇文章的诸多准备、我们就能以之为基础实现核感知机和 SVM 了。不过需要指出的是，由于我们实现的 SVM 是一个朴素的版本、所以如果是要在实际任务中应用 SVM 的话，还是应该使用由前人开发、维护并经过长年考验的成熟的库（比如 LibSVM 等）；这些库能够处理更大的数据和更多的边值情况、运行的速度也会快上很多，这是因为它们通常都使用了底层语言来实现核心算法、且在算法上也做了许多数值稳定性">
+<meta property="og:image" content="http://www.carefree0910.com/posts/917ccef9/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/917ccef9/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/917ccef9/p3.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/917ccef9/p4.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/917ccef9/p5.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/917ccef9/p6.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/917ccef9/p7.png">
+<meta property="og:updated_time" content="2017-04-28T10:48:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="核模型的实现与评估">
+<meta name="twitter:description" content="有了上一篇文章的诸多准备、我们就能以之为基础实现核感知机和 SVM 了。不过需要指出的是，由于我们实现的 SVM 是一个朴素的版本、所以如果是要在实际任务中应用 SVM 的话，还是应该使用由前人开发、维护并经过长年考验的成熟的库（比如 LibSVM 等）；这些库能够处理更大的数据和更多的边值情况、运行的速度也会快上很多，这是因为它们通常都使用了底层语言来实现核心算法、且在算法上也做了许多数值稳定性">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/917ccef9/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/917ccef9/"/>
+
+
+
+
+
+  <title> 核模型的实现与评估 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/917ccef9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                核模型的实现与评估
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T12:10:51+08:00">
+                2017-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
+                    <span itemprop="name">支持向量机</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>有了上一篇文章的诸多准备、我们就能以之为基础实现核感知机和 SVM 了。不过需要指出的是，由于我们实现的 SVM 是一个朴素的版本、所以如果是要在实际任务中应用 SVM 的话，还是应该使用由前人开发、维护并经过长年考验的成熟的库（比如 LibSVM 等）；这些库能够处理更大的数据和更多的边值情况、运行的速度也会快上很多，这是因为它们通常都使用了底层语言来实现核心算法、且在算法上也做了许多数值稳定性和数值优化的处理</p>
+<a id="more"></a>
+<h1 id="核感知机的实现"><a href="#核感知机的实现" class="headerlink" title="核感知机的实现"></a>核感知机的实现</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">from</span> Util.Bases <span class="keyword">import</span> KernelBase</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">KernelPerceptron</span><span class="params">(KernelBase)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        KernelBase.__init__(self)</div><div class="line">        <span class="comment"># 对于核感知机而言、循环体中所需的额外参数是学习速率（默认为1）</span></div><div class="line">        self._fit_args, self._fit_args_names = [<span class="number">1</span>], [<span class="string">"lr"</span>]</div><div class="line"></div><div class="line">    <span class="comment"># 更新dw</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_dw_cache</span><span class="params">(self, idx, lr, sample_weight)</span>:</span></div><div class="line">        self._dw_cache = lr * self._y[idx] * sample_weight[idx]</div><div class="line"></div><div class="line">    <span class="comment"># 更新db</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_db_cache</span><span class="params">(self, idx, lr, sample_weight)</span>:</span></div><div class="line">        self._db_cache = self._dw_cache</div><div class="line"></div><div class="line">    <span class="comment"># 利用和训练样本中的类别向量y来更新w和b</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_params</span><span class="params">(self)</span>:</span></div><div class="line">        self._w = self._alpha * self._y</div><div class="line">        self._b = np.sum(self._w)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_fit</span><span class="params">(self, sample_weight, lr)</span>:</span></div><div class="line">        <span class="comment"># 获取加权误差向量</span></div><div class="line">        _err = (np.sign(self._prediction_cache) != self._y) * sample_weight</div><div class="line">        <span class="comment"># 引入随机性以进行随机梯度下降</span></div><div class="line">        _indices = np.random.permutation(len(self._y))</div><div class="line">        <span class="comment"># 获取“错得最严重”的样本所对应的下标</span></div><div class="line">        _idx = _indices[np.argmax(_err[_indices])]</div><div class="line">        <span class="comment"># 若该样本被正确分类、则所有样本都已正确分类，此时返回真值、退出训练循环体</span></div><div class="line">        <span class="keyword">if</span> self._prediction_cache[_idx] == self._y[_idx]:</div><div class="line">            <span class="keyword">return</span> <span class="keyword">True</span></div><div class="line">        <span class="comment"># 否则、进行随机梯度下降</span></div><div class="line">        self._alpha[_idx] += lr</div><div class="line">        self._update_dw_cache(_idx, lr, sample_weight)</div><div class="line">        self._update_db_cache(_idx, lr, sample_weight)</div><div class="line">        self._update_pred_cache(_idx)</div></pre></td></tr></table></figure>
+<p>可以看到代码清晰简洁，这主要得益于核感知机算法本身比较直白。我们可以先通过螺旋线数据集来大致看看它的分类能力、结果如下图所示：</p>
+<img src="/posts/917ccef9/p1.png" alt="p1.png" title="">
+<p>左图为 RBF 核感知机（<script type="math/tex">\gamma = 0.5</script>）、准确率为 90.0%；右图为多项式核感知机（<script type="math/tex">p = 12</script>）、准确率为 98.75%（迭代次数都是<script type="math/tex">10^{5}</script>）。虽说效果貌似还不错，但是由它们的训练曲线可以看出、训练过程其实是相当“不稳定”的：</p>
+<img src="/posts/917ccef9/p2.png" alt="p2.png" title="">
+<p>左、右图分别对应着 RBF 核感知机和多项式核感知机的训练曲线。之所以有这么大的波动、是因为我们采取的随机梯度下降每次只会进行非常局部的更新，而螺旋线数据集本身又具有比较特殊的结构，从而在直观上也能想象、模型的参数在训练的过程中很容易来回震荡。这一点在 SVM 上也会有体现、因为我们打算实现的 SMO 算法同样也是针对局部（两个变量）进行更新的</p>
+<h1 id="核-SVM-的实现"><a href="#核-SVM-的实现" class="headerlink" title="核 SVM 的实现"></a>核 SVM 的实现</h1><p>接下来就看看核 SVM 的实现，虽说有些繁复、但其实只是一步一步地将之前说过的算法翻译出来而已，如果能理顺算法的逻辑的话、实现本身其实并不困难：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"></div><div class="line"><span class="keyword">from</span> Util.Bases <span class="keyword">import</span> KernelBase, KernelConfig</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SVM</span><span class="params">(KernelBase, metaclass=SubClassChangeNamesMeta)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        KernelBase.__init__(self)</div><div class="line">        <span class="comment"># 对于核SVM而言、循环体中所需的额外参数是容许误差（默认为）</span></div><div class="line">        self._fit_args, self._fit_args_names = [<span class="number">1e-3</span>], [<span class="string">"tol"</span>]</div><div class="line">        self._c = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="comment"># 实现SMO算法中、挑选出第一个变量的方法</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_pick_first</span><span class="params">(self, tol)</span>:</span></div><div class="line">        con1 = self._alpha &gt; <span class="number">0</span></div><div class="line">        con2 = self._alpha &lt; self._c</div><div class="line">        <span class="comment"># 算出损失向量并拷贝成3份</span></div><div class="line">        err1 = self._y * self._prediction_cache - <span class="number">1</span></div><div class="line">        err2 = err1.copy()</div><div class="line">        err3 = err1.copy()</div><div class="line">        <span class="comment"># 将相应的数位置为0</span></div><div class="line">        err1[con1 | (err1 &gt;= <span class="number">0</span>)] = <span class="number">0</span></div><div class="line">        err2[(~con1 | ~con2) | (err2 == <span class="number">0</span>)] = <span class="number">0</span></div><div class="line">        err3[con2 | (err3 &lt;= <span class="number">0</span>)] = <span class="number">0</span></div><div class="line">        <span class="comment"># 算出总的损失向量并取出最大的一项</span></div><div class="line">        err = err1 ** <span class="number">2</span> + err2 ** <span class="number">2</span> + err3 ** <span class="number">2</span></div><div class="line">        idx = np.argmax(err)</div><div class="line">        <span class="comment"># 若该项的损失小于则返回返回空值</span></div><div class="line">        <span class="keyword">if</span> err[idx] &lt; tol:</div><div class="line">            <span class="keyword">return</span></div><div class="line">        <span class="comment"># 否则、返回对应的下标</span></div><div class="line">        <span class="keyword">return</span> idx</div><div class="line"></div><div class="line">    <span class="comment"># 实现SMO算法中、挑选出第二个变量的方法（事实上是随机挑选）</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_pick_second</span><span class="params">(self, idx1)</span>:</span></div><div class="line">        idx = np.random.randint(len(self._y))</div><div class="line">        <span class="keyword">while</span> idx == idx1:</div><div class="line">            idx = np.random.randint(len(self._y))</div><div class="line">        <span class="keyword">return</span> idx</div><div class="line"></div><div class="line">    <span class="comment"># 获取新的的下界</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_get_lower_bound</span><span class="params">(self, idx1, idx2)</span>:</span></div><div class="line">        <span class="keyword">if</span> self._y[idx1] != self._y[idx2]:</div><div class="line">            <span class="keyword">return</span> max(<span class="number">0.</span>, self._alpha[idx2] - self._alpha[idx1])</div><div class="line">        <span class="keyword">return</span> max(<span class="number">0.</span>, self._alpha[idx2] + self._alpha[idx1] - self._c)</div><div class="line"></div><div class="line">    <span class="comment"># 获取新的的上界</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_get_upper_bound</span><span class="params">(self, idx1, idx2)</span>:</span></div><div class="line">        <span class="keyword">if</span> self._y[idx1] != self._y[idx2]:</div><div class="line">            <span class="keyword">return</span> min(self._c, self._c + self._alpha[idx2] - self._alpha[idx1])</div><div class="line">        <span class="keyword">return</span> min(self._c, self._alpha[idx2] + self._alpha[idx1])</div><div class="line"></div><div class="line">    <span class="comment"># 更新dw</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_dw_cache</span><span class="params">(self, idx1, idx2, da1, da2, y1, y2)</span>:</span></div><div class="line">        self._dw_cache = np.array([da1 * y1, da2 * y2])</div><div class="line"></div><div class="line">    <span class="comment"># 更新db</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_db_cache</span><span class="params">(self, idx1, idx2, da1, da2, y1, y2, e1, e2)</span>:</span></div><div class="line">        gram_12 = self._gram[idx1][idx2]</div><div class="line">        b1 = -e1 - y1 * self._gram[idx1][idx1] * da1 - y2 * gram_12 * da2</div><div class="line">        b2 = -e2 - y1 * gram_12 * da1 - y2 * self._gram[idx2][idx2] * da2</div><div class="line">        self._db_cache = (b1 + b2) * <span class="number">0.5</span></div><div class="line"></div><div class="line">    <span class="comment"># 利用和训练样本中的类别向量y来更新w和b</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_params</span><span class="params">(self)</span>:</span></div><div class="line">        self._w = self._alpha * self._y</div><div class="line">        _idx = np.argmax((self._alpha != <span class="number">0</span>) &amp; (self._alpha != self._c))</div><div class="line">        self._b = self._y[_idx] – np.sum(self._alpha * self._y * self._gram[_idx])</div></pre></td></tr></table></figure>
+<p>以上就是 SMO 算法中的核心步骤，接下来只需要将它们整合进一个大框架中即可（需要指出的是，随机选取第二个变量虽说效果也不错、但效率终究还是会差上一点；不过考虑到实现的复杂度、我们还是用随机选取的方法来进行实现）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义局部更新参数的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_update_alpha</span><span class="params">(self, idx1, idx2)</span>:</span></div><div class="line">    l, h = self._get_lower_bound(idx1, idx2), self._get_upper_bound(idx1, idx2)</div><div class="line">    y1, y2 = self._y[idx1], self._y[idx2]</div><div class="line">    e1 = self._prediction_cache[idx1] - self._y[idx1]</div><div class="line">    e2 = self._prediction_cache[idx2] - self._y[idx2]</div><div class="line">    eta = self._gram[idx1][idx1] + self._gram[idx2][idx2] - <span class="number">2</span> * self._gram[idx1][idx2]</div><div class="line">    a2_new = self._alpha[idx2] + (y2 * (e1 - e2)) / eta</div><div class="line">    <span class="keyword">if</span> a2_new &gt; h:</div><div class="line">        a2_new = h</div><div class="line">    <span class="keyword">elif</span> a2_new &lt; l:</div><div class="line">        a2_new = l</div><div class="line">    a1_old, a2_old = self._alpha[idx1], self._alpha[idx2]</div><div class="line">    da2 = a2_new - a2_old</div><div class="line">    da1 = -y1 * y2 * da2</div><div class="line">    self._alpha[idx1] += da1</div><div class="line">    self._alpha[idx2] = a2_new</div><div class="line">    <span class="comment"># 根据、来更新dw和db并局部更新</span></div><div class="line">    self._update_dw_cache(idx1, idx2, da1, da2, y1, y2)</div><div class="line">    self._update_db_cache(idx1, idx2, da1, da2, y1, y2, e1, e2)</div><div class="line">    self._update_pred_cache(idx1, idx2)</div><div class="line"></div><div class="line"><span class="comment"># 初始化惩罚因子C</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_prepare</span><span class="params">(self, **kwargs)</span>:</span></div><div class="line">    self._c = kwargs.get(<span class="string">"c"</span>, KernelConfig.default_c)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_fit</span><span class="params">(self, sample_weight, tol)</span>:</span></div><div class="line">    idx1 = self._pick_first(tol)</div><div class="line">    <span class="comment"># 若没能选出第一个变量、则所有样本的误差都，此时返回真值、退出训练循环体</span></div><div class="line">    <span class="keyword">if</span> idx1 <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">return</span> <span class="keyword">True</span></div><div class="line">    idx2 = self._pick_second(idx1)</div><div class="line">    self._update_alpha(idx1, idx2)</div></pre></td></tr></table></figure>
+<p>可以看到大部分代码确实只是算法的直译。同样可以先通过螺旋线数据集来大致看看核 SVM 的分类能力、结果如下图所示（图中用黑圈标注的样本点即是支持向量）：</p>
+<img src="/posts/917ccef9/p3.png" alt="p3.png" title="">
+<p>左图为 RBF 核 SVM（<script type="math/tex">\gamma = 0.5</script>）、迭代了 729 次即达到了停机条件（所有样本的误差都<script type="math/tex">< \epsilon</script>）、最终准确率为 51.25%；右图为多项式核 SVM（<script type="math/tex">p = 12</script>）、迭代了 6727 次即达到了停机条件、准确率为 97.5%。它们的训练曲线如下图所示：</p>
+<img src="/posts/917ccef9/p4.png" alt="p4.png" title="">
+<p>左、右图分别对应着 RBF 核 SVM 和多项式核 SVM 的训练曲线。虽说看上去似乎比核感知机的表现还要差、但这毕竟只是一个特殊的情形；事实上、即使是成熟的 SVM 库也并不是万能的。比如如果直接使用螺旋线数据集来训练 sklearn 中的、基于 LibSVM 进行实现的 SVM 模型的话、会得到如下图所示的结果：</p>
+<img src="/posts/917ccef9/p5.png" alt="p5.png" title="">
+<p>左图为 RBF 核 SVM（<script type="math/tex">\gamma = 0.5</script>）、最终准确率为 50.0%；右图为多项式核 SVM（<script type="math/tex">p = 12</script>）、准确率为 65.0%。造成这种差异的原因在于我们实现的多项式核函数和 sklearn 中的 SVM 所使用的多项式核函数不一样，如果将我们的核函数传进去、是可以得到相似结果的</p>
+<p>作为本篇文章的收尾，我们可以通过画出两种核模型在蘑菇数据集上的训练曲线来简单地评估一下模型在真实数据下的表现。为了说明模型的泛化能力，我们只取 100 个样本作为训练样本、并用剩余 8000 多个样本作为测试样本来检验</p>
+<p>首先来看一下核感知机的表现：</p>
+<img src="/posts/917ccef9/p6.png" alt="p6.png" title="">
+<p>左图为 RBF 核感知机（<script type="math/tex">\gamma \approx 0.04546</script>）的训练曲线、最终在测试集上的准确率为 92.53%；右图为多项式核感知机（<script type="math/tex">p = 3</script>）的训练曲线、最终在测试集上的准确率为 91.59%（迭代次数都是<script type="math/tex">10^{4}</script>）。由于只采用了 100 个样本训练、每次训练后的模型表现会波动得比较厉害；不过总体而言、RBF 核感知机会比多项式核感知机波动得更厉害一点</p>
+<p>接下来看一下核 SVM 的表现：</p>
+<img src="/posts/917ccef9/p7.png" alt="p7.png" title="">
+<p>左图为 RBF 核 SVM（<script type="math/tex">\gamma \approx 0.04546</script>）、迭代了 462 次即达到了停机条件、最终在测试集上的准确率为 94.29%；右图为多项式核 SVM（<script type="math/tex">p = 3</script>）、迭代 1609 次即达到了停机条件、最终在测试集上的准确率为 92.96%</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/924abfe1/" rel="prev" title="从线性到非线性">
+                <i class="fa fa-chevron-left"></i> 从线性到非线性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/1dc4445a/" rel="next" title="多分类与支持向量回归">
+                多分类与支持向量回归 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#核感知机的实现"><span class="nav-number">1.</span> <span class="nav-text">核感知机的实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核-SVM-的实现"><span class="nav-number">2.</span> <span class="nav-text">核 SVM 的实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

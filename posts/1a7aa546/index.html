@@ -103,7 +103,7 @@
 <meta property="og:image" content="http://www.carefree0910.com/posts/1a7aa546/p2.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/1a7aa546/p3.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/1a7aa546/p4.png">
-<meta property="og:updated_time" content="2017-04-23T02:59:55.000Z">
+<meta property="og:updated_time" content="2017-04-28T10:50:32.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="决策树的剪枝算法">
 <meta name="twitter:description" content="在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当">
@@ -408,7 +408,7 @@
       
 
       
-        <p>在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当的“剪枝”、我们在上一节中也已经大量接触了这一概念。剪枝通常分为两类：“预剪枝（Pre-Pruning）”和“后剪枝（Post-Pruning）”，其中“预剪枝”的概念在生成算法中已有定义，彼时我们采取的说法是“停止条件”；而一般提起剪枝时指的都是“后剪枝”，它是指在决策树生成完毕后再对其进行修剪、把多余的节点剪掉。换句话说，后剪枝是从全局出发、通过某种标准对一些 Node 进行局部剪枝，这样就能减少决策树中 Node 的数目、从而有效地降低模型复杂度</p>
+        <p>在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当的“剪枝”、我们在上一篇文章中也已经大量接触了这一概念。剪枝通常分为两类：“预剪枝（Pre-Pruning）”和“后剪枝（Post-Pruning）”，其中“预剪枝”的概念在生成算法中已有定义，彼时我们采取的说法是“停止条件”；而一般提起剪枝时指的都是“后剪枝”，它是指在决策树生成完毕后再对其进行修剪、把多余的节点剪掉。换句话说，后剪枝是从全局出发、通过某种标准对一些 Node 进行局部剪枝，这样就能减少决策树中 Node 的数目、从而有效地降低模型复杂度</p>
 <a id="more"></a>
 <p>是故问题的关键在于如何定出局部剪枝的标准。通常来说我们有两种做法：</p>
 <ul>
@@ -742,7 +742,7 @@ p = \arg{\min_{p}{\_\text{thresholds}}}</script>然后对<code>_tmp_nodes[p]</co
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -753,7 +753,7 @@ p = \arg{\min_{p}{\_\text{thresholds}}}</script>然后对<code>_tmp_nodes[p]</co
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

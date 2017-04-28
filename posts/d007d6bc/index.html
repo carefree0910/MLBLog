@@ -99,7 +99,7 @@
 <meta property="og:url" content="http://www.carefree0910.com/posts/d007d6bc/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="无论是贝叶斯学派还是频率学派，一个无法避开的问题就是如何从已有的样本中获取信息并据此估计目标模型的参数。比较有名的“频率近似概率”其实就是（基于大数定律的）相当合理的估计之一，本章所叙述的两种参数估计方法在最后也通常会归结于它">
-<meta property="og:updated_time" content="2017-04-20T13:22:34.000Z">
+<meta property="og:updated_time" content="2017-04-28T10:53:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="参数估计">
 <meta name="twitter:description" content="无论是贝叶斯学派还是频率学派，一个无法避开的问题就是如何从已有的样本中获取信息并据此估计目标模型的参数。比较有名的“频率近似概率”其实就是（基于大数定律的）相当合理的估计之一，本章所叙述的两种参数估计方法在最后也通常会归结于它">
@@ -424,7 +424,7 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 <script type="math/tex; mode=display">
 {\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{p(\theta|\tilde{X}) = \arg{\max_\theta{p(\theta)\prod_{i = 1}^{N}{p(x_{i}|\theta)}}}}}</script><p>同样的，为了计算简洁，我们通常对上式取对数：</p>
 <script type="math/tex; mode=display">
-{\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{\ln{p(\theta|\tilde{X})} = \arg{\max_\theta\left\lbrack \ln{p\left( \theta \right)} + \sum_{i = 1}^{N}{\ln{p\left( x_{i} \middle| \theta \right)}} \right\rbrack}}}</script><p>可以看到，从形式上、极大后验概率估计只比极大似然估计多了<script type="math/tex">\ln{p(\theta)}</script>这一项，不过它们背后的思想却相当不同。不过有意思的是，在下一节具体讨论朴素贝叶斯算法时我们会看到、朴素贝叶斯在估计参数时选用了极大似然估计法、但是在做决策时则选用了 MAP 估计</p>
+{\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{\ln{p(\theta|\tilde{X})} = \arg{\max_\theta\left\lbrack \ln{p\left( \theta \right)} + \sum_{i = 1}^{N}{\ln{p\left( x_{i} \middle| \theta \right)}} \right\rbrack}}}</script><p>可以看到，从形式上、极大后验概率估计只比极大似然估计多了<script type="math/tex">\ln{p(\theta)}</script>这一项，不过它们背后的思想却相当不同。不过有意思的是，在之后具体讨论朴素贝叶斯算法时我们会看到、朴素贝叶斯在估计参数时选用了极大似然估计法、但是在做决策时则选用了 MAP 估计</p>
 <p>和极大似然估计相比，MAP 估计的一个显著优势在于它可以引入所谓的“先验知识”，这正是贝叶斯学派的精髓。当然这个优势同时也伴随着劣势：它我们对模型参数有相对较好的认知、否则会相当大地影响到结果的合理性</p>
 <p>既然先验分布如此重要，那么是否有比较合理的、先验分布的选取方法呢？事实上，如何确定先验分布这个问题，正是贝叶斯统计中最困难、最具有争议性却又必须解决的问题。虽然这个问题确实有许多现代的研究成果，但遗憾的是，尚未能有一个圆满的理论和普适的方法。这里拟介绍“协调性假说”这个相对而言拥有比较好的直观的理论：</p>
 <ul>
@@ -583,7 +583,7 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -594,7 +594,7 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

@@ -112,7 +112,7 @@
 <meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p11.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p12.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/fb0d2f02/p13.png">
-<meta property="og:updated_time" content="2017-04-25T16:11:20.000Z">
+<meta property="og:updated_time" content="2017-04-28T10:52:10.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="集成模型的性能分析">
 <meta name="twitter:description" content="正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析 直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较">
@@ -418,7 +418,7 @@
 
       
         <p>正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析</p>
-<p>直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较贴近现实的实验。为讨论方便，我们一律采用决策树作为 AdaBoost 的弱分类器（亦即采用提升树模型进行讨论）、其强度可以通过调整其最深层数来控制。我们可以利用<code>DataUtil</code>类来生成或获取原始数据集，其完整代码可参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py" target="_blank" rel="external">这里</a>、生成数据集的代码则会在前三小节分别放出</p>
+<p>直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较贴近现实的实验。为讨论方便，我们一律采用决策树作为 AdaBoost 的弱分类器（亦即采用提升树模型进行讨论）、其强度可以通过调整其最深层数来控制。我们可以利用<code>DataUtil</code>类来生成或获取原始数据集，其完整代码可参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py" target="_blank" rel="external">这里</a>、生成数据集的代码则会在前三节分别放出</p>
 <p>对于二维数据，我们拟打算使用三种数据集来进行评估：</p>
 <ul>
 <li>随机数据集。该数据集主要用于直观地感受模型的分类能力</li>
@@ -634,7 +634,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -645,7 +645,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

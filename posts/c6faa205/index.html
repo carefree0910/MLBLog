@@ -102,7 +102,7 @@
 <meta property="og:image" content="http://www.carefree0910.com/posts/c6faa205/p1.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/c6faa205/p2.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/c6faa205/p3.png">
-<meta property="og:updated_time" content="2017-04-23T02:58:26.000Z">
+<meta property="og:updated_time" content="2017-04-28T10:49:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="决策树的生成算法">
 <meta name="twitter:description" content="虽然我们之前已经用了许多文字来描述决策树、但可能还是显得过于抽象。为了能有直观的认知，在此援引维基百科上一张很好的图来进行说明：  这张图基本蕴含了决策树中所有的关键结构，下面我们分开来分析它们">
@@ -427,7 +427,7 @@
 <li>C4.5 算法在其上进一步发展、给出了对混合型数据分类的解决方案</li>
 <li>CART 算法则更进一步、给出了对数据回归的解决方案</li>
 </ul>
-<p>虽说它们的功能越来越强大，但正如第一小节所言、它们的核心思想都是一致的：算法通过不断划分数据集来生成决策树，其中每一步的划分能够使当前的信息增益达到最大</p>
+<p>虽说它们的功能越来越强大，但正如前文所言、它们的核心思想都是一致的：算法通过不断划分数据集来生成决策树，其中每一步的划分能够使当前的信息增益达到最大</p>
 <p>值得一提的是，该核心思想的背后其实也有着机器学习的一些普适性的思想。我们可以这样来看待决策树：模型的损失就是数据集的不确定性，模型的算法就是最小化该不确定性；同时，和许多其它模型一样，想要从整个参数空间中选出模型的最优参数是个 NP 完全问题，所以我们（和许多其它算法一样）采用启发式的方法、近似求解这个最优化问题。具体而言，我们每次会选取一个局部最优解（每次选取一个特征对数据集进行划分使得信息增益最大化）、并把这些局部解合成最终解（合成一个划分规则的序列）</p>
 <p>可以这样直观地去想一个决策树的生成过程：</p>
 <ul>
@@ -798,7 +798,7 @@ f\left( x_{i} \right) = \sum_{m = 1}^{M}{c_{m}I\left( x_{i} \in R_{m} \right)}</
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -809,7 +809,7 @@ f\left( x_{i} \right) = \sum_{m = 1}^{M}{c_{m}I\left( x_{i} \in R_{m} \right)}</
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

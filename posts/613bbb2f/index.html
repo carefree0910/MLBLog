@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="数学," />
+  <meta name="keywords" content="数学,算法,综述," />
 
 
 
@@ -92,17 +92,17 @@
 
 
 
-<meta name="description" content="这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度">
-<meta name="keywords" content="数学">
+<meta name="description" content="这篇文章会叙述之前没有解决的纯数学问题，会涉及到相当庞杂的数学概念与思想，其中一些推导的难度相对而言可能会比较大">
+<meta name="keywords" content="数学,算法,综述">
 <meta property="og:type" content="article">
 <meta property="og:title" content="相关数学理论">
 <meta property="og:url" content="http://www.carefree0910.com/posts/613bbb2f/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
-<meta property="og:description" content="这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度">
-<meta property="og:updated_time" content="2017-04-25T16:49:37.000Z">
+<meta property="og:description" content="这篇文章会叙述之前没有解决的纯数学问题，会涉及到相当庞杂的数学概念与思想，其中一些推导的难度相对而言可能会比较大">
+<meta property="og:updated_time" content="2017-04-28T12:23:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="相关数学理论">
-<meta name="twitter:description" content="这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度">
+<meta name="twitter:description" content="这篇文章会叙述之前没有解决的纯数学问题，会涉及到相当庞杂的数学概念与思想，其中一些推导的难度相对而言可能会比较大">
 
 
 
@@ -345,8 +345,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-26T00:19:04+08:00">
-                2017-04-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T19:01:43+08:00">
+                2017-04-28
               </time>
             
 
@@ -368,8 +368,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集成学习/" itemprop="url" rel="index">
-                    <span itemprop="name">集成学习</span>
+                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
+                    <span itemprop="name">支持向量机</span>
                   </a>
                 </span>
 
@@ -403,82 +403,92 @@
       
 
       
-        <p>这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度</p>
+        <p>这篇文章会叙述之前没有解决的纯数学问题，会涉及到相当庞杂的数学概念与思想，其中一些推导的难度相对而言可能会比较大</p>
 <a id="more"></a>
-<h1 id="经验分布函数"><a href="#经验分布函数" class="headerlink" title="经验分布函数"></a>经验分布函数</h1><p>正如前文所说，经验分布函数的数学表达式为：</p>
+<h1 id="梯度下降法"><a href="#梯度下降法" class="headerlink" title="梯度下降法"></a>梯度下降法</h1><p>前文已经相当充分地说明了梯度下降的直观，本节则打算用较严谨的数学语言来重新叙述一遍这个方法</p>
+<p>首先说明其地位：梯度下降法（又称最速下降法）是求解无约束最优化问题的最常用的手段之一，同时由于现有的深度学习框架（比如 Tensorflow）基本都会含有自动求导并更新参数的功能、所以梯度下降法的实现往往会简单且高效</p>
+<p>其次说明一下梯度下降法的大致步骤。正如前文所说、梯度下降法的核心在于在于函数的“求导”，而由于一般来说样本都是高维的样本（亦即<script type="math/tex">x \in \mathbb{R}^{n}</script>、<script type="math/tex">n \geq 2</script>）、所以此时我们要求的其实是函数的梯度。由于梯度是微积分里面的基础知识、这里就不“追本溯源”般地讲解梯度的定义之类的了，如果确实不甚了解且不满足于前文给出的直观解释的话、可以参见维基百科中的详细定义（<a href="https://zh.wikipedia.org/wiki/梯度" target="_blank" rel="external">中文版</a>和<a href="https://en.wikipedia.org/wiki/Gradient" target="_blank" rel="external">英文版</a>都有，个人建议尽量看英文版）</p>
+<p>不管怎么说、函数梯度的这一点性质需要谨记：它是使函数值上升最快的方向，这就同时意味着负梯度是使函数值下降最快的“更新方向”。利用该性质，梯度下降法认为在每一步迭代中、都应该以梯度为更新方向“迈进”一步；在机器学习中、我们通常把这时迈进的“步长”称作“学习速率”：</p>
+<ol>
+<li><strong>输入</strong>：想要最小化的目标函数<script type="math/tex">f(x)</script>、迭代次数 M、学习速率<script type="math/tex">\eta</script>、计算精度<script type="math/tex">\epsilon</script>，其中<script type="math/tex">x \in \mathbb{R}^{n}</script></li>
+<li><strong>过程</strong>：<ol>
+<li>求出<script type="math/tex">f(x)</script>的梯度函数：  <script type="math/tex; mode=display">
+g(x) \triangleq \nabla f(x)</script></li>
+<li>取一个初始估计值<script type="math/tex">x^{\left( 0 \right)} \in \mathbb{R}^{n}</script></li>
+<li>对<script type="math/tex">j = 1,\ldots,M</script>：<ol>
+<li>计算负梯度——<script type="math/tex">g_{j} = - g(x^{\left( j \right)})</script>，若<script type="math/tex">\left\| g_{j} \right\| < \epsilon</script>则退出循环、令最终解<script type="math/tex">x^{*} = x^{\left( j \right)}</script></li>
+<li>否则、向更新方向<script type="math/tex">g_{j}</script>迈进步长为<script type="math/tex">\eta</script>的一步：  <script type="math/tex; mode=display">
+x^{\left( j + 1 \right)} = x^{\left( j \right)} + \eta g_{j}</script></li>
+<li>若<script type="math/tex">\left\| f\left( x^{\left( j + 1 \right)} \right) - f(x^{\left( j \right)}) \right\| < \epsilon</script>或<script type="math/tex">\left\| x^{\left( j + 1 \right)} - x^{\left( j \right)} \right\| < \epsilon</script>则退出循环、令最终解<script type="math/tex">x^{*} = x^{\left( j + 1 \right)}</script></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：最终解<script type="math/tex">x^{*}</script></li>
+</ol>
+<p>上述算法是一个最为朴素的梯度下降法框架，通过在其基础上结合具体的模型进行改进、拓展能够衍生出一系列著名的算法。具体而言、这些拓展算法通常会针对如下两个部分进行改进：</p>
+<ul>
+<li>不是单纯地把梯度作为更新方向、而是利用更多的属性来定出更新方向</li>
+<li>不把学习速率设成常量、而设法让其能够“适应算法”并根据具体情况进行调整</li>
+</ul>
+<p>有关梯度下降的拓展算法会在下一个系列的文章中进行比较详细的叙述，这里我们仅针对第二点来举一个非常直观的改进例子（仅写出与上述算法中不同的部分）：</p>
+<ul>
+<li><strong>算法 2.3.2 步</strong><br>对<script type="math/tex">j = 1,\ldots,M</script>：<ul>
+<li>否则求出<script type="math/tex">\eta_{j}</script>、使得：  <script type="math/tex; mode=display">
+f\left( x^{\left( j \right)} + {\eta_{j}g}_{j} \right) = \min_{\eta>0}{f(x^{\left( j \right)} + \eta g_{j})}</script>然后根据<script type="math/tex">\eta_{j}</script>来更新估计值：  <script type="math/tex; mode=display">
+x^{\left( j + 1 \right)} = x^{\left( j \right)} + \eta_{j}g_{j}</script>这种算法又可以称作精确线性搜索准则。当优化问题为凸优化、亦即函数为凸函数时，可以证明若迭代次数 M 足够大、精确线性搜索必定能够收敛到全局最优解</li>
+</ul>
+</li>
+</ul>
+<p>考虑到对于具体的机器学习模型而言、其训练时一般会同时用到许多的样本，此时进行梯度下降法的话就不免会遇到一个问题：计算梯度时，是应该同时对多个样本进行求解然后将结果整合、还是对样本逐个进行求解？对该问题的不同解答对应着不同的算法、前文也已经有所提及。具体而言：</p>
+<ul>
+<li>对于随机梯度下降（SGD）、其求梯度的公式为：  <script type="math/tex; mode=display">
+g_{j} = - \nabla f\left( x_{i} \right)</script>其中 i 是一个合适的下标。SGD 的优缺点都比较直观：虽然（在同样的迭代次数下）它的训练速度很快、但它搜索解空间的过程会显得比较盲目（就有种东走一下西走一下的感觉），这直接导致其收敛速度反而可能会更慢。同时如果考虑实际应用的话，由于 SGD 难以并行实现、所以其效率往往会比较低</li>
+<li>对于小批量梯度下降（MBGD）、其求梯度的公式为：  <script type="math/tex; mode=display">
+g_{j} = - \frac{1}{m}\left( \nabla f\left( x_{S_{1}} \right) + \ldots + \nabla f\left( x_{S_{m}} \right) \right)</script>其中 m 是一个合适的、小于总样本数 N 的数，<script type="math/tex">S_1,...,S_m</script>则是 m 个合适的下标；通常我们会称<script type="math/tex">\left\{ x_{S_1},...,x_{S_m}\right\}</script>为一个 batch。MBGD 可谓是应用得最广泛的梯度下降法，它在单步迭代中会比 SGD 慢、但它对解空间的搜索会显得“可控”很多、从而收敛速度一般反而会比 SGD 要快</li>
+<li>对于批量梯度下降（BGD）、其求梯度的公式为：  <script type="math/tex; mode=display">
+g_{j} = - \frac{1}{N}\sum_{i = 1}^{N}{\nabla f\left( x_{i} \right)}</script>BGD 会有一种“过犹不及”的感觉，由于它单步迭代中会用到所有样本，所以当训练集很大的时候、无论是时间开销还是空间开销都会变得难以忍受</li>
+</ul>
+<p>以上我们就大概综述了一遍梯度下降法的框架，更为细致的具体算法则会在下一个系列中介绍神经网络时进行部分说明</p>
+<h1 id="拉格朗日对偶性"><a href="#拉格朗日对偶性" class="headerlink" title="拉格朗日对偶性"></a>拉格朗日对偶性</h1><p>如果按照最一般性的定义来讲的话，拉格朗日对偶性会显得太过“纯粹”、或说可以算是数学家的游戏。因此本小节拟打算通过推导如何将软间隔最大化 SVM 的原始最优化问题转化为对偶问题、来间接说明拉格朗日对偶性的一般性步骤</p>
+<p>注意到原始问题为：</p>
 <script type="math/tex; mode=display">
-F_{N}\left( x \right) = \frac{1}{N}\sum_{i = 1}^{N}{I_{\left( - \infty,x \right\rbrack}(x_{i})}</script><p>如果将<script type="math/tex">x_{1},\ldots,x_{N}</script>按从小到大的顺序排成<script type="math/tex">x_{(1)},\ldots,x_{\left( N \right)}</script>，我们通常称其中的<script type="math/tex">x_{\left( i \right)}</script>为第 i 个次序统计量。易知可以利用次序统计量将<script type="math/tex">F_{N}(x)</script>表示成更直观的形式：</p>
+\min_{w,b}{L\left( w,b,x,y \right) =}\frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}\xi_{i}</script><p>使得：</p>
 <script type="math/tex; mode=display">
-F_{N}\left( x \right) = \left\{ \begin{matrix}
-0,\ \ &x < x_{\left( 1 \right)} \\
-\frac{i}{N},\ \ &x \in \left\lbrack x_{\left( i \right)},x_{\left( i + 1 \right)} \right)\ (i = 1,\ldots,N - 1) \\
-1,\ \ &x \geq x_{\left( N \right)} \\
-\end{matrix} \right.\</script><p>关于其优良性，前文所说的“频率估计概率”的严谨叙述其实就是强大数律：</p>
+y_{i}\left( w \cdot x_{i} + b \right) \geq 1 - \xi_{i}\ (i = 1,\ldots,N)</script><p>其中</p>
 <script type="math/tex; mode=display">
-p\left( \lim_{N}{F_{N}\left( x \right) - F\left( x \right) = 0} \right) = 1\ (\forall x)</script><p>亦即</p>
+\xi_{i} \geq 0\ (i = 1,\ldots,N)</script><p>那么原始问题的拉格朗日函数即为：</p>
 <script type="math/tex; mode=display">
-F_{N}(x) \xrightarrow{a.s.} F(x)</script><p>同时还有一个更强的结论（Glivenko-Cantelli 定理）：</p>
-<script type="math/tex; mode=display">
-p\left( \lim_{N}{\sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right| = 0} \right) = 1</script><p>亦即</p>
-<script type="math/tex; mode=display">
-\left\| F_{N}\left( x \right) - F\left( x \right) \right\|_{\infty} \equiv \sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right|\xrightarrow{a.s.}0</script><p>其中，<script type="math/tex">\sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right|</script>就是著名的柯尔莫诺夫-斯米尔诺夫检验（Kolmogorov-Smirnov Statistic）。值得一提的是，用其它范数来代替这里的无穷范数有时也是合理的。比如说用二范数来代替时、对应的就是 Cramér-von Mises Criterion</p>
-<p>此外，我们还可以利用中心极限定理等来研究经验分布函数（比如与正态分布扯上关系等等），这里就不详细展开了。总之，经验分布函数的优良性是相当有保证的，与其本质类似的 Bootstrap 的优良性也因而有了保证。当然、Bootstrap 自己是有一套成熟理论的，不过如果就这点展开来叙述的话、多多少少会偏离了本系列文章的主旨，所以这里就仅通过讨论经验分布函数来间接地感受 Bootstrap 的优良性</p>
-<h1 id="AdaBoost-与前向分步加法模型"><a href="#AdaBoost-与前向分步加法模型" class="headerlink" title="AdaBoost 与前向分步加法模型"></a>AdaBoost 与前向分步加法模型</h1><p>本节主要用于推导如下定理：AdaBoost 分类模型可以等价为损失函数为指数函数的前向分步加法模型</p>
-<p>假设经过<script type="math/tex">k</script>轮迭代后、前项分布算法已经得到了加法模型<script type="math/tex">f_{k}(x)</script>，亦即：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-f_{k}\left( x \right) &= f_{k - 1}\left( x \right) + \alpha_{k}g_{k}\left( x \right) = f_{k - 2}\left( x \right) + \alpha_{k - 1}g_{k - 1}\left( x \right) + \alpha_{k}g_{k}(x) \\
-
-&= \ldots = \sum_{i = 1}^{k}{\alpha_{i}g_{i}(x)}
-\end{align}</script><p>可知、第<script type="math/tex">k + 1</script>轮的模型<script type="math/tex">f_{k + 1}</script>能表示为：</p>
-<script type="math/tex; mode=display">
-f_{k + 1}\left( x \right) = f_{k}\left( x \right) + \alpha_{k + 1}g_{k + 1}(x)</script><p>我们关心的问题就是，如何在<script type="math/tex">f_{k}(x)</script>确定下来的情况下、训练出第<script type="math/tex">k + 1</script>轮的个体分类器<script type="math/tex">g_{k + 1}(x)</script>及其权重<script type="math/tex">\alpha_{k + 1}</script>。注意到我们的损失函数是指数函数，亦即：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-L &= \sum_{i = 1}^{N}{\exp\left\lbrack - y_{i}f_{k + 1}\left( x_{i} \right) \right\rbrack} \\
-
-&= \sum_{i = 1}^{N}w_{ki}\exp\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}(x_{i})\rbrack
-\end{align}</script><p>其中</p>
-<script type="math/tex; mode=display">
-w_{ki} = \exp\lbrack - y_{i}f_{k}(x_{i})\rbrack</script><p>在<script type="math/tex">f_{k}(x)</script>确定下来的情况下是常数。由于我们的最终目的是最小化损失函数、所以<script type="math/tex">\alpha_{k + 1}</script>和<script type="math/tex">g_{k + 1}(x)</script>就可以表示为：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-\left( \alpha_{k + 1},g_{k + 1}\left( x \right) \right) &= \arg{\min_{\alpha,g}{\sum_{i = 1}^{N}{w_{ki}\exp\left\lbrack - y_{i}\alpha g\left( x_{i} \right) \right\rbrack}}} \\
-
-&= \arg{\min_{\alpha,g}{\sum_{y_{i} = g\left( x_{i} \right)}^{}{w_{ki}e^{- \alpha}} + \sum_{y_{i} \neq g\left( x_{i} \right)}^{}{w_{ki}e^{\alpha}}}} \\
-
-&= \arg{\min_{\alpha,g}{\left( e^{\alpha} - e^{- \alpha} \right)\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)} + e^{- \alpha}\sum_{i = 1}^{N}w_{ki}}} \\
-
-&= \arg{\min_{\alpha,g}{\left( e^{\alpha} - e^{- \alpha} \right)\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)} + e^{- \alpha}}}
-\end{align}</script><p>上式可以分两步求解。先看当<script type="math/tex">\alpha</script>确定下来后应该如何定出<script type="math/tex">g_{k + 1}(x)</script>，易知：</p>
-<script type="math/tex; mode=display">
-g_{k + 1}\left( x \right) = \arg{\min_{g}{\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)}}}</script><p>亦即第<script type="math/tex">k + 1</script>步的个体分类器应该使训练集上的加权错误率最小。不妨设解出的<script type="math/tex">g_{k + 1}(x)</script>在训练集上的加权错误率为<script type="math/tex">e_{k + 1}</script>、亦即：</p>
-<script type="math/tex; mode=display">
-\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g_{k + 1}\left( x_{i} \right) \right)} \triangleq e_{k + 1}</script><p>我们需要利用它来定出<script type="math/tex">\alpha_{k + 1}</script>。注意到对目标函数求偏导后易知：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-\alpha_{k + 1} &= \arg{\min_{\alpha}{\left( e^{\alpha} - e^{- \alpha} \right)e_{k + 1} + e^{- \alpha}}} \\
-
-&\Leftrightarrow \left( e^{\alpha_{k + 1}} + e^{- \alpha_{k + 1}} \right)e_{k + 1} - e^{- \alpha_{k + 1}} = 0 \\
-
-&\Leftrightarrow \alpha_{k + 1} = \frac{1}{2}\ln\frac{1 - e_{k + 1}}{e_{k + 1}}
-\end{align}</script><p>这和 AdaBoost 中确定个体分类器权值的式子一模一样。接下来只需要证明样本权重更新的式子也彼此一致即可得证定理，而事实上、由于：</p>
-<script type="math/tex; mode=display">
-f_{k + 1}\left( x \right) = f_{k}\left( x \right) + \alpha_{k + 1}g_{k + 1}\left( x \right)</script><p>从而</p>
+L\left( w,b,\xi,\alpha,\beta \right) = \frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}\xi_{i} - \sum_{i = 1}^{N}{\alpha_{i}\left\lbrack y_{i}\left( w \cdot x_{i} + b \right) - 1 + \xi_{i} \right\rbrack} - \sum_{i = 1}^{N}{\beta_{i}\xi_{i}}</script><p>为求解<script type="math/tex">L</script>的极小、我们需要对<script type="math/tex">w</script>、<script type="math/tex">b</script>和<script type="math/tex">\xi</script>求偏导并令偏导为 0。易知：</p>
 <script type="math/tex; mode=display">
 \begin{align}
-w_{k + 1,i} &= \exp\left\lbrack - y_{i}f_{k + 1}\left( x_{i} \right) \right\rbrack \\
-
-&= \exp\left\lbrack - y_{i}f_{k}\left( x_{i} \right) \right\rbrack \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack \\
-
-&= w_{ki} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack
-\end{align}</script><p>注意到我们要将样本权重归一化，所以须有：</p>
+\nabla_{w}L &= w - \sum_{i = 1}^{N}{\alpha_{i}y_{i}x_{i}} = 0 \\
+\nabla_{b}L &= \sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0 \\
+\nabla_{\xi_{i}}L &= C - \alpha_{i} - \beta_{i} = 0
+\end{align}</script><p>解得</p>
 <script type="math/tex; mode=display">
-w_{k + 1,i} \leftarrow \frac{w_{k + 1,i}}{Z_{k}}</script><p>其中</p>
+w = \sum_{i = 1}^{N}{\alpha_{i}y_{i}x_{i}}</script><script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><p>以及对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
 <script type="math/tex; mode=display">
-Z_{k} = \sum_{i = 1}^{N}w_{k + 1,i} = \sum_{i = 1}^{N}{w_{ki} \cdot \exp\left\lbrack - \alpha_{k + 1}y_{i}g_{k + 1}\left( x_{i} \right) \right\rbrack}</script><p>是故</p>
+\alpha_{i} + \beta_{i} = C</script><p>将它们带入<script type="math/tex">L\left( w,b,\xi,\alpha,\beta \right)</script>、得</p>
 <script type="math/tex; mode=display">
-w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack</script><p>这和 AdaBoost 中更新样本权重的式子也一模一样。综上所述、定理得证</p>
+L\left( w,b,\xi,\alpha,\beta \right) = - \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}</script><p>从而原始问题的对偶问题即为求上式的极大值、亦即</p>
+<script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script><p>其中约束条件为：</p>
+<script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><p>以及对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+\alpha_{i} \geq 0,\ \ \beta_{i} \geq 0</script><script type="math/tex; mode=display">
+\alpha_{i} + \beta_{i} = C\ (i = 1,\ldots,N)</script><p>易知上述约束可以简化为对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script><p>综上所述即得前文叙述过的软间隔最大化的对偶形式。注意到原始问题是凸二次规划、从而对偶形式的解<script type="math/tex">w^{*}</script>、<script type="math/tex">b^{*}</script>、<script type="math/tex">\xi^{*}</script>、<script type="math/tex">\alpha^{*}</script>和<script type="math/tex">\beta^{*}</script>满足 KKT 条件，亦即：</p>
+<script type="math/tex; mode=display">
+\nabla_{w}L(w^{*},b^{*},\xi^{*},\alpha^{*},\beta^{*}) = \nabla_{b}L(w^{*},b^{*},\xi^{*},\alpha^{*},\beta^{*}) = \nabla_{\xi}L(w^{*},b^{*},\xi^{*},\alpha^{*},\beta^{*}) = 0</script><p>以及对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+\alpha_{i}^{*}\left\lbrack y_{i}\left( w^{*} \cdot x_{i} + b^{*} \right) - 1 + \xi^{*} \right\rbrack = 0</script><script type="math/tex; mode=display">
+y_{i}\left( w^{*} \cdot x_{i} + b^{*} \right) - 1 + \xi^{*} \geq 0</script><script type="math/tex; mode=display">
+\alpha^{*} \geq 0,\beta^{*} \geq 0,\xi^{*} \geq 0</script><script type="math/tex; mode=display">
+\xi^{*}\beta^{*} = 0</script><p>由它们就可以推出前文说明过的、<script type="math/tex">w^{*}</script>和<script type="math/tex">b^{*}</script>关于<script type="math/tex">\alpha^{*}</script>的表达式了</p>
 
       
     </div>
@@ -532,6 +542,10 @@ w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g
           
             <a href="/tags/数学/" rel="tag"># 数学</a>
           
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+            <a href="/tags/综述/" rel="tag"># 综述</a>
+          
         </div>
       
 
@@ -544,8 +558,8 @@ w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/707464b/" rel="prev" title="AdaBoost 算法的解释">
-                <i class="fa fa-chevron-left"></i> AdaBoost 算法的解释
+              <a href="/posts/1dc4445a/" rel="prev" title="多分类与支持向量回归">
+                <i class="fa fa-chevron-left"></i> 多分类与支持向量回归
               </a>
             
           </div>
@@ -554,8 +568,8 @@ w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/posts/48a0211a/" rel="next" title="“集成学习”小结">
-                “集成学习”小结 <i class="fa fa-chevron-right"></i>
+              <a href="/posts/5b3e9c59/" rel="next" title="“支持向量机”小结">
+                “支持向量机”小结 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -631,7 +645,7 @@ w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -642,7 +656,7 @@ w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -715,7 +729,7 @@ w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#经验分布函数"><span class="nav-number">1.</span> <span class="nav-text">经验分布函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AdaBoost-与前向分步加法模型"><span class="nav-number">2.</span> <span class="nav-text">AdaBoost 与前向分步加法模型</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#梯度下降法"><span class="nav-number">1.</span> <span class="nav-text">梯度下降法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#拉格朗日对偶性"><span class="nav-number">2.</span> <span class="nav-text">拉格朗日对偶性</span></a></li></ol></div>
             
 
           </div>

@@ -3,6 +3,806 @@
   
     
     <entry>
+      <title><![CDATA[“支持向量机”小结]]></title>
+      <url>/posts/5b3e9c59/</url>
+      <content type="html"><![CDATA[<ul>
+<li>感知机利用 SGD 能保证对线性可分数据集正确分类（无论学习速率为多少）、但它没怎么考虑泛化能力的问题</li>
+<li>线性 SVM 通过引入间隔（硬、软）最大化的概念来增强模型的泛化能力</li>
+<li>核技巧能够将线性算法“升级”为非线性算法，通过将原始问题转化为对偶问题能够非常自然地对核技巧进行应用</li>
+<li>对于一个二分类模型，有许多方法能够直接将它拓展为多分类问题</li>
+<li>SVM 的思想能用于做回归（SVR）；具体而言、SVR 容许模型输出和真值之间存在<script type="math/tex">\epsilon</script>的差距以期望提高泛化能力</li>
+</ul>
+]]></content>
+      
+        <categories>
+            
+            <category> 支持向量机 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 小结 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[相关数学理论]]></title>
+      <url>/posts/613bbb2f/</url>
+      <content type="html"><![CDATA[<p>这篇文章会叙述之前没有解决的纯数学问题，会涉及到相当庞杂的数学概念与思想，其中一些推导的难度相对而言可能会比较大</p>
+<a id="more"></a>
+<h1 id="梯度下降法"><a href="#梯度下降法" class="headerlink" title="梯度下降法"></a>梯度下降法</h1><p>前文已经相当充分地说明了梯度下降的直观，本节则打算用较严谨的数学语言来重新叙述一遍这个方法</p>
+<p>首先说明其地位：梯度下降法（又称最速下降法）是求解无约束最优化问题的最常用的手段之一，同时由于现有的深度学习框架（比如 Tensorflow）基本都会含有自动求导并更新参数的功能、所以梯度下降法的实现往往会简单且高效</p>
+<p>其次说明一下梯度下降法的大致步骤。正如前文所说、梯度下降法的核心在于在于函数的“求导”，而由于一般来说样本都是高维的样本（亦即<script type="math/tex">x \in \mathbb{R}^{n}</script>、<script type="math/tex">n \geq 2</script>）、所以此时我们要求的其实是函数的梯度。由于梯度是微积分里面的基础知识、这里就不“追本溯源”般地讲解梯度的定义之类的了，如果确实不甚了解且不满足于前文给出的直观解释的话、可以参见维基百科中的详细定义（<a href="https://zh.wikipedia.org/wiki/梯度" target="_blank" rel="external">中文版</a>和<a href="https://en.wikipedia.org/wiki/Gradient" target="_blank" rel="external">英文版</a>都有，个人建议尽量看英文版）</p>
+<p>不管怎么说、函数梯度的这一点性质需要谨记：它是使函数值上升最快的方向，这就同时意味着负梯度是使函数值下降最快的“更新方向”。利用该性质，梯度下降法认为在每一步迭代中、都应该以梯度为更新方向“迈进”一步；在机器学习中、我们通常把这时迈进的“步长”称作“学习速率”：</p>
+<ol>
+<li><strong>输入</strong>：想要最小化的目标函数<script type="math/tex">f(x)</script>、迭代次数 M、学习速率<script type="math/tex">\eta</script>、计算精度<script type="math/tex">\epsilon</script>，其中<script type="math/tex">x \in \mathbb{R}^{n}</script></li>
+<li><strong>过程</strong>：<ol>
+<li>求出<script type="math/tex">f(x)</script>的梯度函数：  <script type="math/tex; mode=display">
+g(x) \triangleq \nabla f(x)</script></li>
+<li>取一个初始估计值<script type="math/tex">x^{\left( 0 \right)} \in \mathbb{R}^{n}</script></li>
+<li>对<script type="math/tex">j = 1,\ldots,M</script>：<ol>
+<li>计算负梯度——<script type="math/tex">g_{j} = - g(x^{\left( j \right)})</script>，若<script type="math/tex">\left\| g_{j} \right\| < \epsilon</script>则退出循环、令最终解<script type="math/tex">x^{*} = x^{\left( j \right)}</script></li>
+<li>否则、向更新方向<script type="math/tex">g_{j}</script>迈进步长为<script type="math/tex">\eta</script>的一步：  <script type="math/tex; mode=display">
+x^{\left( j + 1 \right)} = x^{\left( j \right)} + \eta g_{j}</script></li>
+<li>若<script type="math/tex">\left\| f\left( x^{\left( j + 1 \right)} \right) - f(x^{\left( j \right)}) \right\| < \epsilon</script>或<script type="math/tex">\left\| x^{\left( j + 1 \right)} - x^{\left( j \right)} \right\| < \epsilon</script>则退出循环、令最终解<script type="math/tex">x^{*} = x^{\left( j + 1 \right)}</script></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：最终解<script type="math/tex">x^{*}</script></li>
+</ol>
+<p>上述算法是一个最为朴素的梯度下降法框架，通过在其基础上结合具体的模型进行改进、拓展能够衍生出一系列著名的算法。具体而言、这些拓展算法通常会针对如下两个部分进行改进：</p>
+<ul>
+<li>不是单纯地把梯度作为更新方向、而是利用更多的属性来定出更新方向</li>
+<li>不把学习速率设成常量、而设法让其能够“适应算法”并根据具体情况进行调整</li>
+</ul>
+<p>有关梯度下降的拓展算法会在下一个系列的文章中进行比较详细的叙述，这里我们仅针对第二点来举一个非常直观的改进例子（仅写出与上述算法中不同的部分）：</p>
+<ul>
+<li><strong>算法 2.3.2 步</strong><br>对<script type="math/tex">j = 1,\ldots,M</script>：<ul>
+<li>否则求出<script type="math/tex">\eta_{j}</script>、使得：  <script type="math/tex; mode=display">
+f\left( x^{\left( j \right)} + {\eta_{j}g}_{j} \right) = \min_{\eta>0}{f(x^{\left( j \right)} + \eta g_{j})}</script>然后根据<script type="math/tex">\eta_{j}</script>来更新估计值：  <script type="math/tex; mode=display">
+x^{\left( j + 1 \right)} = x^{\left( j \right)} + \eta_{j}g_{j}</script>这种算法又可以称作精确线性搜索准则。当优化问题为凸优化、亦即函数为凸函数时，可以证明若迭代次数 M 足够大、精确线性搜索必定能够收敛到全局最优解</li>
+</ul>
+</li>
+</ul>
+<p>考虑到对于具体的机器学习模型而言、其训练时一般会同时用到许多的样本，此时进行梯度下降法的话就不免会遇到一个问题：计算梯度时，是应该同时对多个样本进行求解然后将结果整合、还是对样本逐个进行求解？对该问题的不同解答对应着不同的算法、前文也已经有所提及。具体而言：</p>
+<ul>
+<li>对于随机梯度下降（SGD）、其求梯度的公式为：  <script type="math/tex; mode=display">
+g_{j} = - \nabla f\left( x_{i} \right)</script>其中 i 是一个合适的下标。SGD 的优缺点都比较直观：虽然（在同样的迭代次数下）它的训练速度很快、但它搜索解空间的过程会显得比较盲目（就有种东走一下西走一下的感觉），这直接导致其收敛速度反而可能会更慢。同时如果考虑实际应用的话，由于 SGD 难以并行实现、所以其效率往往会比较低</li>
+<li>对于小批量梯度下降（MBGD）、其求梯度的公式为：  <script type="math/tex; mode=display">
+g_{j} = - \frac{1}{m}\left( \nabla f\left( x_{S_{1}} \right) + \ldots + \nabla f\left( x_{S_{m}} \right) \right)</script>其中 m 是一个合适的、小于总样本数 N 的数，<script type="math/tex">S_1,...,S_m</script>则是 m 个合适的下标；通常我们会称<script type="math/tex">\left\{ x_{S_1},...,x_{S_m}\right\}</script>为一个 batch。MBGD 可谓是应用得最广泛的梯度下降法，它在单步迭代中会比 SGD 慢、但它对解空间的搜索会显得“可控”很多、从而收敛速度一般反而会比 SGD 要快</li>
+<li>对于批量梯度下降（BGD）、其求梯度的公式为：  <script type="math/tex; mode=display">
+g_{j} = - \frac{1}{N}\sum_{i = 1}^{N}{\nabla f\left( x_{i} \right)}</script>BGD 会有一种“过犹不及”的感觉，由于它单步迭代中会用到所有样本，所以当训练集很大的时候、无论是时间开销还是空间开销都会变得难以忍受</li>
+</ul>
+<p>以上我们就大概综述了一遍梯度下降法的框架，更为细致的具体算法则会在下一个系列中介绍神经网络时进行部分说明</p>
+<h1 id="拉格朗日对偶性"><a href="#拉格朗日对偶性" class="headerlink" title="拉格朗日对偶性"></a>拉格朗日对偶性</h1><p>如果按照最一般性的定义来讲的话，拉格朗日对偶性会显得太过“纯粹”、或说可以算是数学家的游戏。因此本小节拟打算通过推导如何将软间隔最大化 SVM 的原始最优化问题转化为对偶问题、来间接说明拉格朗日对偶性的一般性步骤</p>
+<p>注意到原始问题为：</p>
+<script type="math/tex; mode=display">
+\min_{w,b}{L\left( w,b,x,y \right) =}\frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}\xi_{i}</script><p>使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq 1 - \xi_{i}\ (i = 1,\ldots,N)</script><p>其中</p>
+<script type="math/tex; mode=display">
+\xi_{i} \geq 0\ (i = 1,\ldots,N)</script><p>那么原始问题的拉格朗日函数即为：</p>
+<script type="math/tex; mode=display">
+L\left( w,b,\xi,\alpha,\beta \right) = \frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}\xi_{i} - \sum_{i = 1}^{N}{\alpha_{i}\left\lbrack y_{i}\left( w \cdot x_{i} + b \right) - 1 + \xi_{i} \right\rbrack} - \sum_{i = 1}^{N}{\beta_{i}\xi_{i}}</script><p>为求解<script type="math/tex">L</script>的极小、我们需要对<script type="math/tex">w</script>、<script type="math/tex">b</script>和<script type="math/tex">\xi</script>求偏导并令偏导为 0。易知：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\nabla_{w}L &= w - \sum_{i = 1}^{N}{\alpha_{i}y_{i}x_{i}} = 0 \\
+\nabla_{b}L &= \sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0 \\
+\nabla_{\xi_{i}}L &= C - \alpha_{i} - \beta_{i} = 0
+\end{align}</script><p>解得</p>
+<script type="math/tex; mode=display">
+w = \sum_{i = 1}^{N}{\alpha_{i}y_{i}x_{i}}</script><script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><p>以及对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+\alpha_{i} + \beta_{i} = C</script><p>将它们带入<script type="math/tex">L\left( w,b,\xi,\alpha,\beta \right)</script>、得</p>
+<script type="math/tex; mode=display">
+L\left( w,b,\xi,\alpha,\beta \right) = - \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}</script><p>从而原始问题的对偶问题即为求上式的极大值、亦即</p>
+<script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script><p>其中约束条件为：</p>
+<script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><p>以及对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+\alpha_{i} \geq 0,\ \ \beta_{i} \geq 0</script><script type="math/tex; mode=display">
+\alpha_{i} + \beta_{i} = C\ (i = 1,\ldots,N)</script><p>易知上述约束可以简化为对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script><p>综上所述即得前文叙述过的软间隔最大化的对偶形式。注意到原始问题是凸二次规划、从而对偶形式的解<script type="math/tex">w^{*}</script>、<script type="math/tex">b^{*}</script>、<script type="math/tex">\xi^{*}</script>、<script type="math/tex">\alpha^{*}</script>和<script type="math/tex">\beta^{*}</script>满足 KKT 条件，亦即：</p>
+<script type="math/tex; mode=display">
+\nabla_{w}L(w^{*},b^{*},\xi^{*},\alpha^{*},\beta^{*}) = \nabla_{b}L(w^{*},b^{*},\xi^{*},\alpha^{*},\beta^{*}) = \nabla_{\xi}L(w^{*},b^{*},\xi^{*},\alpha^{*},\beta^{*}) = 0</script><p>以及对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+\alpha_{i}^{*}\left\lbrack y_{i}\left( w^{*} \cdot x_{i} + b^{*} \right) - 1 + \xi^{*} \right\rbrack = 0</script><script type="math/tex; mode=display">
+y_{i}\left( w^{*} \cdot x_{i} + b^{*} \right) - 1 + \xi^{*} \geq 0</script><script type="math/tex; mode=display">
+\alpha^{*} \geq 0,\beta^{*} \geq 0,\xi^{*} \geq 0</script><script type="math/tex; mode=display">
+\xi^{*}\beta^{*} = 0</script><p>由它们就可以推出前文说明过的、<script type="math/tex">w^{*}</script>和<script type="math/tex">b^{*}</script>关于<script type="math/tex">\alpha^{*}</script>的表达式了</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 支持向量机 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 数学 </tag>
+            
+            <tag> 算法 </tag>
+            
+            <tag> 综述 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[多分类与支持向量回归]]></title>
+      <url>/posts/1dc4445a/</url>
+      <content type="html"><![CDATA[<p>本篇文章将简要说明几种将二分类模型拓展为多分类模型的普适性方法，它们不仅能对前三篇文章叙述的感知机和 SVM 进行应用、同时还能应用于在上一个系列中进行了说明的 AdaBoost 二分类模型；在本篇的第四节（也是最后一节）、我们则会简要地说明一下如何将支持向量机的思想应用在回归问题上</p>
+<a id="more"></a>
+<h1 id="一对多方法（One-vs-Rest）"><a href="#一对多方法（One-vs-Rest）" class="headerlink" title="一对多方法（One-vs-Rest）"></a>一对多方法（One-vs-Rest）</h1><p>一对多方法常简称为 OvR、是一种比较比较“豪放”的方法：对于一个 K 类问题、OvR 将训练 K 个二分类模型<script type="math/tex">\{ G_{1},\ldots,G_{K}\}</script>，每个模型将训练集中的某一类的样本作为正样本、其余类的样本作为负样本。模型的输出空间为实数空间、它反映了模型对决策的“信心”</p>
+<p>具体而言、模型<script type="math/tex">G_{i}</script>会把第<script type="math/tex">i</script>类看成一类、把其余类看成另一类并尝试通过训练来区分开第<script type="math/tex">i</script>类和剩余类别；若<script type="math/tex">G_{i}</script>有比较大的自信来判定输入样本<em>x</em>是（或不是）第<script type="math/tex">i</script>类、那么<script type="math/tex">G_{i}(x)</script>将会是一个比较大的正（负）数，否则、<script type="math/tex">G_{i}(x)</script>将会是一个比较小的正（负）数</p>
+<p>训练好 K 个模型后、直接将输出最大的模型所对应的类别作为决策即可、亦即：</p>
+<script type="math/tex; mode=display">
+y_{\text{pred}} = \arg{\max_{i}{G_{i}(x)}}</script><p>之所以称这种方法比较“豪放”、主要是因为对每个模型的训练都存在比较严重的偏差：正样本集和负样本集的样本数之比在原始训练集均匀的情况下将会是<script type="math/tex">\frac{1}{K - 1}</script>。针对该缺陷、一种比较常见的做法是只抽取负样本集中的一部分来进行训练（比如抽取其中的三分之一）</p>
+<h1 id="一对一方法（One-vs-One）"><a href="#一对一方法（One-vs-One）" class="headerlink" title="一对一方法（One-vs-One）"></a>一对一方法（One-vs-One）</h1><p>一对一方法常简称为 OvO、可谓是一种很直观的方法：对于一个 K 类问题、OvO 将直接训练出<script type="math/tex">\frac{K\left( K - 1 \right)}{2}</script>个二分类模型<script type="math/tex">\{ G_{12},\ldots,G_{1K},G_{23},\ldots,G_{2K},\ldots,G_{K - 1,K}\}</script>，每个模型都只从训练集中接受两个类的样本来进行训练。模型的输出空间为二值空间<script type="math/tex">\{ - 1, + 1\}</script>、亦即模型只需要具有投票的能力即可</p>
+<p>具体而言、模型<script type="math/tex">G_{\text{ij}}(i < j)</script>将接受且仅接受所有第<script type="math/tex">i</script>类和第<script type="math/tex">j</script>类的样本并尝试通过训练来区分开第<script type="math/tex">i</script>类和第<script type="math/tex">j</script>类；同时，假设<script type="math/tex">c_{i}</script>代表第<script type="math/tex">i</script>类的样本空间、那么就有：</p>
+<script type="math/tex; mode=display">
+G_{ij}(x) = \left\{ \begin{matrix}
+ - 1,\ \ & x \in c_{j} \\
+ + 1,\ \ & x \in c_{i} \\
+\end{matrix} \right.\</script><p>训练好<script type="math/tex">\frac{K\left( K - 1 \right)}{2}</script>个模型后，OvO 将通过投票表决来进行决策、在<script type="math/tex">\frac{K\left( K - 1 \right)}{2}</script>次投票中得票最多的类即为模型所预测的结果。具体而言，如果考察<script type="math/tex">G_{ij}</script>、那么若<script type="math/tex">G_{\text{ij}}</script>输出<script type="math/tex">- 1</script>则第<script type="math/tex">j</script>类得一票、若<script type="math/tex">G_{ij}</script>输出<script type="math/tex">+ 1</script>则第<script type="math/tex">i</script>类得一票。如果只有两个类别（比如第<script type="math/tex">i</script>类和第<script type="math/tex">j</script>类）得票一致、那么直接看针对这两个类别的模型（亦即<script type="math/tex">G_{ij}</script>）的结果即可；如果多于两个类别的得票一致、则需要具体情况具体分析</p>
+<p>OvO 是一个相当不错的方法、没有类似于 OvR 中“有偏”的问题。然而它也是有一个显而易见的缺点的——由于模型的量级是<script type="math/tex">K^{2}</script>、所以它的时间开销会相当大</p>
+<h1 id="有向无环图方法（Directed-Acyclic-Graph-Method）"><a href="#有向无环图方法（Directed-Acyclic-Graph-Method）" class="headerlink" title="有向无环图方法（Directed Acyclic Graph Method）"></a>有向无环图方法（Directed Acyclic Graph Method）</h1><p>有向无环图方法常简称为 DAG，它的训练过程和 OvO 的训练过程完全一致、区别只在于最后的决策过程。具体而言、DAG 会将<script type="math/tex">\frac{K\left( K - 1 \right)}{2}</script>个模型作为一个有向无环图中的<script type="math/tex">\frac{K\left( K - 1 \right)}{2}</script>节点并逐步进行决策。其工作原理可以用下图进行说明（假设<script type="math/tex">K = 4</script>）：</p>
+<img src="/posts/1dc4445a/p1.png" alt="p1.png" title="">
+<h1 id="支持向量回归（Support-Vector-Regression）"><a href="#支持向量回归（Support-Vector-Regression）" class="headerlink" title="支持向量回归（Support Vector Regression）"></a>支持向量回归（Support Vector Regression）</h1><p>支持向量回归常简称为 SVR，它的基本思想与“软”间隔的思想类似——传统的回归模型通常只有在模型预测值<script type="math/tex">f(x)</script>和真值<script type="math/tex">y</script>完全一致时损失函数的值才为 0（最经典的就是当损失函数为<script type="math/tex">\left\| f\left( x \right) - y \right\|^{2}</script>的情形），而 SVR 则允许<script type="math/tex">f(x)</script>和<script type="math/tex">y</script>之间有一个<script type="math/tex">\epsilon</script>的误差、亦即仅当：</p>
+<script type="math/tex; mode=display">
+\left| f\left( x \right) - y \right| > \epsilon</script><p>时、我们才认为模型在<script type="math/tex">(x,y)</script>点处有损失。这与支持向量机做分类时有种“恰好相反”的感觉：对于分类问题、只有当样本点离分界面足够远时才不计损失；对于回归问题、则只有当真值离预测值足够远时才计损失。但是仔细思考的话、就不难想通它们的思想和目的是完全一致的：都是为了提高模型的泛化能力</p>
+<p>类比于之前讲过的 SVM 算法、可以很自然地写出 SVR 所对应的无约束优化问题：</p>
+<script type="math/tex; mode=display">
+\min_{w,b,x,y}{\frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}{l_{\epsilon}(w,b,x_{i},y_{i})}}</script><p>其中</p>
+<script type="math/tex; mode=display">
+l_{\epsilon}(w,b,x_{i},y_{i}) = \left\{ \begin{matrix}
+0,\ \ &|f\left( x_{i} \right) - y_{i}| \leq \epsilon \\
+\left| f\left( x_{i} \right) - y_{i} \right| - \epsilon,\ \ &|f\left( x_{i} \right) - y_{i}| > \epsilon \\
+\end{matrix} \right.\</script><p>于是可以利用梯度下降法等进行求解。同样类比于 SVM 的对偶问题、我们可以提出 SVR 的对偶问题，细节就不展开叙述了</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 支持向量机 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 算法 </tag>
+            
+            <tag> 综述 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[核模型的实现与评估]]></title>
+      <url>/posts/917ccef9/</url>
+      <content type="html"><![CDATA[<p>有了上一篇文章的诸多准备、我们就能以之为基础实现核感知机和 SVM 了。不过需要指出的是，由于我们实现的 SVM 是一个朴素的版本、所以如果是要在实际任务中应用 SVM 的话，还是应该使用由前人开发、维护并经过长年考验的成熟的库（比如 LibSVM 等）；这些库能够处理更大的数据和更多的边值情况、运行的速度也会快上很多，这是因为它们通常都使用了底层语言来实现核心算法、且在算法上也做了许多数值稳定性和数值优化的处理</p>
+<a id="more"></a>
+<h1 id="核感知机的实现"><a href="#核感知机的实现" class="headerlink" title="核感知机的实现"></a>核感知机的实现</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">from</span> Util.Bases <span class="keyword">import</span> KernelBase</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">KernelPerceptron</span><span class="params">(KernelBase)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        KernelBase.__init__(self)</div><div class="line">        <span class="comment"># 对于核感知机而言、循环体中所需的额外参数是学习速率（默认为1）</span></div><div class="line">        self._fit_args, self._fit_args_names = [<span class="number">1</span>], [<span class="string">"lr"</span>]</div><div class="line"></div><div class="line">    <span class="comment"># 更新dw</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_dw_cache</span><span class="params">(self, idx, lr, sample_weight)</span>:</span></div><div class="line">        self._dw_cache = lr * self._y[idx] * sample_weight[idx]</div><div class="line"></div><div class="line">    <span class="comment"># 更新db</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_db_cache</span><span class="params">(self, idx, lr, sample_weight)</span>:</span></div><div class="line">        self._db_cache = self._dw_cache</div><div class="line"></div><div class="line">    <span class="comment"># 利用和训练样本中的类别向量y来更新w和b</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_params</span><span class="params">(self)</span>:</span></div><div class="line">        self._w = self._alpha * self._y</div><div class="line">        self._b = np.sum(self._w)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_fit</span><span class="params">(self, sample_weight, lr)</span>:</span></div><div class="line">        <span class="comment"># 获取加权误差向量</span></div><div class="line">        _err = (np.sign(self._prediction_cache) != self._y) * sample_weight</div><div class="line">        <span class="comment"># 引入随机性以进行随机梯度下降</span></div><div class="line">        _indices = np.random.permutation(len(self._y))</div><div class="line">        <span class="comment"># 获取“错得最严重”的样本所对应的下标</span></div><div class="line">        _idx = _indices[np.argmax(_err[_indices])]</div><div class="line">        <span class="comment"># 若该样本被正确分类、则所有样本都已正确分类，此时返回真值、退出训练循环体</span></div><div class="line">        <span class="keyword">if</span> self._prediction_cache[_idx] == self._y[_idx]:</div><div class="line">            <span class="keyword">return</span> <span class="keyword">True</span></div><div class="line">        <span class="comment"># 否则、进行随机梯度下降</span></div><div class="line">        self._alpha[_idx] += lr</div><div class="line">        self._update_dw_cache(_idx, lr, sample_weight)</div><div class="line">        self._update_db_cache(_idx, lr, sample_weight)</div><div class="line">        self._update_pred_cache(_idx)</div></pre></td></tr></table></figure>
+<p>可以看到代码清晰简洁，这主要得益于核感知机算法本身比较直白。我们可以先通过螺旋线数据集来大致看看它的分类能力、结果如下图所示：</p>
+<img src="/posts/917ccef9/p1.png" alt="p1.png" title="">
+<p>左图为 RBF 核感知机（<script type="math/tex">\gamma = 0.5</script>）、准确率为 90.0%；右图为多项式核感知机（<script type="math/tex">p = 12</script>）、准确率为 98.75%（迭代次数都是<script type="math/tex">10^{5}</script>）。虽说效果貌似还不错，但是由它们的训练曲线可以看出、训练过程其实是相当“不稳定”的：</p>
+<img src="/posts/917ccef9/p2.png" alt="p2.png" title="">
+<p>左、右图分别对应着 RBF 核感知机和多项式核感知机的训练曲线。之所以有这么大的波动、是因为我们采取的随机梯度下降每次只会进行非常局部的更新，而螺旋线数据集本身又具有比较特殊的结构，从而在直观上也能想象、模型的参数在训练的过程中很容易来回震荡。这一点在 SVM 上也会有体现、因为我们打算实现的 SMO 算法同样也是针对局部（两个变量）进行更新的</p>
+<h1 id="核-SVM-的实现"><a href="#核-SVM-的实现" class="headerlink" title="核 SVM 的实现"></a>核 SVM 的实现</h1><p>接下来就看看核 SVM 的实现，虽说有些繁复、但其实只是一步一步地将之前说过的算法翻译出来而已，如果能理顺算法的逻辑的话、实现本身其实并不困难：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"></div><div class="line"><span class="keyword">from</span> Util.Bases <span class="keyword">import</span> KernelBase, KernelConfig</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SVM</span><span class="params">(KernelBase, metaclass=SubClassChangeNamesMeta)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        KernelBase.__init__(self)</div><div class="line">        <span class="comment"># 对于核SVM而言、循环体中所需的额外参数是容许误差（默认为）</span></div><div class="line">        self._fit_args, self._fit_args_names = [<span class="number">1e-3</span>], [<span class="string">"tol"</span>]</div><div class="line">        self._c = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="comment"># 实现SMO算法中、挑选出第一个变量的方法</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_pick_first</span><span class="params">(self, tol)</span>:</span></div><div class="line">        con1 = self._alpha &gt; <span class="number">0</span></div><div class="line">        con2 = self._alpha &lt; self._c</div><div class="line">        <span class="comment"># 算出损失向量并拷贝成3份</span></div><div class="line">        err1 = self._y * self._prediction_cache - <span class="number">1</span></div><div class="line">        err2 = err1.copy()</div><div class="line">        err3 = err1.copy()</div><div class="line">        <span class="comment"># 将相应的数位置为0</span></div><div class="line">        err1[con1 | (err1 &gt;= <span class="number">0</span>)] = <span class="number">0</span></div><div class="line">        err2[(~con1 | ~con2) | (err2 == <span class="number">0</span>)] = <span class="number">0</span></div><div class="line">        err3[con2 | (err3 &lt;= <span class="number">0</span>)] = <span class="number">0</span></div><div class="line">        <span class="comment"># 算出总的损失向量并取出最大的一项</span></div><div class="line">        err = err1 ** <span class="number">2</span> + err2 ** <span class="number">2</span> + err3 ** <span class="number">2</span></div><div class="line">        idx = np.argmax(err)</div><div class="line">        <span class="comment"># 若该项的损失小于则返回返回空值</span></div><div class="line">        <span class="keyword">if</span> err[idx] &lt; tol:</div><div class="line">            <span class="keyword">return</span></div><div class="line">        <span class="comment"># 否则、返回对应的下标</span></div><div class="line">        <span class="keyword">return</span> idx</div><div class="line"></div><div class="line">    <span class="comment"># 实现SMO算法中、挑选出第二个变量的方法（事实上是随机挑选）</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_pick_second</span><span class="params">(self, idx1)</span>:</span></div><div class="line">        idx = np.random.randint(len(self._y))</div><div class="line">        <span class="keyword">while</span> idx == idx1:</div><div class="line">            idx = np.random.randint(len(self._y))</div><div class="line">        <span class="keyword">return</span> idx</div><div class="line"></div><div class="line">    <span class="comment"># 获取新的的下界</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_get_lower_bound</span><span class="params">(self, idx1, idx2)</span>:</span></div><div class="line">        <span class="keyword">if</span> self._y[idx1] != self._y[idx2]:</div><div class="line">            <span class="keyword">return</span> max(<span class="number">0.</span>, self._alpha[idx2] - self._alpha[idx1])</div><div class="line">        <span class="keyword">return</span> max(<span class="number">0.</span>, self._alpha[idx2] + self._alpha[idx1] - self._c)</div><div class="line"></div><div class="line">    <span class="comment"># 获取新的的上界</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_get_upper_bound</span><span class="params">(self, idx1, idx2)</span>:</span></div><div class="line">        <span class="keyword">if</span> self._y[idx1] != self._y[idx2]:</div><div class="line">            <span class="keyword">return</span> min(self._c, self._c + self._alpha[idx2] - self._alpha[idx1])</div><div class="line">        <span class="keyword">return</span> min(self._c, self._alpha[idx2] + self._alpha[idx1])</div><div class="line"></div><div class="line">    <span class="comment"># 更新dw</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_dw_cache</span><span class="params">(self, idx1, idx2, da1, da2, y1, y2)</span>:</span></div><div class="line">        self._dw_cache = np.array([da1 * y1, da2 * y2])</div><div class="line"></div><div class="line">    <span class="comment"># 更新db</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_db_cache</span><span class="params">(self, idx1, idx2, da1, da2, y1, y2, e1, e2)</span>:</span></div><div class="line">        gram_12 = self._gram[idx1][idx2]</div><div class="line">        b1 = -e1 - y1 * self._gram[idx1][idx1] * da1 - y2 * gram_12 * da2</div><div class="line">        b2 = -e2 - y1 * gram_12 * da1 - y2 * self._gram[idx2][idx2] * da2</div><div class="line">        self._db_cache = (b1 + b2) * <span class="number">0.5</span></div><div class="line"></div><div class="line">    <span class="comment"># 利用和训练样本中的类别向量y来更新w和b</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_params</span><span class="params">(self)</span>:</span></div><div class="line">        self._w = self._alpha * self._y</div><div class="line">        _idx = np.argmax((self._alpha != <span class="number">0</span>) &amp; (self._alpha != self._c))</div><div class="line">        self._b = self._y[_idx] – np.sum(self._alpha * self._y * self._gram[_idx])</div></pre></td></tr></table></figure>
+<p>以上就是 SMO 算法中的核心步骤，接下来只需要将它们整合进一个大框架中即可（需要指出的是，随机选取第二个变量虽说效果也不错、但效率终究还是会差上一点；不过考虑到实现的复杂度、我们还是用随机选取的方法来进行实现）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义局部更新参数的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_update_alpha</span><span class="params">(self, idx1, idx2)</span>:</span></div><div class="line">    l, h = self._get_lower_bound(idx1, idx2), self._get_upper_bound(idx1, idx2)</div><div class="line">    y1, y2 = self._y[idx1], self._y[idx2]</div><div class="line">    e1 = self._prediction_cache[idx1] - self._y[idx1]</div><div class="line">    e2 = self._prediction_cache[idx2] - self._y[idx2]</div><div class="line">    eta = self._gram[idx1][idx1] + self._gram[idx2][idx2] - <span class="number">2</span> * self._gram[idx1][idx2]</div><div class="line">    a2_new = self._alpha[idx2] + (y2 * (e1 - e2)) / eta</div><div class="line">    <span class="keyword">if</span> a2_new &gt; h:</div><div class="line">        a2_new = h</div><div class="line">    <span class="keyword">elif</span> a2_new &lt; l:</div><div class="line">        a2_new = l</div><div class="line">    a1_old, a2_old = self._alpha[idx1], self._alpha[idx2]</div><div class="line">    da2 = a2_new - a2_old</div><div class="line">    da1 = -y1 * y2 * da2</div><div class="line">    self._alpha[idx1] += da1</div><div class="line">    self._alpha[idx2] = a2_new</div><div class="line">    <span class="comment"># 根据、来更新dw和db并局部更新</span></div><div class="line">    self._update_dw_cache(idx1, idx2, da1, da2, y1, y2)</div><div class="line">    self._update_db_cache(idx1, idx2, da1, da2, y1, y2, e1, e2)</div><div class="line">    self._update_pred_cache(idx1, idx2)</div><div class="line"></div><div class="line"><span class="comment"># 初始化惩罚因子C</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_prepare</span><span class="params">(self, **kwargs)</span>:</span></div><div class="line">    self._c = kwargs.get(<span class="string">"c"</span>, KernelConfig.default_c)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_fit</span><span class="params">(self, sample_weight, tol)</span>:</span></div><div class="line">    idx1 = self._pick_first(tol)</div><div class="line">    <span class="comment"># 若没能选出第一个变量、则所有样本的误差都，此时返回真值、退出训练循环体</span></div><div class="line">    <span class="keyword">if</span> idx1 <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">return</span> <span class="keyword">True</span></div><div class="line">    idx2 = self._pick_second(idx1)</div><div class="line">    self._update_alpha(idx1, idx2)</div></pre></td></tr></table></figure>
+<p>可以看到大部分代码确实只是算法的直译。同样可以先通过螺旋线数据集来大致看看核 SVM 的分类能力、结果如下图所示（图中用黑圈标注的样本点即是支持向量）：</p>
+<img src="/posts/917ccef9/p3.png" alt="p3.png" title="">
+<p>左图为 RBF 核 SVM（<script type="math/tex">\gamma = 0.5</script>）、迭代了 729 次即达到了停机条件（所有样本的误差都<script type="math/tex">< \epsilon</script>）、最终准确率为 51.25%；右图为多项式核 SVM（<script type="math/tex">p = 12</script>）、迭代了 6727 次即达到了停机条件、准确率为 97.5%。它们的训练曲线如下图所示：</p>
+<img src="/posts/917ccef9/p4.png" alt="p4.png" title="">
+<p>左、右图分别对应着 RBF 核 SVM 和多项式核 SVM 的训练曲线。虽说看上去似乎比核感知机的表现还要差、但这毕竟只是一个特殊的情形；事实上、即使是成熟的 SVM 库也并不是万能的。比如如果直接使用螺旋线数据集来训练 sklearn 中的、基于 LibSVM 进行实现的 SVM 模型的话、会得到如下图所示的结果：</p>
+<img src="/posts/917ccef9/p5.png" alt="p5.png" title="">
+<p>左图为 RBF 核 SVM（<script type="math/tex">\gamma = 0.5</script>）、最终准确率为 50.0%；右图为多项式核 SVM（<script type="math/tex">p = 12</script>）、准确率为 65.0%。造成这种差异的原因在于我们实现的多项式核函数和 sklearn 中的 SVM 所使用的多项式核函数不一样，如果将我们的核函数传进去、是可以得到相似结果的</p>
+<p>作为本篇文章的收尾，我们可以通过画出两种核模型在蘑菇数据集上的训练曲线来简单地评估一下模型在真实数据下的表现。为了说明模型的泛化能力，我们只取 100 个样本作为训练样本、并用剩余 8000 多个样本作为测试样本来检验</p>
+<p>首先来看一下核感知机的表现：</p>
+<img src="/posts/917ccef9/p6.png" alt="p6.png" title="">
+<p>左图为 RBF 核感知机（<script type="math/tex">\gamma \approx 0.04546</script>）的训练曲线、最终在测试集上的准确率为 92.53%；右图为多项式核感知机（<script type="math/tex">p = 3</script>）的训练曲线、最终在测试集上的准确率为 91.59%（迭代次数都是<script type="math/tex">10^{4}</script>）。由于只采用了 100 个样本训练、每次训练后的模型表现会波动得比较厉害；不过总体而言、RBF 核感知机会比多项式核感知机波动得更厉害一点</p>
+<p>接下来看一下核 SVM 的表现：</p>
+<img src="/posts/917ccef9/p7.png" alt="p7.png" title="">
+<p>左图为 RBF 核 SVM（<script type="math/tex">\gamma \approx 0.04546</script>）、迭代了 462 次即达到了停机条件、最终在测试集上的准确率为 94.29%；右图为多项式核 SVM（<script type="math/tex">p = 3</script>）、迭代 1609 次即达到了停机条件、最终在测试集上的准确率为 92.96%</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 支持向量机 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> Python </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[从线性到非线性]]></title>
+      <url>/posts/924abfe1/</url>
+      <content type="html"><![CDATA[<p>前文已经提过，由于对偶形式中的样本点仅以内积的形式出现、所以利用核技巧能将线性算法“升级”为非线性算法。有一个与核技巧（Kernel Trick）类似的概念叫核方法（Kernel Method），这两者的区别可以简单地从字面意思去认知：当我们提及核方法（Method）时、我们比较注重它背后的原理；当我们提及核技巧（Trick）时、我们更注重它实际的应用。考虑到本书的主旨、我们还是选择了核技巧这一说法</p>
+<p><strong><em>注意：以上关于核技巧和核方法这两个名词的区分不是一种共识、而是我个人为了简化问题而作的一种形象的说明，所以切忌将其作为严谨的叙述</em></strong></p>
+<a id="more"></a>
+<h1 id="核技巧简述"><a href="#核技巧简述" class="headerlink" title="核技巧简述"></a>核技巧简述</h1><p>虽说重视应用、但一些基本的概念还是需要稍微了解的。核方法本身要深究的话会牵扯到诸如正定核、内积空间、希尔伯特空间乃至于再生核希尔伯特空间（Reproducing Kernel Hilbert Space，常简称为 RKHS）、这些东西又会牵扯到泛函的相关理论，可谓是一个可以单独拿来出书的知识点。幸运的是，单就核技巧而言、我们仅需要知道其中的三个定理即可，这三个定理分别说明了核技巧的合理性、普适性和高效性。不过在叙述这三个定理之前，我们可以先来看看核技巧的直观解释</p>
+<p>核技巧往简单地说，就是将一个低维的线性不可分的数据映射到一个高维的空间、并期望映射后的数据在高维空间里是线性可分的。我们以异或数据集为例：在二维空间中、异或数据集是线性不可分的；但是通过将其映射到三维空间、我们可以非常简单地让其在三维空间中变得线性可分。比如定义映射：</p>
+<script type="math/tex; mode=display">
+\phi\left( x,y \right) = \left\{ \begin{matrix}
+\left( x,y,1 \right),\ \ & xy > 0 \\
+\left( x,y,0 \right),\ \ & xy \leq 0 \\
+\end{matrix} \right.\</script><p>该映射的效果如下图所示：</p>
+<img src="/posts/924abfe1/p1.png" alt="p1.png" title="">
+<p>可以看到，虽然左图的数据集线性不可分、但显然右图的数据集是线性可分的，这就是核技巧工作原理的一个不太严谨但仍然合理的解释</p>
+<p><strong><em>注意：这里我们暂时采用了“从低维到高维的映射”这一说法、但该说法并不完全严谨，原因会在后文说明、这里只需留一个心眼即可</em></strong></p>
+<p>从直观上来说，确实容易想象、同一份数据在越高维的空间中越有可能线性可分，但从理论上是否确实如此呢？1965 年提出的 Cover 定理解决了这个问题，它的具体叙述如下：若设 d 维空间中 N 个点线性可分的概率为<script type="math/tex">p(d,N)</script>，那么就有：</p>
+<script type="math/tex; mode=display">
+p\left( d,N \right) = \frac{2\sum_{i = 0}^{m}C_{N - 1}^{i}}{2^{N}} = \left\{ \begin{matrix}
+\frac{\sum_{i = 1}^{d}C_{N - 1}^{i}}{2^{N - 1}},\ \ & N > d + 1 \\
+1,\ \ & N \leq d + 1 \\
+\end{matrix} \right.\</script><p>其中</p>
+<script type="math/tex; mode=display">
+m = \min{(d,\ N - 1)}</script><p>定理的证明细节从略，我们只需要知道它证明了当空间的维数 d 越大时、其中的 N 个点线性可分的概率就越大，这构成了核技巧的理论基础之一</p>
+<p>至此，似乎问题就转化为了如何寻找合适的映射<script type="math/tex">\phi</script>、使得数据集在被它映射到高维空间后变得线性可分。不过可以想象的是，现实任务中的数据集要比上文我们拿来举例的异或数据集要复杂得多、直接构造一个恰当的<script type="math/tex">\phi</script>的难度甚至可能高于解决问题本身。而核技巧的巧妙之处就在于，它能将构造映射这个过程再次进行转化、从而使得问题变得简易：它通过核函数来避免显式定义映射<script type="math/tex">\phi</script>。往简单里说、核技巧会通过用核函数</p>
+<script type="math/tex; mode=display">
+K\left( x_{i},x_{j} \right) = \phi\left( x_{i} \right) \cdot \phi(x_{j})</script><p>替换各式算法中出现的内积</p>
+<script type="math/tex; mode=display">
+x_{i} \cdot x_{j}</script><p>来完成将数据从低维映射到高维的过程。换句话说、核技巧的思想如下：</p>
+<ul>
+<li>将算法表述成样本点内积的组合（这经常能通过算法的对偶形式实现）</li>
+<li>设法找到核函数<script type="math/tex">K\left( x_i,x_j\right)</script>，它能返回样本点<script type="math/tex">x_i</script>、<script type="math/tex">x_j</script>被<script type="math/tex">\phi</script>作用后的内积</li>
+<li>用<script type="math/tex">K\left( x_i,x_j\right)</script>替换<script type="math/tex">x_i\cdot x_j</script>、完成低维到高维的映射（同时也完成了从线性算法到非线性算法的转换）</li>
+</ul>
+<p>而核技巧事实上能够应用的场景更为宽泛——在 2002 年由 Sch<script type="math/tex">\ddot{o}</script>lkopf 和 Smola 证明的表示定理告诉我们：设<script type="math/tex">\mathcal{H}</script>为核函数<script type="math/tex">K</script>对应的映射后的空间（RKHS），<script type="math/tex">\left\| h \right\|_{\mathcal{H}}</script>表示<script type="math/tex">\mathcal{H}</script>中<script type="math/tex">h</script>的范数，那么对于任意单调递增的函数<script type="math/tex">C</script>和任意非负损失函数<script type="math/tex">L</script>、优化问题</p>
+<script type="math/tex; mode=display">
+\min_{h\in\mathcal{H}}{L\left( h\left( x_{1} \right),\ldots,h\left( x_{N} \right) \right) + C(\left\| h \right\|_{\mathcal{H}})}</script><p>的解总可以表述为核函数<script type="math/tex">K</script>的线性组合</p>
+<script type="math/tex; mode=display">
+h^{*}\left( x \right) = \sum_{i = 1}^{N}{\alpha_{i}K(x,x_{i})}</script><p>这意味着对于任意一个损失函数和一个单调递增的正则化项组成的优化问题、我们都能够对其应用核技巧。所以至此、大多数的问题就转化为如何找到能够表示成高维空间中内积的核函数了。幸运的是、1909 年提出的 Mercer 定理解决了这个问题，它的具体叙述如下：<script type="math/tex">K\left( x_{i},x_{j} \right)</script>若满足</p>
+<script type="math/tex; mode=display">
+K\left( x_{i},x_{j} \right) = K\left( x_{j},x_{i} \right)</script><p>亦即如果<script type="math/tex">K\left( x_{i},x_{j} \right)</script>是对称函数的话、那么它具有 Hilbert 空间中内积形式的充要条件有以下两个：</p>
+<ul>
+<li>对任何平方可积<script type="math/tex">g</script>、满足  <script type="math/tex; mode=display">
+\int K\left( x_{i},x_{j} \right)g\left( x_{i} \right)g\left( x_{j} \right)dx_{i}dx_{j} \geq 0</script></li>
+<li>对含任意 N 个样本的数据集<script type="math/tex">D=\left\{ x_1,...,x_N\right\}</script>、核矩阵：  <script type="math/tex; mode=display">
+\mathbf{K} = \begin{bmatrix}
+K\left( x_{1},x_{1} \right) & \ldots & K\left( x_{1},x_{N} \right) \\
+\vdots & \ddots & \vdots \\
+K\left( x_{N},x_{1} \right) & \ldots & K\left( x_{N},x_{N} \right) \\
+\end{bmatrix}_{N \times N} = \left\lbrack K_{ij} \right\rbrack_{N \times N}</script>是半正定矩阵</li>
+</ul>
+<p><strong><em>注意：通常我们会称满足这两个充要条件之一的函数为 Mercer 核函数而把核函数定义得更宽泛。由于本书不打算在理论上深入太多、所以一律将 Mercer 核函数简称为核函数。此外，虽说 Mercer 核函数确实具有 Hilbert 空间中的内积形式、但此时的 Hilbert 空间并不一定具有“维度”这么好的概念（或说、可以认为此时 Hilbert 空间的维度为无穷大，比如下面马上就要讲到的 RBF 核、它映射后的空间就是无穷维的）。这也正是为何前文说“从低维到高维的映射”不完全严谨</em></strong></p>
+<p>Mercer 定理为寻找核函数带来了极大的便利。可以证明如下两族函数都是核函数：</p>
+<ul>
+<li>多项式核  <script type="math/tex; mode=display">
+K\left( x_{i},x_{j} \right) = \left( x_{i} \cdot x_{j} + 1 \right)^{p}</script></li>
+<li>径向基（Radial Basis Function，常简称为RBF）核  <script type="math/tex; mode=display">
+K\left( x_{i},x_{j} \right) = \exp\left( - \gamma\left\| x_{i} - x_{j} \right\|^{2} \right)</script></li>
+</ul>
+<h1 id="核技巧的应用"><a href="#核技巧的应用" class="headerlink" title="核技巧的应用"></a>核技巧的应用</h1><p>我们接下来会实现的也正是这两族核函数对应的、应用了核技巧的算法，具体而言、我们会利用核技巧来将感知机和支持向量机算法从原始的线性版本“升级”为非线性版本</p>
+<p>由简入繁、先从核感知机讲起；由于感知机对偶算法十分简单、对其应用核技巧相应的也非常平凡——直接用核函数替换掉相应内积即可。不过需要注意的是，由于我们采用的是随机梯度下降、所以算法中也应尽量只更新局部参数以避免进行无用的计算：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
+<li><p><strong>过程</strong>：</p>
+<ol>
+<li><p>初始化参数：  </p>
+<script type="math/tex; mode=display">
+\alpha = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script><script type="math/tex; mode=display">
+\hat{y} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script><p>同时计算核矩阵：  </p>
+<script type="math/tex; mode=display">
+\mathbf{K} = \left\lbrack K\left( x_{i},x_{j} \right) \right\rbrack_{N \times N}</script></li>
+<li><p>对<script type="math/tex">j = 1,\ldots,M</script>：  </p>
+<script type="math/tex; mode=display">
+E = \left\{ \left( x_{i},y_{i} \right) \middle| {\hat{y}}_{i} \leq 0 \right\}</script><ol>
+<li>若<script type="math/tex">E = \varnothing</script>（亦即没有误分类的样本点）则退出循环体</li>
+<li>否则，任取<script type="math/tex">E</script>中的一个样本点<script type="math/tex">(x_{i},y_{i})</script>并利用其下标更新局部参数：  <script type="math/tex; mode=display">
+\alpha_{i} \leftarrow \alpha_{i} + \eta</script><script type="math/tex; mode=display">
+dw = db = \eta y_{i}</script></li>
+<li>利用<script type="math/tex">dw</script>和<script type="math/tex">db</script>更新预测向量<script type="math/tex">\hat{y}</script>：  <script type="math/tex; mode=display">
+\hat{y} \leftarrow \hat{y} + dw\mathbf{K}_{i\mathbf{\cdot}} + db\mathbf{1}</script>其中、<script type="math/tex">\mathbf{K}_{i\mathbf{\cdot}}</script>表示<script type="math/tex">\mathbf{K}</script>的第 i 行、<script type="math/tex">\mathbf{1}</script>表示全为 1 的向量</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：感知机模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( \sum_{i = 1}^{N}{\alpha_{i}y_{i}\left( K\left( x_{i},x \right) + 1 \right)} \right)</script></li>
+</ol>
+<p>再来看如何对 SVM 应用核技巧。虽说在对偶算法上应用核技巧是非常自然、直观的，但是直接在原始算法上应用核技巧也无不可</p>
+<p>注意原始问题可以表述为：</p>
+<script type="math/tex; mode=display">
+\min_{w,b}\hat{L}\left( w,b,x,y \right) = \min_{w,b}{\frac{1}{2}\left\| w \right\|^{2} + \sum_{i = 1}^{N}{\max(0,1 - y_{i}(w \cdot x_{i} + b)}}</script><p>若令<script type="math/tex">w = \sum_{i = 1}^{N}{u_{i}\phi(x_{i})} = u \cdot \phi(x)</script>、其中：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+u &= (u_{1},\ldots,u_{N}) \\
+\phi\left( x \right) &= \left( \phi\left( x_{1} \right),\ldots,\phi\left( x_{N} \right) \right)^{T}
+\end{align}</script><p>则可知上述问题能够通过<script type="math/tex">\phi</script>映射到高维空间上：</p>
+<script type="math/tex; mode=display">
+\min_{w,b}{\frac{1}{2}u^{T}\mathbf{K}u + \sum_{i = 1}^{N}{\max(0,1 - y_{i}\left( \sum_{j = 1}^{N}{u_{i}\phi\left( x_{j} \right) \cdot \phi\left( x_{i} \right)} \right))}}</script><p>亦即</p>
+<script type="math/tex; mode=display">
+\min_{w,b}{\frac{1}{2}u^{T}\mathbf{K}u + \sum_{i = 1}^{N}{max(0,1 - y_{i}u \cdot \mathbf{K}_{i\mathbf{\cdot}})}}</script><p>利用一定的技巧是可以直接利用梯度下降法直接对这个无约束最优化问题求解的，不过相关的数学理论基础都相当繁复、实现起来也有些麻烦；尽管如此、还是有许多优秀的算法是基于上述思想的</p>
+<p>直观起见、我们还是将重点放在如何对 SMO 应用核技巧的讨论上。由于前文已经说明了 SMO 的大致步骤，所以我们先补充说明当时没有讲到的、选出两个变量后应该如何继续求解，然后再来看具体的算法应该如何叙述</p>
+<script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}K_{ij}}} + \sum_{i = 1}^{N}\alpha_{i}}</script><p>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script><p>不妨设<script type="math/tex">i=1</script>、<script type="math/tex">j=2</script>，那么在针对<script type="math/tex">\alpha_1</script>、<script type="math/tex">\alpha_2</script>的情况下，<script type="math/tex">\alpha_3,...,\alpha_N</script>是固定的、且上述最优化问题可以转化为：</p>
+<script type="math/tex; mode=display">\max_{\alpha_1,\alpha_2}{- \frac{1}{2}\left( K_{11}\alpha_{1}^{2} + y_{1}y_{2}K_{12}\alpha_{1}\alpha_{2} + K_{22}\alpha_{2}^{2} \right) - \left( y_{1}\alpha_{1}\sum_{i = 3}^{N}{y_{i}\alpha_{i}K_{i1}} + y_{2}\alpha_{2}\sum_{i = 3}^{N}K_{i2} \right) + {(\alpha}_{1} + \alpha_{2})}</script><p>使得对<script type="math/tex">i = 1</script>和<script type="math/tex">i = 2</script>、有</p>
+<script type="math/tex; mode=display">
+y_{1}\alpha_{1} + y_{2}\alpha_{2} = - \sum_{i = 3}^{N}{y_{i}\alpha_{i} = const}</script><script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script><p>其中<script type="math/tex">const</script>为常数。可以看出此时问题确实转化为了一个带约束的二次函数求极值问题、从而能够比较简单地求出其解析解。推导过程从略、以下就直接在算法中写出结果：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、容许误差<script type="math/tex">\epsilon</script>，其中：  <script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
+<li><p><strong>过程</strong>：</p>
+<ol>
+<li>初始化参数：  <script type="math/tex; mode=display">
+\alpha = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script><script type="math/tex; mode=display">
+\hat{y} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script>同时计算核矩阵：  <script type="math/tex; mode=display">
+\mathbf{K} = \left\lbrack K\left( x_{i},x_{j} \right) \right\rbrack_{N \times N}</script></li>
+<li><p>对<script type="math/tex">j = 1,\ldots,M</script>：</p>
+<ol>
+<li>选出违反 KKT 条件最严重的样本点<script type="math/tex">(x_{i},y_{i})</script>，若其违反程度小于<script type="math/tex">\epsilon</script>、则退出循环体</li>
+<li><p>否则、选出异于i的任一个下标 j，针对<script type="math/tex">\alpha_{i}</script>和<script type="math/tex">\alpha_{j}</script>构造一个新的只有两个变量二次规划问题并求出解析解。具体而言，首先要更新的是<script type="math/tex">\alpha_{2}</script>、它由以下几个参数定出：  </p>
+<script type="math/tex; mode=display">
+\begin{align}
+e_{i} &= {\hat{y}}_{i} - y_{i}\ (i = 1,2) \\
+dK &= K_{11} + K_{22} - 2K_{12} \\
+\alpha_{2}^{new,raw} &= \alpha_{2} + \frac{y_{2}\left( e_{1} - e_{2} \right)}{dK}
+\end{align}</script><p>考虑到约束条件、我们需要定出新的<script type="math/tex">\alpha_{2}</script>下上界：  </p>
+<script type="math/tex; mode=display">
+\begin{align}
+l &= \left\{ \begin{matrix}
+max(0,\alpha_{2} - \alpha_{1}),\ \ & y_{1} \neq y_{2} \\
+max(0,\alpha_{2} + \alpha_{1} - C),\ \ & y_{1} = y_{2} \\
+\end{matrix} \right.\ \\
+
+h &= \left\{ \begin{matrix}
+min(C,C + \alpha_{2} - \alpha_{1}),\ \ & y_{1} \neq y_{2} \\
+max(C,\alpha_{2} + \alpha_{1}),\ \ & y_{1} = y_{2} \\
+\end{matrix} \right.\
+\end{align}</script><p>继而根据<script type="math/tex">l</script>和<script type="math/tex">h</script>对<script type="math/tex">\alpha_{2}^{new,raw}</script>进行“裁剪”即可：  </p>
+<script type="math/tex; mode=display">
+\alpha_{2} \leftarrow \left\{ \begin{matrix}
+l,\ \ &\alpha_{2}^{new,raw} < l \\
+\alpha_{2}^{new,raw},\ \ &{l \leq \alpha}_{2}^{new,raw} \\
+h,\ \ &\alpha_{2}^{new,raw} > h \\
+\end{matrix} \right.\  \leq h</script><p>这里要注意记录<script type="math/tex">\alpha_{2}</script>的增量：  </p>
+<script type="math/tex; mode=display">
+\Delta\alpha_{2} = \alpha_{2}^{\text{new}} - \alpha_{2}^{\text{old}}</script></li>
+<li>利用<script type="math/tex">\Delta\alpha_{2}</script>更新<script type="math/tex">\alpha_{1}</script>、同时注意记录<script type="math/tex">\alpha_{1}</script>的增量：  <script type="math/tex; mode=display">
+\begin{align}
+\alpha_{1} &\leftarrow \alpha_{1} - y_{1}y_{2}\Delta\alpha_{2} \\
+\Delta\alpha_{1} &= \alpha_{1}^{\text{new}} - \alpha_{1}^{\text{old}}
+\end{align}</script></li>
+<li>利用<script type="math/tex">\Delta\alpha_{1}</script>、<script type="math/tex">\Delta\alpha_{2}</script>进行局部更新：  <script type="math/tex; mode=display">
+\begin{align}
+dw &= (y_{1}\Delta\alpha_{1},y_{2}\Delta\alpha_{2}) \\
+db &= \frac{b_{1} + b_{2}}{2}
+\end{align}</script>其中  <script type="math/tex; mode=display">
+\begin{align}
+b_{1} &= - e_{1} - y_{1}K_{11}\Delta\alpha_{1} - y_{2}K_{12}\Delta\alpha_{2} \\
+b_{2} &= - e_{2} - y_{1}K_{12}\Delta\alpha_{1} - y_{2}K_{22}\Delta\alpha_{2}
+\end{align}</script></li>
+<li>利用<script type="math/tex">dw</script>和<script type="math/tex">db</script>更新预测向量<script type="math/tex">\hat{y}</script>：  <script type="math/tex; mode=display">
+\hat{y} \leftarrow \hat{y} + dw_{1}\mathbf{K}_{1\mathbf{\cdot}} + dw_{2}\mathbf{K}_{2\mathbf{\cdot}} + db\mathbf{1}</script>其中、`$\mathbf{K}_{\mathbf{i}\mathbf{\cdot}}$表示$\mathbf{K}$的第i行、$\mathbf{1}$表示全为1的向量</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：感知机模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( \sum_{i = 1}^{N}{\alpha_{i}y_{i}K\left( x_{i},x \right)} + b \right)</script>、其中：</li>
+</ol>
+<script type="math/tex; mode=display">
+b = y_{k} - \sum_{i = 1}^{N}{y_{i}\alpha_{i}K_{ik}}</script><p>这里的下标 k 满足</p>
+<script type="math/tex; mode=display">
+0 < \alpha_{k} < C</script><p>可以用反证法证明这样的下标 k 必存在、具体步骤从略</p>
+<p>从这两种算法应用核技巧的方式可以看出，虽然它们应用的训练算法完全不同（一个是随机梯度下降、一个是序列最小最优化）、但它们每一次迭代中做的事情却有相当多是一致的；为了合理重复利用代码、我们可以先把对应的实现都抽象出来：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">KernelBase</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._fit_args, self._args_names：记录循环体中所需额外参数的信息的属性</div><div class="line">        self._x, self._y, self._gram：记录数据集和Gram矩阵的属性</div><div class="line">            self._w, self._b, self._alpha：记录各种参数的属性</div><div class="line">        self._kernel, self._kernel_name, self._kernel_param：记录核函数相关信息的属性</div><div class="line">            self._prediction_cache, self._dw_cache, self._db_cache：记录 、dw、db的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(KernelBase, self).__init__()</div><div class="line">        self._fit_args, self._fit_args_names = <span class="keyword">None</span>, []</div><div class="line">        self._x = self._y = self._gram = <span class="keyword">None</span></div><div class="line">        self._w = self._b = self._alpha = <span class="keyword">None</span></div><div class="line">        self._kernel = self._kernel_name = self._kernel_param = <span class="keyword">None</span></div><div class="line">        self._prediction_cache = self._dw_cache = self._db_cache = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="comment"># 定义计算多项式核矩阵的函数</span></div><div class="line"><span class="meta">    @staticmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_poly</span><span class="params">(x, y, p)</span>:</span></div><div class="line">        <span class="keyword">return</span> (x.dot(y.T) + <span class="number">1</span>) ** p</div><div class="line"></div><div class="line">    <span class="comment"># 定义计算RBF核矩阵的函数</span></div><div class="line"><span class="meta">    @staticmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_rbf</span><span class="params">(x, y, gamma)</span>:</span></div><div class="line">        <span class="keyword">return</span> np.exp(-gamma * np.sum((x[..., <span class="keyword">None</span>, :] - y) ** <span class="number">2</span>, axis=<span class="number">2</span>))</div></pre></td></tr></table></figure>
+<p>其中定义 RBF 核函数时用到了升维的操作、这算是 Numpy 的高级使用技巧之一；具体的思想和机制会在后续的文章中进行简要说明、这里就暂时按下不表</p>
+<p>以上我们就搭好了基本的框架、接下来要做的就是继续把具有普适性的训练过程进行抽象和实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 默认使用RBF核、默认迭代次数epoch为一万次</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, kernel=<span class="string">"rbf"</span>, epoch=<span class="number">10</span> ** <span class="number">4</span>, **kwargs)</span>:</span></div><div class="line">    self._x, self._y = np.atleast_2d(x), np.array(y)</div><div class="line">    <span class="keyword">if</span> kernel == <span class="string">"poly"</span>:</div><div class="line">        <span class="comment"># 对于多项式核、默认使用KernelConfig中的default_p作为p的取值</span></div><div class="line">        _p = kwargs.get(<span class="string">"p"</span>, KernelConfig.default_p)</div><div class="line">        self._kernel_name = <span class="string">"Polynomial"</span></div><div class="line">        self._kernel_param = <span class="string">"degree = &#123;&#125;"</span>.format(_p)</div><div class="line">        self._kernel = <span class="keyword">lambda</span> _x, _y: KernelBase._poly(_x, _y, _p)</div><div class="line">    <span class="keyword">elif</span> kernel == <span class="string">"rbf"</span>:</div><div class="line">         <span class="comment"># 对于RBF核、默认使用样本x的维数n的倒数1/n作为的取值</span></div><div class="line">        _gamma = kwargs.get(<span class="string">"gamma"</span>, <span class="number">1</span> / self._x.shape[<span class="number">1</span>])</div><div class="line">        self._kernel_name = <span class="string">"RBF"</span></div><div class="line">        self._kernel_param = <span class="string">"gamma = &#123;&#125;"</span>.format(_gamma)</div><div class="line">        self._kernel = <span class="keyword">lambda</span> _x, _y: KernelBase._rbf(_x, _y, _gamma)</div><div class="line">    <span class="comment"># 初始化参数</span></div><div class="line">    self._alpha, self._w, self._prediction_cache = (</div><div class="line">        np.zeros(len(x)), np.zeros(len(x)), np.zeros(len(x)))</div><div class="line">    self._gram = self._kernel(self._x, self._x)</div><div class="line">    self._b = <span class="number">0</span></div><div class="line">    <span class="comment"># 调用 _prepare方法进行特殊参数的初始化（比如SVM中的惩罚因子C）</span></div><div class="line">    self._prepare(**kwargs)</div><div class="line">    <span class="comment"># 获取在循环体中会用到的参数</span></div><div class="line">    _fit_args = []</div><div class="line">    <span class="keyword">for</span> _name, _arg <span class="keyword">in</span> zip(self._fit_args_names, self._fit_args):</div><div class="line">        <span class="keyword">if</span> _name <span class="keyword">in</span> kwargs:</div><div class="line">            _arg = kwargs[_name]</div><div class="line">        _fit_args.append(_arg)</div><div class="line">    <span class="comment"># 迭代、直至达到迭代次数epoch或 _fit核心方法返回真值</span></div><div class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">        <span class="keyword">if</span> self._fit(sample_weight, *_fit_args):</div><div class="line">            <span class="keyword">break</span></div><div class="line">    <span class="comment"># 利用和训练样本来更新w和b</span></div><div class="line">    self._update_params()</div></pre></td></tr></table></figure>
+<p>注意到我们调用了一个叫<code>KernelConfig</code>的类、它的定义很简单：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">KernelConfig</span>:</span></div><div class="line">    default_c = <span class="number">1</span></div><div class="line">    default_p = <span class="number">3</span></div></pre></td></tr></table></figure>
+<p>亦即默认惩罚因子<script type="math/tex">C</script>为 1、多项式核的次数<script type="math/tex">p</script>为 3。同时需要注意的是，我们在循环体里面调用了<code>_fit</code>核心方法、在最后调用了<code>_update_params</code>方法，这两个方法都是留给子类定义的；不过比较巧妙的是，无论是记录<script type="math/tex">\hat{y}</script>的<code>_prediction_cache</code>的更新还是预测函数<code>predict</code>的定义、都可以写成同一种形式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义更新预测向量 _prediction_cache的函数</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_update_pred_cache</span><span class="params">(self, *args)</span>:</span></div><div class="line">    self._prediction_cache += self._db_cache</div><div class="line">    <span class="keyword">if</span> len(args) == <span class="number">1</span>:</div><div class="line">        self._prediction_cache += self._dw_cache * self._gram[args[<span class="number">0</span>]]</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        self._prediction_cache += self._dw_cache.dot(self._gram[args, ...])</div><div class="line"></div><div class="line"><span class="comment"># 定义预测函数</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x, get_raw_results=False)</span>:</span></div><div class="line">    <span class="comment"># 计算测试集和训练集之间的核矩阵并利用它来做决策</span></div><div class="line">    x = self._kernel(np.atleast_2d(x), self._x)</div><div class="line">    y_pred = x.dot(self._w) + self._b</div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> get_raw_results:</div><div class="line">        <span class="keyword">return</span> np.sign(y_pred)</div><div class="line">    <span class="keyword">return</span> y_pred</div></pre></td></tr></table></figure>]]></content>
+      
+        <categories>
+            
+            <category> 支持向量机 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 数学 </tag>
+            
+            <tag> 算法 </tag>
+            
+            <tag> Python </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[从感知机到支持向量机]]></title>
+      <url>/posts/d455305a/</url>
+      <content type="html"><![CDATA[<p>感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：</p>
+<img src="/posts/d455305a/p1.png" alt="p1.png" title="">
+<p>可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容</p>
+<a id="more"></a>
+<h1 id="间隔最大化与线性-SVM"><a href="#间隔最大化与线性-SVM" class="headerlink" title="间隔最大化与线性 SVM"></a>间隔最大化与线性 SVM</h1><p>上图的结果之所以显得不合理、主要是因为分离超平面离正负样本点集都显得“太近”了。因此一个自然的想法就是：在训练过程中考虑上超平面到点集的距离、并努力让这个距离最大化</p>
+<p>然而直接从集合出发定义集合到平面的距离是相对困难的、所以通常会将它转化为点到平面的距离。前文已经说过，对于样本点<script type="math/tex">(x_{i},y_{i})</script>而言、它到超平面<script type="math/tex">\Pi:w \cdot x + b = 0</script>的相对距离即为：</p>
+<script type="math/tex; mode=display">
+d^{*}\left( x_{i},\Pi \right) = |w \cdot x_{i} + b|</script><p>这里的相对距离<script type="math/tex">d^{*}</script>有一个更学术一点称谓——函数间隔（Functional Margin）。函数间隔有一个比较明显的缺陷就是、当<script type="math/tex">w</script>和<script type="math/tex">b</script>等比例变大或变小时，虽然超平面不会改变、但是<script type="math/tex">d^{*}</script>却会随之等比例变大或变小。为解决这个问题、我们可以比较自然地定义出所谓的几何间隔（Geometric Distance）：</p>
+<script type="math/tex; mode=display">
+d\left( x_{i},\Pi \right) = \frac{1}{\left\| w \right\|} \cdot d^{*}\left( x_{i},\Pi \right) = \frac{1}{\left\| w \right\|} \cdot |w \cdot x_{i} + b|</script><p>这里的<script type="math/tex">\left\| w \right\|</script>是<script type="math/tex">w</script>的欧式范数。顾名思义、几何间隔描述的就是向量<script type="math/tex">x_{i}</script>到超平面<script type="math/tex">\Pi</script>的几何距离（欧氏距离），它不会随<script type="math/tex">w</script>和<script type="math/tex">b</script>的等比例变化而变化、是相对稳定且直观意义优良的距离的定义方法。SVM 在训练过程中所引入的也正是各个样本点到当前分离超平面的几何距离，结合前文所说的“努力让超平面到点集的距离最大化”、SVM 算法就可以比较自然地叙述为：最大化（几何间隔）<script type="math/tex">d</script>、使得：</p>
+<script type="math/tex; mode=display">
+\frac{1}{\left\| w \right\|} \cdot \left\lbrack y_{i}\left( w \cdot x_{i} + b \right) \right\rbrack \geq d\ (i = 1,\ldots,N)</script><p>考虑到几何间隔和函数间隔之间的转换关系、该问题可以等价为：最大化<script type="math/tex">\frac{d^{*}}{\left\| w \right\|}</script>、使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq d^{*}\ (i = 1,\ldots,N)</script><p>可以发现函数间隔<script type="math/tex">d^{*}</script>的取值其实对该优化问题的解没有影响。这是因为当<script type="math/tex">d^{*}</script>变成<script type="math/tex">\lambda d^{*}</script>时、<script type="math/tex">w</script>和<script type="math/tex">b</script>也会相应地变成<script type="math/tex">\lambda w</script>和<script type="math/tex">\lambda b</script>（在超平面不变的情况下），此时<script type="math/tex">\frac{d^{*}}{\left\| w \right\|}</script>和不等式约束都没有变、所以对优化问题确实没有影响。这样的话我们就能不妨设<script type="math/tex">d^{*} = 1</script>、从而优化问题就可以转换为：最大化<script type="math/tex">\frac{1}{\left\| w \right\|}</script>、使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq 1\ (i = 1,\ldots,N)</script><p>易知该优化问题又能转化为：最小化<script type="math/tex">\frac{1}{2}\left\| w \right\|^{2}</script>、使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) - 1 \geq 0\ (i = 1,\ldots,N)</script><p>这就是 SVM 算法的最原始的形式。可以证明，只要训练集<script type="math/tex">D</script>线性可分、那么 SVM 算法对应的这个优化问题的解就存在且唯一；其中存在性的证明相对直观、唯一性的证明需要用到反证法和一些数学上的技巧，细节从略</p>
+<p>假设该优化问题的解为<script type="math/tex">w^{*}</script>和<script type="math/tex">b^{*}</script>，我们通常称超平面：</p>
+<script type="math/tex; mode=display">
+\Pi^{*}:w^{*} \cdot x + b^{*} = 0</script><p>为<script type="math/tex">D</script>的最大硬间隔分离超平面。之所以称它为“硬间隔”的理由会在后文叙述，这里暂时按下不表。需要指出的是，考虑到优化问题中的不等式约束、易知在超平面</p>
+<script type="math/tex; mode=display">
+\Pi_{1}^{*}:w^{*} \cdot x + b = - 1</script><p>和超平面</p>
+<script type="math/tex; mode=display">
+\Pi_{2}^{*}:w^{*} \cdot x + b = + 1</script><p>之间、是没有任何<script type="math/tex">D</script>中的样本点的。不过在<script type="math/tex">\Pi_{1}^{*}</script>和<script type="math/tex">\Pi_{2}^{*}</script>上、确实有可能有样本点。我们通常称<script type="math/tex">\Pi_{1}^{*}</script>和<script type="math/tex">\Pi_{2}^{*}</script>为间隔边界、称其上的某些点为支持向量</p>
+<p><strong><em>注意：也有间隔边界上的样本点全是支持向量的说法，本书采用的支持向量的定义将更“苛刻”一些，具体细节会在 SVM 算法的对偶形式的叙述中讲到</em></strong></p>
+<p>以上的叙述比较完整地说明了 SVM 如何应用于线性可分的数据集，接下来我们就看看如何将这种思想拓展到线性不可分数据集的分类之上。事实上，由于单用超平面的话、甚至连对线性不可分数据集正确分类都做不到，更不用提在此之上的将（硬）间隔最大化的问题了；但是考虑到间隔最大化的思想、我们可以做一定的“妥协”：将“硬”间隔转化为更加普适的“软”间隔。从数学的角度来说，这等价于将不等式约束放宽：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \rightarrow y_{i}\left( w \cdot x_{i} + b \right) \geq 1 - \xi_{i}</script><p>其中的<script type="math/tex">\xi_{i}</script>通常被称为“松弛变量”，它需要满足<script type="math/tex">\xi_{i} \geq 0</script>。当然、这个约束的放宽并不是没有代价的，我们要在需要最小化的<script type="math/tex">{\frac{1}{2}\left\| w \right\|}^{2}</script>上加进一个“惩罚项”来“惩罚”<script type="math/tex">\xi_{i}</script>。换句话说，我们需要最小化的项将变为：</p>
+<script type="math/tex; mode=display">
+L\left( w,b,x,y \right) = \frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}\xi_{i}</script><p>式中<script type="math/tex">L(w,b,x,y)</script>即为损失函数、损失函数中的<script type="math/tex">C</script>（<script type="math/tex">> 0</script>）通常被称为“惩罚因子”，它描述了对松弛变量<script type="math/tex">\xi_{i}</script>的“惩罚力度”：<script type="math/tex">C</script>越大意味着最终的 SVM 模型越不能容忍误分类的点，越小则反之</p>
+<p>综上所述、SVM 算法对应的优化问题可以拓展为：最小化<script type="math/tex">L(w,b,x,y)</script>、使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq 1 - \xi_{i}\ (i = 1,\ldots,N)</script><p>其中</p>
+<script type="math/tex; mode=display">
+\xi_{i} \geq 0\ (i = 1,\ldots,N)</script><p>可以证明该优化问题的解存在、且<script type="math/tex">w</script>的解唯一但<script type="math/tex">b</script>的解不唯一，证明细节从略。同时参照感知机算法、自然希望能够写出使用随机梯度下降来训练软间隔最大化 SVM 的算法；但是注意到<script type="math/tex">L</script>表达式中的<script type="math/tex">\xi_{i}</script>是有约束的（需要不小于 0）、所以直接对其进行随机梯度下降存在一定的困难。为了将问题近似转化为无约束最优化问题、我们可以引入 Hinge 损失，其定义很简单：</p>
+<script type="math/tex; mode=display">
+l\left( w,b,x,y \right) = \max(0,1 - y\left( w \cdot x + b \right))</script><p>其中<script type="math/tex">y \in \left\{ - 1, + 1 \right\}</script>。换句话说，只有在模型作出足够肯定的正确的预测时、Hinge 损失才为 0；否则即使模型作出了正确的预测、Hinge 损失还是有可能给予模型一个惩罚</p>
+<p>利用 Hinge 损失、我们可以把损失函数<script type="math/tex">L</script>写成：</p>
+<script type="math/tex; mode=display">
+\hat{L}\left( w,b,x,y \right) = \frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}{l(w,b,x_{i},y_{i})}</script><p>并通过最小化<script type="math/tex">\hat{L}</script>来求解上述 SVM 算法对应的最优化问题</p>
+<p><strong><em>注意：最小化<script type="math/tex">\hat{L}</script>和上文最优化问题的等价性可能并不太显然，但是通过对比损失函数及逐条比对约束条件、完成等价性证明不算太困难（比如直接令<script type="math/tex">\xi_{i} = l(w,b,x_{i},y_{i})</script>）</em></strong></p>
+<p>由于我们想要写出随机梯度下降的算法、所以求出<script type="math/tex">\hat{L}</script>在单一样本<script type="math/tex">(x_{i},y_{i})</script>上对<script type="math/tex">w</script>和<script type="math/tex">b</script>的偏导数是有必要的：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\partial\hat{L}(w,b,x_{i},y_{i})}{\partial w} &= w + \left\{ \begin{matrix}
+0,\ \ & y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \\
+ - Cy_{i}x_{i},\ \ & y_{i}\left( w \cdot x_{i} + b \right) < 1 \\
+\end{matrix} \right.\ \\
+
+\frac{\partial\hat{L}(w,b,x_{i},y_{i})}{\partial b} &= \left\{ \begin{matrix}
+0,\ \ & y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \\
+ - Cy_{i},\ \ & y_{i}\left( w \cdot x_{i} + b \right) < 1 \\
+\end{matrix} \right.\
+\end{align}</script><p>有了这两个偏导数之后，模仿感知机算法、我们就可以比较轻松地写出软间隔最大化 SVM 的随机梯度下降训练算法：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、惩罚因子<script type="math/tex">C</script>、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
+<li><strong>过程</strong>：<ol>
+<li>初始化参数：  <script type="math/tex; mode=display">
+w = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{n},b = 0</script></li>
+<li>对<script type="math/tex">j = 1,\ldots,M</script>：<ol>
+<li>算出误差向量<script type="math/tex">e = \left( e_{1},\ldots,e_{N} \right)^{T}</script>、其中：  <script type="math/tex; mode=display">
+e_{i} = 1 - y_{i}(w \cdot x_{i} + b)</script></li>
+<li>取出误差最大的一项：  <script type="math/tex; mode=display">
+i = \arg{\min_{i}e_{i}}</script></li>
+<li>若<script type="math/tex">e_{i} \leq 0</script>则直接退出循环体、否则取对应的样本来进行随机梯度下降  <script type="math/tex; mode=display">
+\begin{align}
+w &\leftarrow (1 - \eta)w + \eta Cy_{i}x_{i} \\
+b &\leftarrow b + \eta Cy_{i}
+\end{align}</script></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：线性 SVM 模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( w \cdot x + b \right)</script></li>
+</ol>
+<p>需要指出的是，虽然算法看上去差不多、内核也都是随机梯度下降，但其实在感知机模型对学习速率不敏感的同时、线性 SVM 对学习速率是相当敏感的。由前文提到过的 Novikoff 定理和凸优化相关理论可以从理论上解释这个现象，囿于篇幅、这里就不展开叙述了</p>
+<p>由于上述线性 SVM 算法的实现和感知机算法的实现几乎一致、所以我们就略去对线性 SVM 实现的详细说明；观众老爷们可以参照感知机的代码来尝试进行实现、我个人实现的版本则可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/e_SVM/LinearSVM.py" target="_blank" rel="external">这里</a></p>
+<p>可以通过二维线性可分数据集来简单直观地感受一下感知机和线性 SVM 的区别、结果如下图所示：</p>
+<img src="/posts/d455305a/p2.png" alt="p2.png" title="">
+<p>其中左、右图分别为感知机和线性 SVM 的表现，可以看出线性 SVM 要更合理</p>
+<h1 id="SVM-算法的对偶形式"><a href="#SVM-算法的对偶形式" class="headerlink" title="SVM 算法的对偶形式"></a>SVM 算法的对偶形式</h1><p>与感知机类似、SVM 算法也是存在着对偶形式，不过这个转化的过程会比感知机那里的转化过程复杂不少。具体的推导步骤会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中、这里我们就直接看结果：</p>
+<ul>
+<li>硬间隔最大化的对偶形式  <script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：  <script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
+\alpha_{i} \geq 0</script></li>
+<li>软间隔最大化的对偶形式  <script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：  <script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script></li>
+</ul>
+<p>可以看到它们彼此之间相似度非常高、且转化的过程和感知机的转化过程也多少有些相似。同样的，由于对偶形式中样本点仅以内积的形式出现、我们通常会先把 Gram 矩阵算出来。现我们假设对偶形式的解为<script type="math/tex">\alpha^{*} = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T}</script>、那么就有：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w^{*} &= \sum_{i = 1}^{N}{\alpha_{i}^{*}y_{i} \cdot x_{i}} \\
+b^{*} &= y_{j} - \sum_{i = 1}^{N}{y_{i}\alpha_{i}^{*}\left( x_{i} \cdot x_{j} \right)}
+\end{align}</script><p>其中<script type="math/tex">w^{*}</script>的表达式和感知机中<script type="math/tex">w^{*}</script>的表达式一致、<script type="math/tex">b^{*}</script>表达式中出现的 j 是满足<script type="math/tex">0 < \alpha_{j} < C</script>的下标（用反证法可以证明这种 j 必然存在，细节从略）</p>
+<p>在有了对偶形式之后、我们就可以叙述支持向量的一个比较“苛刻”的定义了：假设支持向量的集合为<script type="math/tex">SV</script>、那么</p>
+<ul>
+<li>在硬间隔最大化 SVM 中：  <script type="math/tex; mode=display">
+x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script></li>
+<li>在软间隔最大化 SVM 中：  <script type="math/tex; mode=display">
+x_{i} \in SV \Leftrightarrow 0 < \alpha_{i}^{*} \leq C</script></li>
+</ul>
+<p>其中在软间隔最大化 SVM 里，由于<script type="math/tex">\alpha_{i}^{*} \leq C</script>本身其实是由约束条件规定的、所以可以把上述两式统一写成：</p>
+<script type="math/tex; mode=display">
+x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下图来直观认知何谓支持向量：</p>
+<img src="/posts/d455305a/p3.png" alt="p3.png" title="">
+<p>图中的线段即为决策边界、被一个黑色圆圈给圈住的样本点即为支持向量，左图为线性可分数据集上的情况、右图为线性不可分数据集上的情况</p>
+<p>此外，说明<script type="math/tex">\alpha_{i}^{*}</script>和<script type="math/tex">\xi_{i}^{*}</script>是如何定出各个样本点和间隔边界、分离超平面之间的位置关系是有必要的，它能加深我们对对偶形式求解过程中涉及到的 KKT 条件的理解与记忆（KKT 条件的相关定义会在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中讲到）。具体而言：</p>
+<ul>
+<li>若<script type="math/tex">\alpha_{i}^{*} = 0</script>，那么<script type="math/tex">x_{i}</script>被正确分类且不在间隔边界上、又或被正确分类且在间隔边界上但不是支持向量</li>
+<li>若<script type="math/tex">0 < \alpha_{i}^{*} < C</script>，那么就有<script type="math/tex">\xi_{i} = 0</script>、亦即<script type="math/tex">x_{i}</script>落在间隔边界上且为支持向量</li>
+<li>若<script type="math/tex">\alpha_{i}^{*} = C</script>，那么：<ul>
+<li>若<script type="math/tex">\xi_{i} = 0</script>、则<script type="math/tex">x_{i}</script>落在间隔边界上且为支持向量</li>
+<li>若<script type="math/tex">0 < \xi_{i} < 1</script>、则<script type="math/tex">x_{i}</script>被正确分类且落在间隔边界和分离超平面之间</li>
+<li>若<script type="math/tex">\xi_{i} = 1</script>、则<script type="math/tex">x_{i}</script>落在分离超平面上</li>
+<li>若<script type="math/tex">\xi_{i} > 1</script>、则<script type="math/tex">x_{i}</script>被错误分类<br>由此可知、<script type="math/tex">\xi_{i}</script>其实刻画了<script type="math/tex">x_{i}</script>到相应间隔边界的函数间隔。换句话说、<script type="math/tex">\frac{\xi_{i}}{\left\| w \right\|}</script>即是<script type="math/tex">x_{i}</script>到间隔边间的距离（几何间隔）</li>
+</ul>
+</li>
+</ul>
+<h1 id="SVM-的训练"><a href="#SVM-的训练" class="headerlink" title="SVM 的训练"></a>SVM 的训练</h1><p>前文曾经提过、原始算法的对偶形式通常能将问题简化；虽然这点在感知机算法上没有太多体现，但是对于 SVM 来说，由于它的应用场景更为广泛、在许多问题的提法下转化成对偶形式的意义将非常重大。目前已经有许多针对 SVM 的成熟算法，本书拟介绍的是其中由 Platt 在 1998 年提出的、针对对偶问题求解的序列最小最优化算法（SMO）。本篇文章主要介绍 SMO 的思路和大概步骤，详细的叙述会在下一篇文章介绍完核技巧后进行</p>
+<p>SMO 是一种启发式算法，其主要手段是在每次迭代中专注于只有两个变量的优问题以期望在可以接受的时间内得到一个较优解。具体而言、SMO 要解决的是软间隔最大化 SVM 的对偶问题：</p>
+<script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script><p>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：</p>
+<script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script><p>解决方案是在循环体中不断针对两个变量构造二次规划、并通过求出其解析解来优化原始的对偶问题。大致步骤如下：</p>
+<ul>
+<li>考察所有变量（<script type="math/tex">\alpha_{1},\ldots,\alpha_{N}</script>）及对应的样本点（<script type="math/tex">\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})</script>）满足 KKT 条件的情况</li>
+<li>若所有变量及对应样本在容许误差内都满足 KKT 条件，则退出循环体、完成训练</li>
+<li>否则、通过如下步骤选出两个变量来构造新的规划问题：<ul>
+<li>选出违反 KKT 条件最严重的样本点、以其对应的变量作为第一个变量</li>
+<li>第二个变量的选取有一种比较繁复且高效的方法，但对于一个朴素的实现而言、第二个变量即使随机选取也无不可</li>
+</ul>
+</li>
+<li>将上述步骤选出的变量以外的变量固定、仅针对这两个变量进行最优化。易知此时问题转化为了求二次函数的极大值、从而能简单地得到解析解</li>
+</ul>
+<p>这里仅简要说明一下 SVM 对偶算法中的 KKT 条件，详细的陈列则会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中。具体而言、<script type="math/tex">\alpha_{i}</script>及其对应样本<script type="math/tex">(x_{i},y_{i})</script>的 KKT 条件为：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\alpha_{i} = 0 &\Leftrightarrow y_{i}g\left( x_{i} \right) \geq 1 \\
+0 < \alpha_{i} < C &\Leftrightarrow y_{i}g\left( x_{i} \right) = 1 \\
+\alpha_{i} = C &\Leftrightarrow y_{i}g\left( x_{i} \right) \leq 1
+\end{align}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
+<script type="math/tex; mode=display">
+c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
+<ul>
+<li>计算“损失向量”<script type="math/tex">c = \left( c_{1},\ldots,c_{N} \right)^{T}</script>、其中：  <script type="math/tex; mode=display">
+c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script></li>
+<li>将损失向量<script type="math/tex">c</script>复制三份（<script type="math/tex">c^{\left( 1 \right)}</script>、<script type="math/tex">c^{\left( 2 \right)}</script>、<script type="math/tex">c^{\left( 3 \right)}</script>）并分情况将相应位置的损失置为 0。具体而言：<ul>
+<li>将<script type="math/tex">\alpha_{i} > 0</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) \geq 1</script>对应的<script type="math/tex">c_{i}^{\left( 1 \right)}</script>置为 0</li>
+<li>将<script type="math/tex">\alpha_{i} = 0</script>或<script type="math/tex">\alpha_{i} = C</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) = 1</script>对应的<script type="math/tex">c_{i}^{\left( 2 \right)}</script>置为 0</li>
+<li>将<script type="math/tex">\alpha_{i} < C</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) \leq 1</script>对应的<script type="math/tex">c_{i}^{\left( 3 \right)}</script>置为 0</li>
+</ul>
+</li>
+<li>将三份损失向量相加并取损失最大的样本对应<script type="math/tex">\alpha_i</script>的作为SMO的第一个变量、亦即：  <script type="math/tex; mode=display">
+i = \arg{\max_{i}{\left\{ c_{i}^{\left( 1 \right)} + c_{i}^{\left( 2 \right)} + c_{i}^{\left( 3 \right)}|i = 1,\ldots,N\right\}}}</script></li>
+</ul>
+<p>在后面 SVM 的朴素实现中、我们打算采用的正是这种定义</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 支持向量机 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 数学 </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[感知机模型]]></title>
+      <url>/posts/93db8ec2/</url>
+      <content type="html"><![CDATA[<p>本篇文章所叙述的感知机模型是我们第一次应用到梯度下降法的模型，它的算法相当简单、但其框架却相当具有代表性。虽然说感知机模型只能处理非常特殊的问题（线性可分的数据集的分类问题）、但它的思想却是值得琢磨的</p>
+<a id="more"></a>
+<h1 id="线性可分性与感知机策略"><a href="#线性可分性与感知机策略" class="headerlink" title="线性可分性与感知机策略"></a>线性可分性与感知机策略</h1><p>在详细叙述感知机模型的原始算法之前，了解感知机适用范围和基本思想是必要的。正如前文所说，感知机只能用于给线性可分的数据集分类。其中，所谓的“线性可分性”的定义其实相当直观：对于一个数据集</p>
+<script type="math/tex; mode=display">
+D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script><p>其中</p>
+<script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script><p>如果存在一个超平面<script type="math/tex">\Pi</script>能够将<script type="math/tex">D</script>中的正负样本点精确地划分到<script type="math/tex">S</script>的两侧、亦即：</p>
+<script type="math/tex; mode=display">
+\exists\Pi:\ w \cdot x + b = 0</script><p>使得</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w \cdot x_{i} + b &< 0\ \left( \forall y_{i} = - 1 \right) \\
+w \cdot x_{i} + b &> 0\ \left( \forall y_{i} = + 1 \right)
+\end{align}</script><p>那么就称数据集<script type="math/tex">D</script>是线性可分的（Linearly Separable）；否则、就称<script type="math/tex">D</script>线性不可分</p>
+<p>当维数<script type="math/tex">n = 2</script>时、数据集线性可分等价于正负样本点能在二维平面上被一条直线精确划分；当<script type="math/tex">n = 3</script>时则等价于能在三维空间中被一个平面精确划分。下给出一组线性可分和一组线性不可分的例子：</p>
+<img src="/posts/93db8ec2/p1.png" alt="线性可分的数据集" title="线性可分的数据集">
+<img src="/posts/93db8ec2/p2.png" alt="线性不可分的数据集" title="线性不可分的数据集">
+<p>从数学的角度来说，线性可分性还有一个比较直观的等价定义：正负样本点集的凸包彼此不交。所谓凸包的定义如下：若集合<script type="math/tex">S \subset \mathbb{R}^{n}</script>由<script type="math/tex">N</script>个点组成：</p>
+<script type="math/tex; mode=display">
+S = \left\{ x_{1},\ldots,x_{N} \right\}\ (x_{i} \in \mathbb{R}^{n},\forall i = 1,\ldots,N)</script><p>那么<script type="math/tex">S</script>的凸包<script type="math/tex">\text{conv}(S)</script>即为：</p>
+<script type="math/tex; mode=display">
+\text{conv}\left( S \right) = \left\{ x = \sum_{i = 1}^{N}{\lambda_{i}x_{i}}|\sum_{i = 1}^{N}\lambda_{i} = 1,\lambda_{i} \geq 0(i = 1,\ldots,N)\right\}</script><p>比如，上述两个二维数据集的凸包将如下面两张图所示：</p>
+<img src="/posts/93db8ec2/p3.png" alt="p3.png" title="">
+<img src="/posts/93db8ec2/p4.png" alt="p4.png" title="">
+<p>第一张图中，正负样本点集的凸包不交、所以数据集线性可分；第二张图中的橙色区域即为正负样本点集凸包的相交处、所以数据集线性不可分</p>
+<p>该等价性的证明可以用反证法得出；由于过程不算困难且结论相当直观、所以具体的推导步骤从略</p>
+<p>知道了线性可分性的定义之后、感知机模型的目的也就容易想到了——无非就是为了找到上文提到过的、能将线性可分数据集中的正负样本点精确划分到两侧的超平面<script type="math/tex">\Pi</script>。考虑到机器学习的共性，我们希望能将找超平面的过程转化为最小化一个损失函数的过程；感知机策略的具体表现、就在于如何定义这个损失函数上。考虑到<script type="math/tex">\Pi</script>的性质，损失函数的定义其实是很自然的：</p>
+<script type="math/tex; mode=display">
+L\left( w,b,x,y \right) = - \sum_{x_{i} \in E}^{}{y_{i}(w \cdot x_{i} + b)}</script><p>其中<script type="math/tex">E</script>是被当前感知机误分类的点集，亦即对<script type="math/tex">\forall x_{i} \in E</script>、有：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w \cdot x_{i} + b &\geq 0\ \left( if\ y_{i} = - 1 \right) \\
+w \cdot x_{i} + b &\leq 0\ \left( if\ y_{i} = + 1 \right)
+\end{align}</script><p>换句话说、损失函数还可以表示为：</p>
+<script type="math/tex; mode=display">
+L\left( w,b,x,y \right) = \sum_{x_{i} \in E}^{}\left| w \cdot x_{i} + b \right|</script><p>注意到对于样本点<script type="math/tex">(x_{i},y_{i})</script>而言、<script type="math/tex">\left| w \cdot x_{i} + b \right|</script>能够相对地表示向量<script type="math/tex">x_{i}</script>到分离超平面<script type="math/tex">w \cdot x + b = 0</script>的距离，所以损失函数的几何解释即为：损失函数值<script type="math/tex">=</script>所有被误分类的样本点到当前分离超平面的相对距离的总和。如果感知机能将所有样本点正确分类的话、<script type="math/tex">E</script>就是空集、此时损失函数<script type="math/tex">L\left( w,b \right) = 0</script>；同时，若误分类的样本点越少或误分类的样本点离当前分离超平面越近、损失函数<script type="math/tex">L\left( w,b \right)</script>的值就越小。是故寻找最终正确的分离超平面<script type="math/tex">\Pi</script>的过程、确实可以转化为最小化损失函数<script type="math/tex">L\left( w,b \right)</script>的过程，而这也正是感知机所采用的训练策略</p>
+<p><strong><em>注意：需要强调的是，<script type="math/tex">\left| w \cdot x_{i} + b \right|</script>所描述的“相对距离”和我们直观上的“欧氏距离”或说“几何距离”是不一样的（事实上它们之间相差了一个<script type="math/tex">\left\| w \right\|</script>）；相对严谨的叙述会放在<a href="/posts/d455305a/" title="从感知机到支持向量机">从感知机到支持向量机</a>中、这里就先按下不表</em></strong></p>
+<h1 id="感知机算法"><a href="#感知机算法" class="headerlink" title="感知机算法"></a>感知机算法</h1><p>最小化损失函数这个过程在决策树的训练中也出现过，彼时我们采用的是一种启发式的算法——选取当前能使损失（信息的不确定性）减少最多的特征作为划分标准来划分数据。感知机算法采用的则是一种应用场景更广的方法——梯度下降法。梯度下降法的一般性定义和相关说明会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中、这里我们只说一个直观：在许多情况下，损失函数是足够好的函数、从而它在每个点都能进行“求导”。求导之后我们就能得到一个损失函数增长最快的“方向”，此时我们沿反方向前进的话、就能期望损失函数以“最快的速度”减少（这也正是为何梯度下降法又叫最速下降法）</p>
+<p>注意到在求得“方向”后、沿方向“走多远”也是需要考虑的参数。一般我们称该参数为“学习速率”或“步长”，通过调整和优化该参数的表现、常常能导出原理一致但表现迥异的算法。不过即使如此，梯度下降法的关键还是在于损失函数的“求导”。需要指出的是，梯度下降法本身还可以大致分为三种具体的算法——随机梯度下降法（Stochastic Gradient Descent，常简称为 SGD）、小批量梯度下降法（Mini-batch Gradient Descent，常简称为 MBGD）和批量梯度下降法（Batch Gradient Descent，常简称为 BGD）。这三种梯度下降法的说明、对比同样会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中进行，这里只需要知道它们行为上的差别：随机梯度下降法在每个迭代中只使用一个样本来进行参数的更新、小批量梯度下降法则会同时选用多个样本来更新参数、批量梯度下降法则更是会同时选用所有样本来更新参数</p>
+<p><strong><em>注意：也有认为 SGD 即为 MBGD 的说法、所以具体的含义需要结合具体情况分析</em></strong></p>
+<p>简单起见、我们采用随机梯度下降来进行训练，此时我们需要求出损失函数在单一样本上对<script type="math/tex">w</script>和<script type="math/tex">b</script>的偏导数：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\partial L(w,b,x_{i},y_{i})}{\partial w} &= \left\{ \begin{matrix}
+0,\ \ &(x_{i},y_{i}) \notin E \\
+ - y_{i}x_{i},\ \ &{(x}_{i},y_{i}) \in E \\
+\end{matrix} \right.\ \\
+
+\frac{\partial L(w,b,x_{i},y_{i})}{\partial b} &= \left\{ \begin{matrix}
+0,\ \ &(x_{i},y_{i}) \notin E \\
+ - y_{i},\ \ &{(x}_{i},y_{i}) \in E \\
+\end{matrix} \right.\
+\end{align}</script><p>利用它们可以自然地写出感知机模型的随机梯度下降训练算法：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
+<li><strong>过程</strong>：<ol>
+<li>初始化参数：  <script type="math/tex; mode=display">
+w = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{n},b = 0</script></li>
+<li>对<script type="math/tex">j = 1,\ldots,M</script>：  <script type="math/tex; mode=display">
+E = \left\{ \left( x_{i},y_{i} \right) \middle| y_{i}\left( w \cdot x_{i} + b \right) \leq 0 \right\}</script><ol>
+<li>若<script type="math/tex">E = \varnothing</script>（亦即没有误分类的样本点）则退出循环体</li>
+<li>否则，任取<script type="math/tex">E</script>中的一个样本点<script type="math/tex">(x_{i},y_{i})</script>并利用它更新参数：  <script type="math/tex; mode=display">
+\begin{align}
+w &\leftarrow w + \eta y_{i}x_{i} \\
+b &\leftarrow b + \eta y_{i}
+\end{align}</script></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：感知机模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = \text{sign}\left( w \cdot x + b \right)</script></li>
+</ol>
+<p>其中最后一步用到的 sign 是符号函数。由于感知机算法中更新一次参数的时间开销非常小、所以通常会把迭代次数 M 设置成一个比较大的数（比如<script type="math/tex">10^{4}</script>）</p>
+<p>此外需要指出的是，虽说感知机只适用于线性可分数据集的分类、但它有个优点就是：无论学习速率<script type="math/tex">\eta</script>是多少，只要数据集线性可分，那么上述感知机算法在 M 足够大的情况下、必然能够训练出一个使得<script type="math/tex">E = \varnothing</script>的分离超平面（这其实就是著名的 Novikoff 定理，证明会用到比较纯粹的数学技巧、所以从略）</p>
+<p>虽说所蕴含的梯度下降的思想并不平凡，但感知机算法单就复杂度而言、可以说是目前为止遇到过的最简单的算法了，其实现相对的也非常简单直观：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">from</span> Util.Bases <span class="keyword">import</span> ClassifierBase</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Perceptron</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(Perceptron, self).__init__()</div><div class="line">        self._w = self._b = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, sample_weight=None, lr=<span class="number">0.01</span>, epoch=<span class="number">10</span> ** <span class="number">6</span>)</span>:</span></div><div class="line">        x, y = np.atleast_2d(x), np.array(y)</div><div class="line">        <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            sample_weight = np.ones(len(y))</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            sample_weight = np.array(sample_weight) * len(y)</div><div class="line">        <span class="comment"># 初始化参数</span></div><div class="line">        self._w = np.zeros(x.shape[<span class="number">1</span>])</div><div class="line">        self._b = <span class="number">0</span></div><div class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">            y_pred = self.predict(x)</div><div class="line">            <span class="comment"># 获取加权误差向量</span></div><div class="line">            _err = (y_pred != y) * sample_weight</div><div class="line">            <span class="comment"># 引入随机性以进行随机梯度下降</span></div><div class="line">            _indices = np.random.permutation(len(y))</div><div class="line">            _idx = _indices[np.argmax(_err[_indices])]</div><div class="line">            <span class="comment"># 若没有被误分类的样本点则完成了训练</span></div><div class="line">            <span class="keyword">if</span> y_pred[_idx] == y[_idx]:</div><div class="line">                <span class="keyword">return</span></div><div class="line">            <span class="comment"># 否则，根据选出的样本点更新参数</span></div><div class="line">            _delta = lr * y[_idx] * sample_weight[_idx]</div><div class="line">            self._w += _delta * x[_idx]</div><div class="line">            self._b += _delta</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x, get_raw_results=False)</span>:</span></div><div class="line">        rs = np.sum(self._w * x, axis=<span class="number">1</span>) + self._b</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> get_raw_results:</div><div class="line">            <span class="keyword">return</span> np.sign(rs)</div><div class="line">        <span class="keyword">return</span> rs</div></pre></td></tr></table></figure>
+<p>可以用之前提到过的两个二维数据集来简单评估一下我们实现的感知机模型，结果如下图所示：</p>
+<img src="/posts/93db8ec2/p5.png" alt="p5.png" title="">
+<p>其中在线性可分的数据集上、感知机只用了一次迭代便得到了上面左图中的效果；在线性不可分的数据集上、感知机在迭代 1000 次后可以得到右图中的效果，此时正确率为 97.5%</p>
+<h1 id="感知机算法的对偶形式"><a href="#感知机算法的对偶形式" class="headerlink" title="感知机算法的对偶形式"></a>感知机算法的对偶形式</h1><p>本节将会简要介绍一个非常重要的概念：拉格朗日对偶性（Lagrange Duality）；在有约束的最优化问题中，为了便于求解、我们常常会利用它来将比较原始问题转化为更好解决的对偶问题。对于特定的问题，原始算法的对偶形式也常常会有一些共性存在。比如对于感知机和后文会介绍的支持向量机来说，它们的对偶算法都会将模型的参数表示为样本点的某种线性组合、并把问题转化为求解线性组合中的各个系数</p>
+<p>虽说感知机算法的原始形式已经非常简单，但是通过将它转化为对偶形式、我们可以比较清晰地感受到转化的过程，这有助于理解和记忆后文介绍的、较为复杂的支持向量机的对偶形式</p>
+<p>考虑到原始算法的核心步骤为：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w &\leftarrow w + \eta y_{i}x_{i} \\
+b &\leftarrow b + \eta y_{i}
+\end{align}</script><p>其中<script type="math/tex">\left( x_{i},y_{i} \right) \in E</script>、<script type="math/tex">E</script>是当前被误分类的样本点的集合；可以看见、参数的更新是完全基于样本点的。考虑到我们要将参数<script type="math/tex">w</script>和<script type="math/tex">b</script>表示为样本点的线性组合，一个自然的想法就是记录下在核心步骤中、各个样本点分别被利用了多少次、然后利用这个次数来将<script type="math/tex">w</script>和<script type="math/tex">b</script>表示出来。比如说，若设样本点<script type="math/tex">\left( x_{i},y_{i} \right)</script>一共在上述核心步骤中被利用了<script type="math/tex">n_{i}</script>次、那么就有（假设初始化参数时<script type="math/tex">w = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{n},b = 0</script>）：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w &= \eta\sum_{i = 1}^{N}{n_{i}y_{i}x_{i}} \\
+b &= \eta\sum_{i = 1}^{N}{n_{i}y_{i}}
+\end{align}</script><p>如果进一步设<script type="math/tex">\alpha_{i} = \eta n_{i}</script>、则有：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w &= \sum_{i = 1}^{N}{\alpha_{i}y_{i}x_{i}} \\
+b &= \sum_{i = 1}^{N}{\alpha_{i}y_{i}}
+\end{align}</script><p>在此基础上，感知机算法的对偶形式就能很自然地写出来了：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
+<li><strong>过程</strong>：<ol>
+<li>初始化参数：  <script type="math/tex; mode=display">
+\alpha = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script></li>
+<li>对<script type="math/tex">j = 1,\ldots,M</script>：  <script type="math/tex; mode=display">
+E = \left\{ \left( x_{i},y_{i} \right) \middle| y_{i}\left( \sum_{k = 1}^{N}{\alpha_{k}y_{k}\left( x_{k} \cdot x_{i} + 1 \right)} \right) \leq 0 \right\}</script><ol>
+<li>若<script type="math/tex">E = \varnothing</script>（亦即没有误分类的样本点）则退出循环体</li>
+<li>否则，任取<script type="math/tex">E</script>中的一个样本点<script type="math/tex">(x_{i},y_{i})</script>并利用其下标更新参数：  <script type="math/tex; mode=display">
+\alpha_{i} \leftarrow \alpha_{i} + \eta</script></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：感知机模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( \sum_{k = 1}^{N}{\alpha_{k}y_{k}\left( x_{k} \cdot x_{i} + 1 \right)} \right)</script></li>
+</ol>
+<p>需要指出的是，在对偶形式中、样本点里面的<script type="math/tex">x</script>仅以内积的形式（<script type="math/tex">x_{k} \cdot x_{i}</script>）出现；这是一个非常重要且深刻的性质，利用它和后文将进行介绍核技巧、能够将许多算法从线性算法“升级”成为非线性算法</p>
+<p>注意到对偶形式的训练过程常常会重复用到大量的、样本点之间的内积，我们通常会提前将样本点两两之间的内积计算出来并存储在一个矩阵中；这个矩阵就是著名的 Gram 矩阵、其数学定义即为：</p>
+<script type="math/tex; mode=display">
+G = \left( x_{i} \cdot x_{j} \right)_{N \times N}</script><p>这样的话，在训练过程中如果要用到相应的内积、只需从 Gram 矩阵中提取即可，这样在大多数情况下都能大大提高效率</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 支持向量机 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 数学 </tag>
+            
+            <tag> 算法 </tag>
+            
+            <tag> Python </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[支持向量机综述]]></title>
+      <url>/posts/487ba3a6/</url>
+      <content type="html"><![CDATA[<p>目前为止讲过的模型中，朴素贝叶斯模型属于生成模型：它的训练过程其实很难称之为“训练”——毕竟它只是对输入的训练数据集进行了若干“计数”的操作；决策树模型的训练过程虽然确实有一些训练的意思在里面，但其本质——各种信息不确定性的度量仍然脱不出“计数”的范畴。换句话说，朴素贝叶斯和决策树的核心步骤似乎都只是“计数”而已。随机森林和 AdaBoost 自不用提，它们都只是将已有的模型进行集成、其本身的训练过程可谓不是主体</p>
+<p>然而我们都知道、机器学习当然不只是“计数”那么简单的一回事。因此我们拟在本系列及以后的系列中介绍另一大类训练方法——梯度下降法（Gradient Decent；有时我们也称之为最速下降法（Steepest Descent））。就本系列而言，我们会先介绍一个比较简易的、应用到了梯度下降法的模型——感知机（Perceptron），然后我们会介绍一个思想和感知机类似、但是应用场景更加广泛的模型——支持向量机（Support Vector Machine，常简称为SVM）</p>
+<p>以下是目录：</p>
+<ul>
+<li><a href="/posts/93db8ec2/" title="感知机模型">感知机模型</a></li>
+<li><a href="/posts/d455305a/" title="从感知机到支持向量机">从感知机到支持向量机</a></li>
+<li><a href="/posts/924abfe1/" title="从线性到非线性">从线性到非线性</a></li>
+<li><a href="/posts/917ccef9/" title="核模型的实现与评估">核模型的实现与评估</a></li>
+<li><a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a></li>
+<li><a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></li>
+<li><a href="/posts/5b3e9c59/" title="“支持向量机”小结">“支持向量机”小结</a>
+</li>
+</ul>
+<p>需要指出的是、本系列的前三篇文章讨论的都是二类分类问题，回归问题和把二类算法拓展成多类算法的手段会放在<a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a>中进行简要介绍（注意虽然我们上一个系列叙述 AdaBoost 算法时同样也只针对二类分类问题进行了说明、但是应用<a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a>中的内容是可以将上一个系列涉及到的的诸多 AdaBoost 二分类模型推广成多分类模型的）</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 支持向量机 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 综述 </tag>
+            
+            <tag> 目录 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[“集成学习”小结]]></title>
       <url>/posts/48a0211a/</url>
       <content type="html"><![CDATA[<ul>
@@ -37,7 +837,7 @@
     <entry>
       <title><![CDATA[相关数学理论]]></title>
       <url>/posts/613bbb2f/</url>
-      <content type="html"><![CDATA[<p>这一节会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度</p>
+      <content type="html"><![CDATA[<p>这篇文章会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度</p>
 <a id="more"></a>
 <h1 id="经验分布函数"><a href="#经验分布函数" class="headerlink" title="经验分布函数"></a>经验分布函数</h1><p>正如前文所说，经验分布函数的数学表达式为：</p>
 <script type="math/tex; mode=display">
@@ -133,7 +933,7 @@ w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g
     <entry>
       <title><![CDATA[AdaBoost 算法的解释]]></title>
       <url>/posts/707464b/</url>
-      <content type="html"><![CDATA[<p>我们前面提到过 Bagging 的数学基础是 Bootstrap 理论、但还没有讲 Boosting 的数学基础。本节拟打算直观地阐述 Boosting 族的代表算法——AdaBoost 算法的解释，由于具体的推导相当繁琐，相关的细节我们会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>里面说明</p>
+      <content type="html"><![CDATA[<p>我们前面提到过 Bagging 的数学基础是 Bootstrap 理论、但还没有讲 Boosting 的数学基础。本篇文章拟打算直观地阐述 Boosting 族的代表算法——AdaBoost 算法的解释，由于具体的推导相当繁琐，相关的细节我们会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>里面说明</p>
 <a id="more"></a>
 <p>首先将结论给出：AdaBoost 算法是前向分步算法的特例，AdaBoost 模型等价于损失函数为指数函数的加法模型</p>
 <p>其中，加法模型的定义是直观且熟悉的：</p>
@@ -169,7 +969,7 @@ L = {\left\lbrack y - f_{k + 1}\left( x \right) \right\rbrack^{2} = \left\lbrack
       <title><![CDATA[集成模型的性能分析]]></title>
       <url>/posts/fb0d2f02/</url>
       <content type="html"><![CDATA[<p>正如前文所说，在实现完 AdaBoost 框架后，我们需要先用 sklearn 中的分类器进行检验、然后再用我们前两章实现的模型进行对比实验。检验的步骤就不在这里详述（毕竟只是一些调试的活），我们在此仅展示在随机森林模型和经过检验的 AdaBoost 模型上进行的一系列的分析</p>
-<p>直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较贴近现实的实验。为讨论方便，我们一律采用决策树作为 AdaBoost 的弱分类器（亦即采用提升树模型进行讨论）、其强度可以通过调整其最深层数来控制。我们可以利用<code>DataUtil</code>类来生成或获取原始数据集，其完整代码可参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py" target="_blank" rel="external">这里</a>、生成数据集的代码则会在前三小节分别放出</p>
+<p>直观起见，我们先采用二维的数据进行实验、并通过可视化来加深对随机森林和 AdaBoost 的理解，然后再用蘑菇数据集做比较贴近现实的实验。为讨论方便，我们一律采用决策树作为 AdaBoost 的弱分类器（亦即采用提升树模型进行讨论）、其强度可以通过调整其最深层数来控制。我们可以利用<code>DataUtil</code>类来生成或获取原始数据集，其完整代码可参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Util.py" target="_blank" rel="external">这里</a>、生成数据集的代码则会在前三节分别放出</p>
 <p>对于二维数据，我们拟打算使用三种数据集来进行评估：</p>
 <ul>
 <li>随机数据集。该数据集主要用于直观地感受模型的分类能力</li>
@@ -297,7 +1097,7 @@ g\left( x \right) = sign\left( f\left( x \right) \right) = \text{sign}\left( \su
 <p><strong><em>注意：虽然笔者认为在 Boosting 中的弱模型就应该选择足够弱的模型，但确实亦有对强模型（如核 SVM）应用 Boosting 也很好的说法。详细而严谨的讨论会牵扯大量的数学理论、这里就不详细展开了</em></strong></p>
 <p>可能观众老爷们此时又会产生一个新的疑问：如果说 Boosting 中的弱模型不宜太强的话，是不是说 Bagging 中的个体模型也不宜太强呢？需要指出的是，虽然从理论上来说使用弱模型进行集成就已足以获得一个相当不错的最终模型，但使用较强的模型来进行集成从原理上是不太矛盾的。考虑到不同的场合，有时确实可以选用较强的模型来作为个体模型</p>
 <p>那么所谓的不太强的弱模型大概是个什么东西呢？一个比较直观的例子就是限制层数的决策树。极端的情况就是限定它只能有一层、亦即上一章我们提到过的“决策树桩”，对应的进行了提升后的模型就是相当有名的提升树（Boosting Tree），它被认为是统计学习中性能最好的方法之一、既可以用来做分类也可以拿来做回归，是个相当强力的模型</p>
-<h1 id="AdaBoost-的实现"><a href="#AdaBoost-的实现" class="headerlink" title="AdaBoost 的实现"></a>AdaBoost 的实现</h1><p>从第一节的算法讲解其实可以看出，虽然 AdaBoost 算法本身很不平凡，但它给出的步骤都是相当便于实现的，基本上一个步骤就对应着 Python 里面的一行代码。在实现的过程中，困难之处可能主要在于如何让实现出来的 AdaBoost 框架易于扩展并具有方便调用的接口，而不在于实现算法本身。同时，为了能够更好地理解 AdaBoost 算法，我们需要对其性能作一系列的分析</p>
+<h1 id="AdaBoost-的实现"><a href="#AdaBoost-的实现" class="headerlink" title="AdaBoost 的实现"></a>AdaBoost 的实现</h1><p>从之前的算法讲解其实可以看出，虽然 AdaBoost 算法本身很不平凡，但它给出的步骤都是相当便于实现的，基本上一个步骤就对应着 Python 里面的一行代码。在实现的过程中，困难之处可能主要在于如何让实现出来的 AdaBoost 框架易于扩展并具有方便调用的接口，而不在于实现算法本身。同时，为了能够更好地理解 AdaBoost 算法，我们需要对其性能作一系列的分析</p>
 <p>由于 AdaBoost 是一个用于提升弱模型的算法，所以我们整体的实现思路大致是（不失一般性、我们先讨论二类分类问题）：</p>
 <ul>
 <li>搭建 AdaBoost 框架</li>
@@ -459,7 +1259,7 @@ p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\l
 <li>若<script type="math/tex">k=1</script>，那么生成决策树的每一步都是在随机选择属性、亦即特征选取的随机性达到最大</li>
 </ul>
 <p>Breiman 在提出随机森林算法的同时指出，一般情况下、推荐取<script type="math/tex">k=\log_2{d}</script></p>
-<h1 id="PAC-框架与-Boosting"><a href="#PAC-框架与-Boosting" class="headerlink" title="PAC 框架与 Boosting"></a>PAC 框架与 Boosting</h1><p>虽然同属集成学习方法，但 Boosting 和 Bagging 的数学理论根基不尽相同：Boosting 产生于计算学习理论（Computational Learning Theory）[Valiant, 1984]。一般而言，如果只是应用机器学习的话、我们无需对它进行太多的了解（甚至可以说对它一知半解反而有害），所以本小节只打算对其最基本的概率近似正确（PAC）学习理论中的“可学习性（PAC Learnability）”进行简要的介绍</p>
+<h1 id="PAC-框架与-Boosting"><a href="#PAC-框架与-Boosting" class="headerlink" title="PAC 框架与 Boosting"></a>PAC 框架与 Boosting</h1><p>虽然同属集成学习方法，但 Boosting 和 Bagging 的数学理论根基不尽相同：Boosting 产生于计算学习理论（Computational Learning Theory）[Valiant, 1984]。一般而言，如果只是应用机器学习的话、我们无需对它进行太多的了解（甚至可以说对它一知半解反而有害），所以本节只打算对其最基本的概率近似正确（PAC）学习理论中的“可学习性（PAC Learnability）”进行简要的介绍</p>
 <p>PAC 学习整体来说是一个比较纯粹的数学理论。有一种说法是、PAC 学习是统计学家研究机器学习的方式，它关心模型的可解释性、然而机器学习专家通常更关心模型的预测能力。这也正是为何说无需太过了解它，因为我们的目的终究不是成为统计的专家、而是更希望成为一个能够应用机器学习的人。不过幸运的是，虽然为了叙述 Boosting、PAC 学习中“可学习性”的概念难以避开，但其本身却是具有很直观的解释的。下面我们就来看看这个直观解释：</p>
 <p>PAC 提出的一个主要的假设、就是它要求数据是从某个稳定的概率分布中产生。直观地说，就是样本在样本空间中的分布状况不能随时间的变化而变化、否则就失去了学习的意义（因为学习到的永远只是“某个时间”的分布，如果未知数据所处时间的分布状况和该时间数据的分布状况不同的话、模型就直接失效了）。然后所谓的PAC可学习性，就是看学习的算法是否能够在合理的时间（多项式时间）内、以足够高的概率输出一个错误率足够低的模型。由此，所谓的“强可学习”和“弱可学习”的概念就很直观了：</p>
 <ul>
@@ -468,7 +1268,7 @@ p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\l
 </ul>
 <p><strong><em>注意：由于进行机器学习时、我们只能针对训练数据集进行学习、所以和真实情况相比肯定是有偏差的。这正是需要提出 PAC 可学习这个概念的原因之一</em></strong></p>
 <p>虽然我们区分定义了这两个概念，不过神奇之处在于，这两个概念在PAC学习框架下是完全等价的[Schapire, 1990]。这意味着对于一个学习问题，只要我们找到了一个“弱学习算法”，就可以把它变成一个“强学习算法”。这当然是意义深刻的，因为往往比较粗糙的“弱学习算法”比较好找、而相对精确的“强学习算法”却难得一求</p>
-<p>那么具体而言应该怎么做呢？这里就需要用到所谓的 Boosting（提升方法）了。提升方法可以定义为用于将由“弱学习算法”生成的“弱模型”、提升成和“强学习算法”所生成的“强模型”性能差不多的模型的方法，它的基本组成单元是许许多多的“弱模型”、然后通过某种手段把它们集成为最终模型。虽然该过程听上去和上一小节介绍的 Bagging 差不多、但它们的思想和背后的数学理论却有较大区别，加以辨析是有必要的</p>
+<p>那么具体而言应该怎么做呢？这里就需要用到所谓的 Boosting（提升方法）了。提升方法可以定义为用于将由“弱学习算法”生成的“弱模型”、提升成和“强学习算法”所生成的“强模型”性能差不多的模型的方法，它的基本组成单元是许许多多的“弱模型”、然后通过某种手段把它们集成为最终模型。虽然该过程听上去和之前介绍的 Bagging 差不多、但它们的思想和背后的数学理论却有较大区别，加以辨析是有必要的</p>
 <p>需要指出的是，Boosting 事实上是一族算法、该族算法有一个类似的框架：</p>
 <ul>
 <li>根据当前的数据训练出一个弱模型</li>
@@ -566,7 +1366,7 @@ p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\l
     <entry>
       <title><![CDATA[相关数学理论]]></title>
       <url>/posts/613bbb2f/</url>
-      <content type="html"><![CDATA[<p>这一节会叙述琴生不等式（Jensen’s Inequality）及其一个简单的应用，为此我们需要知道凸函数的概念：</p>
+      <content type="html"><![CDATA[<p>本篇文章会叙述琴生不等式（Jensen’s Inequality）及其一个简单的应用，为此我们需要知道凸函数的概念：</p>
 <ul>
 <li>若函数<script type="math/tex">f(x)</script>对<script type="math/tex">\forall p\in [0,1]</script>、都满足：  <script type="math/tex; mode=display">
 pf\left( x_{1} \right) + \left( 1 - p \right)f\left( x_{2} \right) \leq f\left( px_{1} + \left( 1 - p \right)x_{2} \right)</script>则称<script type="math/tex">f(x)</script>为凸函数（有时又叫上凸函数）</li>
@@ -729,7 +1529,7 @@ s_{n}f\left( \sum_{k = 1}^{n}{\frac{p_{k}}{s_{n}}f\left( x_{k} \right)} \right) 
     <entry>
       <title><![CDATA[决策树的剪枝算法]]></title>
       <url>/posts/1a7aa546/</url>
-      <content type="html"><![CDATA[<p>在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当的“剪枝”、我们在上一节中也已经大量接触了这一概念。剪枝通常分为两类：“预剪枝（Pre-Pruning）”和“后剪枝（Post-Pruning）”，其中“预剪枝”的概念在生成算法中已有定义，彼时我们采取的说法是“停止条件”；而一般提起剪枝时指的都是“后剪枝”，它是指在决策树生成完毕后再对其进行修剪、把多余的节点剪掉。换句话说，后剪枝是从全局出发、通过某种标准对一些 Node 进行局部剪枝，这样就能减少决策树中 Node 的数目、从而有效地降低模型复杂度</p>
+      <content type="html"><![CDATA[<p>在知道怎么得到一颗决策树后、我们当然就会想知道：这样建立起来的决策树的表现究竟如何？从直观上来说，只要决策树足够深、划分标准足够细，它在训练集上的表现就能接近完美；但同时也容易想象，由于它可能把训练集的一些“特性”当做所有数据的“共性”来看待，它在未知的测试数据上的表现可能就会比较一般、亦即会出现过拟合的问题。我们知道，模型出现过拟合问题一般是因为模型太过复杂，所以决策树解决过拟合的方法是采取适当的“剪枝”、我们在上一篇文章中也已经大量接触了这一概念。剪枝通常分为两类：“预剪枝（Pre-Pruning）”和“后剪枝（Post-Pruning）”，其中“预剪枝”的概念在生成算法中已有定义，彼时我们采取的说法是“停止条件”；而一般提起剪枝时指的都是“后剪枝”，它是指在决策树生成完毕后再对其进行修剪、把多余的节点剪掉。换句话说，后剪枝是从全局出发、通过某种标准对一些 Node 进行局部剪枝，这样就能减少决策树中 Node 的数目、从而有效地降低模型复杂度</p>
 <a id="more"></a>
 <p>是故问题的关键在于如何定出局部剪枝的标准。通常来说我们有两种做法：</p>
 <ul>
@@ -1118,7 +1918,7 @@ S_i\ge\beta N</script>那么就认为第 i 维的特征是连续型随机变量<
 <li>C4.5 算法在其上进一步发展、给出了对混合型数据分类的解决方案</li>
 <li>CART 算法则更进一步、给出了对数据回归的解决方案</li>
 </ul>
-<p>虽说它们的功能越来越强大，但正如第一小节所言、它们的核心思想都是一致的：算法通过不断划分数据集来生成决策树，其中每一步的划分能够使当前的信息增益达到最大</p>
+<p>虽说它们的功能越来越强大，但正如前文所言、它们的核心思想都是一致的：算法通过不断划分数据集来生成决策树，其中每一步的划分能够使当前的信息增益达到最大</p>
 <p>值得一提的是，该核心思想的背后其实也有着机器学习的一些普适性的思想。我们可以这样来看待决策树：模型的损失就是数据集的不确定性，模型的算法就是最小化该不确定性；同时，和许多其它模型一样，想要从整个参数空间中选出模型的最优参数是个 NP 完全问题，所以我们（和许多其它算法一样）采用启发式的方法、近似求解这个最优化问题。具体而言，我们每次会选取一个局部最优解（每次选取一个特征对数据集进行划分使得信息增益最大化）、并把这些局部解合成最终解（合成一个划分规则的序列）</p>
 <p>可以这样直观地去想一个决策树的生成过程：</p>
 <ul>
@@ -2356,7 +3156,7 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 <script type="math/tex; mode=display">
 {\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{p(\theta|\tilde{X}) = \arg{\max_\theta{p(\theta)\prod_{i = 1}^{N}{p(x_{i}|\theta)}}}}}</script><p>同样的，为了计算简洁，我们通常对上式取对数：</p>
 <script type="math/tex; mode=display">
-{\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{\ln{p(\theta|\tilde{X})} = \arg{\max_\theta\left\lbrack \ln{p\left( \theta \right)} + \sum_{i = 1}^{N}{\ln{p\left( x_{i} \middle| \theta \right)}} \right\rbrack}}}</script><p>可以看到，从形式上、极大后验概率估计只比极大似然估计多了<script type="math/tex">\ln{p(\theta)}</script>这一项，不过它们背后的思想却相当不同。不过有意思的是，在下一节具体讨论朴素贝叶斯算法时我们会看到、朴素贝叶斯在估计参数时选用了极大似然估计法、但是在做决策时则选用了 MAP 估计</p>
+{\hat{\theta}}_{\text{MAP}} = \arg{\max_\theta{\ln{p(\theta|\tilde{X})} = \arg{\max_\theta\left\lbrack \ln{p\left( \theta \right)} + \sum_{i = 1}^{N}{\ln{p\left( x_{i} \middle| \theta \right)}} \right\rbrack}}}</script><p>可以看到，从形式上、极大后验概率估计只比极大似然估计多了<script type="math/tex">\ln{p(\theta)}</script>这一项，不过它们背后的思想却相当不同。不过有意思的是，在之后具体讨论朴素贝叶斯算法时我们会看到、朴素贝叶斯在估计参数时选用了极大似然估计法、但是在做决策时则选用了 MAP 估计</p>
 <p>和极大似然估计相比，MAP 估计的一个显著优势在于它可以引入所谓的“先验知识”，这正是贝叶斯学派的精髓。当然这个优势同时也伴随着劣势：它我们对模型参数有相对较好的认知、否则会相当大地影响到结果的合理性</p>
 <p>既然先验分布如此重要，那么是否有比较合理的、先验分布的选取方法呢？事实上，如何确定先验分布这个问题，正是贝叶斯统计中最困难、最具有争议性却又必须解决的问题。虽然这个问题确实有许多现代的研究成果，但遗憾的是，尚未能有一个圆满的理论和普适的方法。这里拟介绍“协调性假说”这个相对而言拥有比较好的直观的理论：</p>
 <ul>
@@ -2394,7 +3194,7 @@ p\left( \tilde{X} \middle| \theta \right) = \theta^{x_{1} + x_{2}}\left( 1 - \th
 <p>所以相比起把模型参数固定、注重样本的随机性的频率学派而言，贝叶斯学派将样本视为是固定的、把模型的参数视为关键。在上面这个例子里面，样本就是抛出去的那枚硬币，模型的参数就是每个人从中获得的“信息”。对于频率学派而言，每个人获得的“信息”不应该有不同，所以自然会根据“均匀硬币抛出正面的概率是 50%”这个“样本的信息”来导出“硬币是正面的概率为 50%”这个结论。但是对贝叶斯学派而言，硬币抛出去就抛出去了，问题的关键在于模型的参数、亦即“观察者”从中获得的信息，所以会导出“对于抛硬币的人而言，硬币是正面的概率是 100%”这一类的结论</p>
 <h1 id="贝叶斯决策论"><a href="#贝叶斯决策论" class="headerlink" title="贝叶斯决策论"></a>贝叶斯决策论</h1><p>大致知道贝叶斯学派的思想后，我们就可以介绍贝叶斯决策论了。这里不可避免地要牵扯到概率论和数理统计的相关定义和知识，但幸运的是它们都是比较基础且直观的部分、无需太多数学背景就可以知道它们的含义：</p>
 <h2 id="行动空间"><a href="#行动空间" class="headerlink" title="行动空间"></a>行动空间</h2><p>行动空间（通常用<script type="math/tex">A</script>来表示）是某项实际工作中可能采取的各种“行动”所构成的集合。正如前文所提到的、贝叶斯学派注重的是模型参数，所以通常而言我们想要做出的“行动”是“决定模型的参数”。因此我们通常会将行动空间取为参数空间，亦即<script type="math/tex">A=\Theta</script></p>
-<h2 id="决策"><a href="#决策" class="headerlink" title="决策"></a>决策</h2><p>决策（通常用<script type="math/tex">\delta(\tilde X)</script>来表示）是样本空间<script type="math/tex">X</script>到行动空间<script type="math/tex">A</script>的一个映射。换句话说，对于一个单一的样本<script type="math/tex">\tilde X</script>（<script type="math/tex">\tilde X\in X</script>），决策函数可以利用它得到<script type="math/tex">A</script>中的一个行动。需要注意的是，这里的样本<script type="math/tex">\tilde X</script>通常是高维的随机向量：<script type="math/tex">\tilde X=(x_1,...,x_N)^T</script>；尤其需要分清的是，这个（以及本小节之后的所有）<script type="math/tex">\tilde X</script>其实是一般意义上的“训练集”、<script type="math/tex">x_i</script>才是一般意义上的“样本”。这是因为本小节主要在叙述数理统计相关知识，所以在术语上和机器学习术语会有所冲突，需要分辨清它们的关系</p>
+<h2 id="决策"><a href="#决策" class="headerlink" title="决策"></a>决策</h2><p>决策（通常用<script type="math/tex">\delta(\tilde X)</script>来表示）是样本空间<script type="math/tex">X</script>到行动空间<script type="math/tex">A</script>的一个映射。换句话说，对于一个单一的样本<script type="math/tex">\tilde X</script>（<script type="math/tex">\tilde X\in X</script>），决策函数可以利用它得到<script type="math/tex">A</script>中的一个行动。需要注意的是，这里的样本<script type="math/tex">\tilde X</script>通常是高维的随机向量：<script type="math/tex">\tilde X=(x_1,...,x_N)^T</script>；尤其需要分清的是，这个（以及本节之后的所有）<script type="math/tex">\tilde X</script>其实是一般意义上的“训练集”、<script type="math/tex">x_i</script>才是一般意义上的“样本”。这是因为本节主要在叙述数理统计相关知识，所以在术语上和机器学习术语会有所冲突，需要分辨清它们的关系</p>
 <h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>损失函数（通常用<script type="math/tex">L(\theta,a)=L(\theta,\delta(\tilde X))</script>来表示）用于衡量当参数是<script type="math/tex">\theta</script>（<script type="math/tex">\theta\in\Theta</script>，<script type="math/tex">\Theta</script>是参数空间）时采取行动<script type="math/tex">a(a\in A)</script>所引起的损失</p>
 <h2 id="决策风险"><a href="#决策风险" class="headerlink" title="决策风险"></a>决策风险</h2><p>决策风险（通常用<script type="math/tex">R(\theta,\delta)</script>来表示）是损失函数的期望：<script type="math/tex">R(\theta,\delta)=EL(\theta,\delta(\tilde X))</script></p>
 <h2 id="先验分布"><a href="#先验分布" class="headerlink" title="先验分布"></a>先验分布</h2><p>先验分布描述了参数<script type="math/tex">\theta</script>在已知样本<script type="math/tex">\tilde X</script>中的分布</p>
@@ -2618,7 +3418,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
 <h1 id="为何选择-Python"><a href="#为何选择-Python" class="headerlink" title="为何选择 Python"></a>为何选择 Python</h1><p>援引开源运动的领袖人物 Eric Raymond 的说法：“Python 语言非常干净，设计优雅，具有出色的模块化特性。其最出色的地方在于，它鼓励清晰易读的代码，特别适合以渐进开发的方式构造项目”。Python 的可读性使得即使是刚学不久的人也看懂大部分的代码，Python 庞大的社区和大量的开发文档更是使得初学者能够快速地实现许许多多令人惊叹的功能。对于 Python 的程序，人们甚至有时会戏称其为“可执行的伪代码（executable pseudo-code）”以突显它的清晰性和可读性</p>
 <p>Python 的强大是毋庸置疑的，上文提到的 Eric Raymond 甚至称其“过于强大了”。与之相对应的、就是 Python 的速度比较慢。然而比起 Python 开发环境提供的海量高级数据结构（如列表、元组、字典、集合等）和数之不尽的第三方库、再加上高速的 CPU 和近代发展起来的 GPU 编程，速度的问题就显得没那么尖锐。况且 Python 还能通过各种途径来使用 C / C++ 代码来编写核心代码，其强大的“胶水”功能使其速度（在程序员能力允许的情况下）和纯粹的 C / C++ 相比已经相去不远。一个典型的例子、也是我们会在本书常常运用到的、就是 Python 中 Numpy 这个第三方库。编写它的语言正是底层语言（C 和 Fortran），其支持向量、矩阵操作的特性和优异的速度使得 Python 在科学计算这一领域大放异彩</p>
 <p><strong><em>注意：Python 及本博客会用到的两个非常优异的第三方库——Numpy 和 Tensorflow 的用法摘要我们会开单独的章节进行说明</em></strong></p>
-<h1 id="Python-在机器学习领域的优势"><a href="#Python-在机器学习领域的优势" class="headerlink" title="Python 在机器学习领域的优势"></a>Python 在机器学习领域的优势</h1><p>虽然在上一小节叙述了 Python 的种种好处，但不可否认的是，确实存在诸如 MATLAB 和 Mathematica 这样的高级程序语言、它们对机器学习的支持也不错，MATLAB 甚至还自带许多机器学习的应用。但是作为一个问心无愧的程序员，我们还是需要提倡支持正版、而 MATLAB 的正版软件需要数千美金。与之相对，由于 Python 是开源项目，几乎所有必要的组件都是完全免费的</p>
+<h1 id="Python-在机器学习领域的优势"><a href="#Python-在机器学习领域的优势" class="headerlink" title="Python 在机器学习领域的优势"></a>Python 在机器学习领域的优势</h1><p>虽然在上一节叙述了 Python 的种种好处，但不可否认的是，确实存在诸如 MATLAB 和 Mathematica 这样的高级程序语言、它们对机器学习的支持也不错，MATLAB 甚至还自带许多机器学习的应用。但是作为一个问心无愧的程序员，我们还是需要提倡支持正版、而 MATLAB 的正版软件需要数千美金。与之相对，由于 Python 是开源项目，几乎所有必要的组件都是完全免费的</p>
 <p>之前也提到过 Python 的速度问题，但是更快更底层的语言、比如 C 和 C++，若使用它们来学习机器学习的话、会不可避免地引发这么一个问题：即使是实现一个非常简单的功能、也需要进行大量的编写和 debug 的过程；在这期间，程序员很有可能忘掉学习机器学习的初衷而迷失在代码的海洋中。笔者曾经尝试过将 Python 上的神经网络框架移植到 C++ 上，这之间的折腾至今难忘</p>
 <p>此外，笔者认为、使用 Python 来学习机器学习是和“不要过早优化”这句编程界金句有着异曲同工之妙的。Python（几乎）唯一的缺陷——速度，在初期进行快速检验算法、思想正误及开发工作时，其实基本不是重要问题。这之中的道理是平凡的：如果解决问题的思想存在问题，那么即使拼命去提高程序的运行效率、也只能使问题越来越大而已。这种时候，先使用 Python 进行快速实现、有必要时再用底层代码重写核心代码，从各方面来说都是一个更好的选择</p>
 <p><del>（有没有觉得这个人真能扯）</del></p>
@@ -2633,9 +3433,9 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
         
         <tags>
             
-            <tag> Python </tag>
-            
             <tag> 综述 </tag>
+            
+            <tag> Python </tag>
             
         </tags>
         
@@ -2664,7 +3464,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
 <p><strong><em>注意：上述本质严格来说应该是 PAC Learning 的本质；在其余的理论框架下、机器学习是可以具有不同的内核的</em></strong></p>
 <p>从上面的讨论可以看出，机器学习和人类思考的过程有或多或少的类似。事实上，我们在第六、第七章讲的神经网络（Neural Network，简称 NN）和卷积神经网络（Convolutional Neural Network，简称 CNN）背后确实有着相应的神经科学的理论背景。然而与此同时我们需要知道的是，机器学习并非是一个“会学习的机器人”和“具有学习的人造人”之类的，这一点从上面诸多讨论也可以明晰（惭愧的是，我在第一次听到“机器学习”四个字时，脑海中浮现的正是一个“聪明的机器人”的图像，甚至还幻想过它和人类一起生活的场景）。相反的，它是被人类利用的、用于发掘数据背后信息的工具</p>
 <p>当然，现在也不乏“危险的人工智能”的说法，霍金大概是其中的“标杆”，这位伟大的英国理论物理学家甚至警告说“人工智能的发展可能意味着人类的灭亡”。孰好孰坏果然还是见仁见智，但可以肯定的是：本书所介绍的内容绝不至于导致世界的毁灭，大家大可轻松愉快地进行接下来的阅读 ( σ’ω’)σ</p>
-<h1 id="机器学习常用术语"><a href="#机器学习常用术语" class="headerlink" title="机器学习常用术语"></a>机器学习常用术语</h1><p>机器学习领域有着许多非常基本的术语，这些术语在外人听来可能相当高深莫测、它们事实上也可能拥有非常复杂的数学背景，但我们需要知道：它们往往也拥有着相对浅显平凡的直观理解（上一小节的假设空间和泛化能力就是两个例子）。本小节会对这些常用的基本术语进行说明与解释，它们背后的数学理论会有所阐述、但不会涉及到过于本质的东西</p>
+<h1 id="机器学习常用术语"><a href="#机器学习常用术语" class="headerlink" title="机器学习常用术语"></a>机器学习常用术语</h1><p>机器学习领域有着许多非常基本的术语，这些术语在外人听来可能相当高深莫测、它们事实上也可能拥有非常复杂的数学背景，但我们需要知道：它们往往也拥有着相对浅显平凡的直观理解（上一节的假设空间和泛化能力就是两个例子）。本节会对这些常用的基本术语进行说明与解释，它们背后的数学理论会有所阐述、但不会涉及到过于本质的东西</p>
 <p>正如前文反复强调的，数据在机器学习中发挥着不可或缺的作用；而用于描述数据的术语有好几个，它们是需要被牢牢记住的：</p>
 <ul>
 <li>“数据集”（Data Set）：就是数据的集合的意思。其中，每一条单独的数据被称为“样本”（Sample）。若没有进行特殊说明，本书都会假设数据集中样本之间在各种意义下相互独立。事实上，除了某些特殊的模型（如隐马尔可夫模型和条件随机场），该假设在大多数场景下都是相当合理的</li>
@@ -2688,7 +3488,7 @@ L(p;n)=\frac 12\sum_{i=1}^m[f(x|p;n)-y]^2</script><p>其中<script type="math/te
 </ul>
 </li>
 </ul>
-<p>最后，小明可能会在测试集上评估一下自己刚刚思考后得到的模型的性能、然后根据这个性能和模型作出的“是否戴口罩”的决策来综合考虑自己到底戴不戴口罩<br>接下来说明一下上一小节中提到过的重要概念：假设空间与泛化能力。泛化能力的含义在上文也有说明，为强调、这里再叙述一遍：</p>
+<p>最后，小明可能会在测试集上评估一下自己刚刚思考后得到的模型的性能、然后根据这个性能和模型作出的“是否戴口罩”的决策来综合考虑自己到底戴不戴口罩<br>接下来说明一下上一节中提到过的重要概念：假设空间与泛化能力。泛化能力的含义在上文也有说明，为强调、这里再叙述一遍：</p>
 <ul>
 <li>泛化能力针对的其实是学习方法，它用于衡量该学习方法学习到的模型在整个样本空间上的表现</li>
 </ul>

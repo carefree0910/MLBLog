@@ -1,0 +1,1165 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数学,算法," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：  可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容">
+<meta name="keywords" content="数学,算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从感知机到支持向量机">
+<meta property="og:url" content="http://www.carefree0910.com/posts/d455305a/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：  可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容">
+<meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p3.png">
+<meta property="og:updated_time" content="2017-04-28T12:11:15.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从感知机到支持向量机">
+<meta name="twitter:description" content="感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：  可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/d455305a/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/d455305a/"/>
+
+
+
+
+
+  <title> 从感知机到支持向量机 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/d455305a/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从感知机到支持向量机
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T10:42:17+08:00">
+                2017-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
+                    <span itemprop="name">支持向量机</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：</p>
+<img src="/posts/d455305a/p1.png" alt="p1.png" title="">
+<p>可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容</p>
+<a id="more"></a>
+<h1 id="间隔最大化与线性-SVM"><a href="#间隔最大化与线性-SVM" class="headerlink" title="间隔最大化与线性 SVM"></a>间隔最大化与线性 SVM</h1><p>上图的结果之所以显得不合理、主要是因为分离超平面离正负样本点集都显得“太近”了。因此一个自然的想法就是：在训练过程中考虑上超平面到点集的距离、并努力让这个距离最大化</p>
+<p>然而直接从集合出发定义集合到平面的距离是相对困难的、所以通常会将它转化为点到平面的距离。前文已经说过，对于样本点<script type="math/tex">(x_{i},y_{i})</script>而言、它到超平面<script type="math/tex">\Pi:w \cdot x + b = 0</script>的相对距离即为：</p>
+<script type="math/tex; mode=display">
+d^{*}\left( x_{i},\Pi \right) = |w \cdot x_{i} + b|</script><p>这里的相对距离<script type="math/tex">d^{*}</script>有一个更学术一点称谓——函数间隔（Functional Margin）。函数间隔有一个比较明显的缺陷就是、当<script type="math/tex">w</script>和<script type="math/tex">b</script>等比例变大或变小时，虽然超平面不会改变、但是<script type="math/tex">d^{*}</script>却会随之等比例变大或变小。为解决这个问题、我们可以比较自然地定义出所谓的几何间隔（Geometric Distance）：</p>
+<script type="math/tex; mode=display">
+d\left( x_{i},\Pi \right) = \frac{1}{\left\| w \right\|} \cdot d^{*}\left( x_{i},\Pi \right) = \frac{1}{\left\| w \right\|} \cdot |w \cdot x_{i} + b|</script><p>这里的<script type="math/tex">\left\| w \right\|</script>是<script type="math/tex">w</script>的欧式范数。顾名思义、几何间隔描述的就是向量<script type="math/tex">x_{i}</script>到超平面<script type="math/tex">\Pi</script>的几何距离（欧氏距离），它不会随<script type="math/tex">w</script>和<script type="math/tex">b</script>的等比例变化而变化、是相对稳定且直观意义优良的距离的定义方法。SVM 在训练过程中所引入的也正是各个样本点到当前分离超平面的几何距离，结合前文所说的“努力让超平面到点集的距离最大化”、SVM 算法就可以比较自然地叙述为：最大化（几何间隔）<script type="math/tex">d</script>、使得：</p>
+<script type="math/tex; mode=display">
+\frac{1}{\left\| w \right\|} \cdot \left\lbrack y_{i}\left( w \cdot x_{i} + b \right) \right\rbrack \geq d\ (i = 1,\ldots,N)</script><p>考虑到几何间隔和函数间隔之间的转换关系、该问题可以等价为：最大化<script type="math/tex">\frac{d^{*}}{\left\| w \right\|}</script>、使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq d^{*}\ (i = 1,\ldots,N)</script><p>可以发现函数间隔<script type="math/tex">d^{*}</script>的取值其实对该优化问题的解没有影响。这是因为当<script type="math/tex">d^{*}</script>变成<script type="math/tex">\lambda d^{*}</script>时、<script type="math/tex">w</script>和<script type="math/tex">b</script>也会相应地变成<script type="math/tex">\lambda w</script>和<script type="math/tex">\lambda b</script>（在超平面不变的情况下），此时<script type="math/tex">\frac{d^{*}}{\left\| w \right\|}</script>和不等式约束都没有变、所以对优化问题确实没有影响。这样的话我们就能不妨设<script type="math/tex">d^{*} = 1</script>、从而优化问题就可以转换为：最大化<script type="math/tex">\frac{1}{\left\| w \right\|}</script>、使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq 1\ (i = 1,\ldots,N)</script><p>易知该优化问题又能转化为：最小化<script type="math/tex">\frac{1}{2}\left\| w \right\|^{2}</script>、使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) - 1 \geq 0\ (i = 1,\ldots,N)</script><p>这就是 SVM 算法的最原始的形式。可以证明，只要训练集<script type="math/tex">D</script>线性可分、那么 SVM 算法对应的这个优化问题的解就存在且唯一；其中存在性的证明相对直观、唯一性的证明需要用到反证法和一些数学上的技巧，细节从略</p>
+<p>假设该优化问题的解为<script type="math/tex">w^{*}</script>和<script type="math/tex">b^{*}</script>，我们通常称超平面：</p>
+<script type="math/tex; mode=display">
+\Pi^{*}:w^{*} \cdot x + b^{*} = 0</script><p>为<script type="math/tex">D</script>的最大硬间隔分离超平面。之所以称它为“硬间隔”的理由会在后文叙述，这里暂时按下不表。需要指出的是，考虑到优化问题中的不等式约束、易知在超平面</p>
+<script type="math/tex; mode=display">
+\Pi_{1}^{*}:w^{*} \cdot x + b = - 1</script><p>和超平面</p>
+<script type="math/tex; mode=display">
+\Pi_{2}^{*}:w^{*} \cdot x + b = + 1</script><p>之间、是没有任何<script type="math/tex">D</script>中的样本点的。不过在<script type="math/tex">\Pi_{1}^{*}</script>和<script type="math/tex">\Pi_{2}^{*}</script>上、确实有可能有样本点。我们通常称<script type="math/tex">\Pi_{1}^{*}</script>和<script type="math/tex">\Pi_{2}^{*}</script>为间隔边界、称其上的某些点为支持向量</p>
+<p><strong><em>注意：也有间隔边界上的样本点全是支持向量的说法，本书采用的支持向量的定义将更“苛刻”一些，具体细节会在 SVM 算法的对偶形式的叙述中讲到</em></strong></p>
+<p>以上的叙述比较完整地说明了 SVM 如何应用于线性可分的数据集，接下来我们就看看如何将这种思想拓展到线性不可分数据集的分类之上。事实上，由于单用超平面的话、甚至连对线性不可分数据集正确分类都做不到，更不用提在此之上的将（硬）间隔最大化的问题了；但是考虑到间隔最大化的思想、我们可以做一定的“妥协”：将“硬”间隔转化为更加普适的“软”间隔。从数学的角度来说，这等价于将不等式约束放宽：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \rightarrow y_{i}\left( w \cdot x_{i} + b \right) \geq 1 - \xi_{i}</script><p>其中的<script type="math/tex">\xi_{i}</script>通常被称为“松弛变量”，它需要满足<script type="math/tex">\xi_{i} \geq 0</script>。当然、这个约束的放宽并不是没有代价的，我们要在需要最小化的<script type="math/tex">{\frac{1}{2}\left\| w \right\|}^{2}</script>上加进一个“惩罚项”来“惩罚”<script type="math/tex">\xi_{i}</script>。换句话说，我们需要最小化的项将变为：</p>
+<script type="math/tex; mode=display">
+L\left( w,b,x,y \right) = \frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}\xi_{i}</script><p>式中<script type="math/tex">L(w,b,x,y)</script>即为损失函数、损失函数中的<script type="math/tex">C</script>（<script type="math/tex">> 0</script>）通常被称为“惩罚因子”，它描述了对松弛变量<script type="math/tex">\xi_{i}</script>的“惩罚力度”：<script type="math/tex">C</script>越大意味着最终的 SVM 模型越不能容忍误分类的点，越小则反之</p>
+<p>综上所述、SVM 算法对应的优化问题可以拓展为：最小化<script type="math/tex">L(w,b,x,y)</script>、使得：</p>
+<script type="math/tex; mode=display">
+y_{i}\left( w \cdot x_{i} + b \right) \geq 1 - \xi_{i}\ (i = 1,\ldots,N)</script><p>其中</p>
+<script type="math/tex; mode=display">
+\xi_{i} \geq 0\ (i = 1,\ldots,N)</script><p>可以证明该优化问题的解存在、且<script type="math/tex">w</script>的解唯一但<script type="math/tex">b</script>的解不唯一，证明细节从略。同时参照感知机算法、自然希望能够写出使用随机梯度下降来训练软间隔最大化 SVM 的算法；但是注意到<script type="math/tex">L</script>表达式中的<script type="math/tex">\xi_{i}</script>是有约束的（需要不小于 0）、所以直接对其进行随机梯度下降存在一定的困难。为了将问题近似转化为无约束最优化问题、我们可以引入 Hinge 损失，其定义很简单：</p>
+<script type="math/tex; mode=display">
+l\left( w,b,x,y \right) = \max(0,1 - y\left( w \cdot x + b \right))</script><p>其中<script type="math/tex">y \in \left\{ - 1, + 1 \right\}</script>。换句话说，只有在模型作出足够肯定的正确的预测时、Hinge 损失才为 0；否则即使模型作出了正确的预测、Hinge 损失还是有可能给予模型一个惩罚</p>
+<p>利用 Hinge 损失、我们可以把损失函数<script type="math/tex">L</script>写成：</p>
+<script type="math/tex; mode=display">
+\hat{L}\left( w,b,x,y \right) = \frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}{l(w,b,x_{i},y_{i})}</script><p>并通过最小化<script type="math/tex">\hat{L}</script>来求解上述 SVM 算法对应的最优化问题</p>
+<p><strong><em>注意：最小化<script type="math/tex">\hat{L}</script>和上文最优化问题的等价性可能并不太显然，但是通过对比损失函数及逐条比对约束条件、完成等价性证明不算太困难（比如直接令<script type="math/tex">\xi_{i} = l(w,b,x_{i},y_{i})</script>）</em></strong></p>
+<p>由于我们想要写出随机梯度下降的算法、所以求出<script type="math/tex">\hat{L}</script>在单一样本<script type="math/tex">(x_{i},y_{i})</script>上对<script type="math/tex">w</script>和<script type="math/tex">b</script>的偏导数是有必要的：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\partial\hat{L}(w,b,x_{i},y_{i})}{\partial w} &= w + \left\{ \begin{matrix}
+0,\ \ & y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \\
+ - Cy_{i}x_{i},\ \ & y_{i}\left( w \cdot x_{i} + b \right) < 1 \\
+\end{matrix} \right.\ \\
+
+\frac{\partial\hat{L}(w,b,x_{i},y_{i})}{\partial b} &= \left\{ \begin{matrix}
+0,\ \ & y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \\
+ - Cy_{i},\ \ & y_{i}\left( w \cdot x_{i} + b \right) < 1 \\
+\end{matrix} \right.\
+\end{align}</script><p>有了这两个偏导数之后，模仿感知机算法、我们就可以比较轻松地写出软间隔最大化 SVM 的随机梯度下降训练算法：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、惩罚因子<script type="math/tex">C</script>、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
+<li><strong>过程</strong>：<ol>
+<li>初始化参数：  <script type="math/tex; mode=display">
+w = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{n},b = 0</script></li>
+<li>对<script type="math/tex">j = 1,\ldots,M</script>：<ol>
+<li>算出误差向量<script type="math/tex">e = \left( e_{1},\ldots,e_{N} \right)^{T}</script>、其中：  <script type="math/tex; mode=display">
+e_{i} = 1 - y_{i}(w \cdot x_{i} + b)</script></li>
+<li>取出误差最大的一项：  <script type="math/tex; mode=display">
+i = \arg{\min_{i}e_{i}}</script></li>
+<li>若<script type="math/tex">e_{i} \leq 0</script>则直接退出循环体、否则取对应的样本来进行随机梯度下降  <script type="math/tex; mode=display">
+\begin{align}
+w &\leftarrow (1 - \eta)w + \eta Cy_{i}x_{i} \\
+b &\leftarrow b + \eta Cy_{i}
+\end{align}</script></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：线性 SVM 模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( w \cdot x + b \right)</script></li>
+</ol>
+<p>需要指出的是，虽然算法看上去差不多、内核也都是随机梯度下降，但其实在感知机模型对学习速率不敏感的同时、线性 SVM 对学习速率是相当敏感的。由前文提到过的 Novikoff 定理和凸优化相关理论可以从理论上解释这个现象，囿于篇幅、这里就不展开叙述了</p>
+<p>由于上述线性 SVM 算法的实现和感知机算法的实现几乎一致、所以我们就略去对线性 SVM 实现的详细说明；观众老爷们可以参照感知机的代码来尝试进行实现、我个人实现的版本则可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/e_SVM/LinearSVM.py" target="_blank" rel="external">这里</a></p>
+<p>可以通过二维线性可分数据集来简单直观地感受一下感知机和线性 SVM 的区别、结果如下图所示：</p>
+<img src="/posts/d455305a/p2.png" alt="p2.png" title="">
+<p>其中左、右图分别为感知机和线性 SVM 的表现，可以看出线性 SVM 要更合理</p>
+<h1 id="SVM-算法的对偶形式"><a href="#SVM-算法的对偶形式" class="headerlink" title="SVM 算法的对偶形式"></a>SVM 算法的对偶形式</h1><p>与感知机类似、SVM 算法也是存在着对偶形式，不过这个转化的过程会比感知机那里的转化过程复杂不少。具体的推导步骤会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中、这里我们就直接看结果：</p>
+<ul>
+<li>硬间隔最大化的对偶形式  <script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：  <script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
+\alpha_{i} \geq 0</script></li>
+<li>软间隔最大化的对偶形式  <script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：  <script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script></li>
+</ul>
+<p>可以看到它们彼此之间相似度非常高、且转化的过程和感知机的转化过程也多少有些相似。同样的，由于对偶形式中样本点仅以内积的形式出现、我们通常会先把 Gram 矩阵算出来。现我们假设对偶形式的解为<script type="math/tex">\alpha^{*} = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T}</script>、那么就有：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w^{*} &= \sum_{i = 1}^{N}{\alpha_{i}^{*}y_{i} \cdot x_{i}} \\
+b^{*} &= y_{j} - \sum_{i = 1}^{N}{y_{i}\alpha_{i}^{*}\left( x_{i} \cdot x_{j} \right)}
+\end{align}</script><p>其中<script type="math/tex">w^{*}</script>的表达式和感知机中<script type="math/tex">w^{*}</script>的表达式一致、<script type="math/tex">b^{*}</script>表达式中出现的 j 是满足<script type="math/tex">0 < \alpha_{j} < C</script>的下标（用反证法可以证明这种 j 必然存在，细节从略）</p>
+<p>在有了对偶形式之后、我们就可以叙述支持向量的一个比较“苛刻”的定义了：假设支持向量的集合为<script type="math/tex">SV</script>、那么</p>
+<ul>
+<li>在硬间隔最大化 SVM 中：  <script type="math/tex; mode=display">
+x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script></li>
+<li>在软间隔最大化 SVM 中：  <script type="math/tex; mode=display">
+x_{i} \in SV \Leftrightarrow 0 < \alpha_{i}^{*} \leq C</script></li>
+</ul>
+<p>其中在软间隔最大化 SVM 里，由于<script type="math/tex">\alpha_{i}^{*} \leq C</script>本身其实是由约束条件规定的、所以可以把上述两式统一写成：</p>
+<script type="math/tex; mode=display">
+x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下图来直观认知何谓支持向量：</p>
+<img src="/posts/d455305a/p3.png" alt="p3.png" title="">
+<p>图中的线段即为决策边界、被一个黑色圆圈给圈住的样本点即为支持向量，左图为线性可分数据集上的情况、右图为线性不可分数据集上的情况</p>
+<p>此外，说明<script type="math/tex">\alpha_{i}^{*}</script>和<script type="math/tex">\xi_{i}^{*}</script>是如何定出各个样本点和间隔边界、分离超平面之间的位置关系是有必要的，它能加深我们对对偶形式求解过程中涉及到的 KKT 条件的理解与记忆（KKT 条件的相关定义会在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中讲到）。具体而言：</p>
+<ul>
+<li>若<script type="math/tex">\alpha_{i}^{*} = 0</script>，那么<script type="math/tex">x_{i}</script>被正确分类且不在间隔边界上、又或被正确分类且在间隔边界上但不是支持向量</li>
+<li>若<script type="math/tex">0 < \alpha_{i}^{*} < C</script>，那么就有<script type="math/tex">\xi_{i} = 0</script>、亦即<script type="math/tex">x_{i}</script>落在间隔边界上且为支持向量</li>
+<li>若<script type="math/tex">\alpha_{i}^{*} = C</script>，那么：<ul>
+<li>若<script type="math/tex">\xi_{i} = 0</script>、则<script type="math/tex">x_{i}</script>落在间隔边界上且为支持向量</li>
+<li>若<script type="math/tex">0 < \xi_{i} < 1</script>、则<script type="math/tex">x_{i}</script>被正确分类且落在间隔边界和分离超平面之间</li>
+<li>若<script type="math/tex">\xi_{i} = 1</script>、则<script type="math/tex">x_{i}</script>落在分离超平面上</li>
+<li>若<script type="math/tex">\xi_{i} > 1</script>、则<script type="math/tex">x_{i}</script>被错误分类<br>由此可知、<script type="math/tex">\xi_{i}</script>其实刻画了<script type="math/tex">x_{i}</script>到相应间隔边界的函数间隔。换句话说、<script type="math/tex">\frac{\xi_{i}}{\left\| w \right\|}</script>即是<script type="math/tex">x_{i}</script>到间隔边间的距离（几何间隔）</li>
+</ul>
+</li>
+</ul>
+<h1 id="SVM-的训练"><a href="#SVM-的训练" class="headerlink" title="SVM 的训练"></a>SVM 的训练</h1><p>前文曾经提过、原始算法的对偶形式通常能将问题简化；虽然这点在感知机算法上没有太多体现，但是对于 SVM 来说，由于它的应用场景更为广泛、在许多问题的提法下转化成对偶形式的意义将非常重大。目前已经有许多针对 SVM 的成熟算法，本书拟介绍的是其中由 Platt 在 1998 年提出的、针对对偶问题求解的序列最小最优化算法（SMO）。本篇文章主要介绍 SMO 的思路和大概步骤，详细的叙述会在下一篇文章介绍完核技巧后进行</p>
+<p>SMO 是一种启发式算法，其主要手段是在每次迭代中专注于只有两个变量的优问题以期望在可以接受的时间内得到一个较优解。具体而言、SMO 要解决的是软间隔最大化 SVM 的对偶问题：</p>
+<script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script><p>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：</p>
+<script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script><p>解决方案是在循环体中不断针对两个变量构造二次规划、并通过求出其解析解来优化原始的对偶问题。大致步骤如下：</p>
+<ul>
+<li>考察所有变量（<script type="math/tex">\alpha_{1},\ldots,\alpha_{N}</script>）及对应的样本点（<script type="math/tex">\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})</script>）满足 KKT 条件的情况</li>
+<li>若所有变量及对应样本在容许误差内都满足 KKT 条件，则退出循环体、完成训练</li>
+<li>否则、通过如下步骤选出两个变量来构造新的规划问题：<ul>
+<li>选出违反 KKT 条件最严重的样本点、以其对应的变量作为第一个变量</li>
+<li>第二个变量的选取有一种比较繁复且高效的方法，但对于一个朴素的实现而言、第二个变量即使随机选取也无不可</li>
+</ul>
+</li>
+<li>将上述步骤选出的变量以外的变量固定、仅针对这两个变量进行最优化。易知此时问题转化为了求二次函数的极大值、从而能简单地得到解析解</li>
+</ul>
+<p>这里仅简要说明一下 SVM 对偶算法中的 KKT 条件，详细的陈列则会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中。具体而言、<script type="math/tex">\alpha_{i}</script>及其对应样本<script type="math/tex">(x_{i},y_{i})</script>的 KKT 条件为：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\alpha_{i} = 0 &\Leftrightarrow y_{i}g\left( x_{i} \right) \geq 1 \\
+0 < \alpha_{i} < C &\Leftrightarrow y_{i}g\left( x_{i} \right) = 1 \\
+\alpha_{i} = C &\Leftrightarrow y_{i}g\left( x_{i} \right) \leq 1
+\end{align}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
+<script type="math/tex; mode=display">
+c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
+<ul>
+<li>计算“损失向量”<script type="math/tex">c = \left( c_{1},\ldots,c_{N} \right)^{T}</script>、其中：  <script type="math/tex; mode=display">
+c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script></li>
+<li>将损失向量<script type="math/tex">c</script>复制三份（<script type="math/tex">c^{\left( 1 \right)}</script>、<script type="math/tex">c^{\left( 2 \right)}</script>、<script type="math/tex">c^{\left( 3 \right)}</script>）并分情况将相应位置的损失置为 0。具体而言：<ul>
+<li>将<script type="math/tex">\alpha_{i} > 0</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) \geq 1</script>对应的<script type="math/tex">c_{i}^{\left( 1 \right)}</script>置为 0</li>
+<li>将<script type="math/tex">\alpha_{i} = 0</script>或<script type="math/tex">\alpha_{i} = C</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) = 1</script>对应的<script type="math/tex">c_{i}^{\left( 2 \right)}</script>置为 0</li>
+<li>将<script type="math/tex">\alpha_{i} < C</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) \leq 1</script>对应的<script type="math/tex">c_{i}^{\left( 3 \right)}</script>置为 0</li>
+</ul>
+</li>
+<li>将三份损失向量相加并取损失最大的样本对应<script type="math/tex">\alpha_i</script>的作为SMO的第一个变量、亦即：  <script type="math/tex; mode=display">
+i = \arg{\max_{i}{\left\{ c_{i}^{\left( 1 \right)} + c_{i}^{\left( 2 \right)} + c_{i}^{\left( 3 \right)}|i = 1,\ldots,N\right\}}}</script></li>
+</ul>
+<p>在后面 SVM 的朴素实现中、我们打算采用的正是这种定义</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/93db8ec2/" rel="prev" title="感知机模型">
+                <i class="fa fa-chevron-left"></i> 感知机模型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/924abfe1/" rel="next" title="从线性到非线性">
+                从线性到非线性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#间隔最大化与线性-SVM"><span class="nav-number">1.</span> <span class="nav-text">间隔最大化与线性 SVM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SVM-算法的对偶形式"><span class="nav-number">2.</span> <span class="nav-text">SVM 算法的对偶形式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SVM-的训练"><span class="nav-number">3.</span> <span class="nav-text">SVM 的训练</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

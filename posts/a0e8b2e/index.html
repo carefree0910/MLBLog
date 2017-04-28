@@ -99,7 +99,7 @@
 <meta property="og:url" content="http://www.carefree0910.com/posts/a0e8b2e/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="贝叶斯决策论是在概率框架下进行决策的基本方法之一、更是统计模式识别的主要方法之一。从名字也许能看出来，贝叶斯决策论其实是贝叶斯统计学派进行决策的方法。为了更加深刻地理解贝叶斯分类器，我们需要先对贝叶斯学派和其决策理论有一个大致的认知">
-<meta property="og:updated_time" content="2017-04-20T12:50:04.000Z">
+<meta property="og:updated_time" content="2017-04-28T10:52:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="贝叶斯决策论">
 <meta name="twitter:description" content="贝叶斯决策论是在概率框架下进行决策的基本方法之一、更是统计模式识别的主要方法之一。从名字也许能看出来，贝叶斯决策论其实是贝叶斯统计学派进行决策的方法。为了更加深刻地理解贝叶斯分类器，我们需要先对贝叶斯学派和其决策理论有一个大致的认知">
@@ -414,7 +414,7 @@
 <p>所以相比起把模型参数固定、注重样本的随机性的频率学派而言，贝叶斯学派将样本视为是固定的、把模型的参数视为关键。在上面这个例子里面，样本就是抛出去的那枚硬币，模型的参数就是每个人从中获得的“信息”。对于频率学派而言，每个人获得的“信息”不应该有不同，所以自然会根据“均匀硬币抛出正面的概率是 50%”这个“样本的信息”来导出“硬币是正面的概率为 50%”这个结论。但是对贝叶斯学派而言，硬币抛出去就抛出去了，问题的关键在于模型的参数、亦即“观察者”从中获得的信息，所以会导出“对于抛硬币的人而言，硬币是正面的概率是 100%”这一类的结论</p>
 <h1 id="贝叶斯决策论"><a href="#贝叶斯决策论" class="headerlink" title="贝叶斯决策论"></a>贝叶斯决策论</h1><p>大致知道贝叶斯学派的思想后，我们就可以介绍贝叶斯决策论了。这里不可避免地要牵扯到概率论和数理统计的相关定义和知识，但幸运的是它们都是比较基础且直观的部分、无需太多数学背景就可以知道它们的含义：</p>
 <h2 id="行动空间"><a href="#行动空间" class="headerlink" title="行动空间"></a>行动空间</h2><p>行动空间（通常用<script type="math/tex">A</script>来表示）是某项实际工作中可能采取的各种“行动”所构成的集合。正如前文所提到的、贝叶斯学派注重的是模型参数，所以通常而言我们想要做出的“行动”是“决定模型的参数”。因此我们通常会将行动空间取为参数空间，亦即<script type="math/tex">A=\Theta</script></p>
-<h2 id="决策"><a href="#决策" class="headerlink" title="决策"></a>决策</h2><p>决策（通常用<script type="math/tex">\delta(\tilde X)</script>来表示）是样本空间<script type="math/tex">X</script>到行动空间<script type="math/tex">A</script>的一个映射。换句话说，对于一个单一的样本<script type="math/tex">\tilde X</script>（<script type="math/tex">\tilde X\in X</script>），决策函数可以利用它得到<script type="math/tex">A</script>中的一个行动。需要注意的是，这里的样本<script type="math/tex">\tilde X</script>通常是高维的随机向量：<script type="math/tex">\tilde X=(x_1,...,x_N)^T</script>；尤其需要分清的是，这个（以及本小节之后的所有）<script type="math/tex">\tilde X</script>其实是一般意义上的“训练集”、<script type="math/tex">x_i</script>才是一般意义上的“样本”。这是因为本小节主要在叙述数理统计相关知识，所以在术语上和机器学习术语会有所冲突，需要分辨清它们的关系</p>
+<h2 id="决策"><a href="#决策" class="headerlink" title="决策"></a>决策</h2><p>决策（通常用<script type="math/tex">\delta(\tilde X)</script>来表示）是样本空间<script type="math/tex">X</script>到行动空间<script type="math/tex">A</script>的一个映射。换句话说，对于一个单一的样本<script type="math/tex">\tilde X</script>（<script type="math/tex">\tilde X\in X</script>），决策函数可以利用它得到<script type="math/tex">A</script>中的一个行动。需要注意的是，这里的样本<script type="math/tex">\tilde X</script>通常是高维的随机向量：<script type="math/tex">\tilde X=(x_1,...,x_N)^T</script>；尤其需要分清的是，这个（以及本节之后的所有）<script type="math/tex">\tilde X</script>其实是一般意义上的“训练集”、<script type="math/tex">x_i</script>才是一般意义上的“样本”。这是因为本节主要在叙述数理统计相关知识，所以在术语上和机器学习术语会有所冲突，需要分辨清它们的关系</p>
 <h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>损失函数（通常用<script type="math/tex">L(\theta,a)=L(\theta,\delta(\tilde X))</script>来表示）用于衡量当参数是<script type="math/tex">\theta</script>（<script type="math/tex">\theta\in\Theta</script>，<script type="math/tex">\Theta</script>是参数空间）时采取行动<script type="math/tex">a(a\in A)</script>所引起的损失</p>
 <h2 id="决策风险"><a href="#决策风险" class="headerlink" title="决策风险"></a>决策风险</h2><p>决策风险（通常用<script type="math/tex">R(\theta,\delta)</script>来表示）是损失函数的期望：<script type="math/tex">R(\theta,\delta)=EL(\theta,\delta(\tilde X))</script></p>
 <h2 id="先验分布"><a href="#先验分布" class="headerlink" title="先验分布"></a>先验分布</h2><p>先验分布描述了参数<script type="math/tex">\theta</script>在已知样本<script type="math/tex">\tilde X</script>中的分布</p>
@@ -576,7 +576,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -587,7 +587,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

@@ -100,7 +100,7 @@
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="本文首先会介绍何谓“集成”、然后会介绍两种常见的集成学习方法：Bagging、AdaBoost 的基本定义。这些概念的背后有着深刻的数学理论，但是它们同时也拥有着很好的直观。获得对它们的直观有助于加深对各种模型的分类性能的理解、同时也有助于根据具体的数据集来挑选相应的、合适的模型来进行学习">
 <meta property="og:image" content="http://www.carefree0910.com/posts/7081b0ee/p1.png">
-<meta property="og:updated_time" content="2017-04-25T14:29:15.000Z">
+<meta property="og:updated_time" content="2017-04-28T10:51:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="“集成”的思想">
 <meta name="twitter:description" content="本文首先会介绍何谓“集成”、然后会介绍两种常见的集成学习方法：Bagging、AdaBoost 的基本定义。这些概念的背后有着深刻的数学理论，但是它们同时也拥有着很好的直观。获得对它们的直观有助于加深对各种模型的分类性能的理解、同时也有助于根据具体的数据集来挑选相应的、合适的模型来进行学习">
@@ -479,7 +479,7 @@ p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\l
 <li>若<script type="math/tex">k=1</script>，那么生成决策树的每一步都是在随机选择属性、亦即特征选取的随机性达到最大</li>
 </ul>
 <p>Breiman 在提出随机森林算法的同时指出，一般情况下、推荐取<script type="math/tex">k=\log_2{d}</script></p>
-<h1 id="PAC-框架与-Boosting"><a href="#PAC-框架与-Boosting" class="headerlink" title="PAC 框架与 Boosting"></a>PAC 框架与 Boosting</h1><p>虽然同属集成学习方法，但 Boosting 和 Bagging 的数学理论根基不尽相同：Boosting 产生于计算学习理论（Computational Learning Theory）[Valiant, 1984]。一般而言，如果只是应用机器学习的话、我们无需对它进行太多的了解（甚至可以说对它一知半解反而有害），所以本小节只打算对其最基本的概率近似正确（PAC）学习理论中的“可学习性（PAC Learnability）”进行简要的介绍</p>
+<h1 id="PAC-框架与-Boosting"><a href="#PAC-框架与-Boosting" class="headerlink" title="PAC 框架与 Boosting"></a>PAC 框架与 Boosting</h1><p>虽然同属集成学习方法，但 Boosting 和 Bagging 的数学理论根基不尽相同：Boosting 产生于计算学习理论（Computational Learning Theory）[Valiant, 1984]。一般而言，如果只是应用机器学习的话、我们无需对它进行太多的了解（甚至可以说对它一知半解反而有害），所以本节只打算对其最基本的概率近似正确（PAC）学习理论中的“可学习性（PAC Learnability）”进行简要的介绍</p>
 <p>PAC 学习整体来说是一个比较纯粹的数学理论。有一种说法是、PAC 学习是统计学家研究机器学习的方式，它关心模型的可解释性、然而机器学习专家通常更关心模型的预测能力。这也正是为何说无需太过了解它，因为我们的目的终究不是成为统计的专家、而是更希望成为一个能够应用机器学习的人。不过幸运的是，虽然为了叙述 Boosting、PAC 学习中“可学习性”的概念难以避开，但其本身却是具有很直观的解释的。下面我们就来看看这个直观解释：</p>
 <p>PAC 提出的一个主要的假设、就是它要求数据是从某个稳定的概率分布中产生。直观地说，就是样本在样本空间中的分布状况不能随时间的变化而变化、否则就失去了学习的意义（因为学习到的永远只是“某个时间”的分布，如果未知数据所处时间的分布状况和该时间数据的分布状况不同的话、模型就直接失效了）。然后所谓的PAC可学习性，就是看学习的算法是否能够在合理的时间（多项式时间）内、以足够高的概率输出一个错误率足够低的模型。由此，所谓的“强可学习”和“弱可学习”的概念就很直观了：</p>
 <ul>
@@ -488,7 +488,7 @@ p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\l
 </ul>
 <p><strong><em>注意：由于进行机器学习时、我们只能针对训练数据集进行学习、所以和真实情况相比肯定是有偏差的。这正是需要提出 PAC 可学习这个概念的原因之一</em></strong></p>
 <p>虽然我们区分定义了这两个概念，不过神奇之处在于，这两个概念在PAC学习框架下是完全等价的[Schapire, 1990]。这意味着对于一个学习问题，只要我们找到了一个“弱学习算法”，就可以把它变成一个“强学习算法”。这当然是意义深刻的，因为往往比较粗糙的“弱学习算法”比较好找、而相对精确的“强学习算法”却难得一求</p>
-<p>那么具体而言应该怎么做呢？这里就需要用到所谓的 Boosting（提升方法）了。提升方法可以定义为用于将由“弱学习算法”生成的“弱模型”、提升成和“强学习算法”所生成的“强模型”性能差不多的模型的方法，它的基本组成单元是许许多多的“弱模型”、然后通过某种手段把它们集成为最终模型。虽然该过程听上去和上一小节介绍的 Bagging 差不多、但它们的思想和背后的数学理论却有较大区别，加以辨析是有必要的</p>
+<p>那么具体而言应该怎么做呢？这里就需要用到所谓的 Boosting（提升方法）了。提升方法可以定义为用于将由“弱学习算法”生成的“弱模型”、提升成和“强学习算法”所生成的“强模型”性能差不多的模型的方法，它的基本组成单元是许许多多的“弱模型”、然后通过某种手段把它们集成为最终模型。虽然该过程听上去和之前介绍的 Bagging 差不多、但它们的思想和背后的数学理论却有较大区别，加以辨析是有必要的</p>
 <p>需要指出的是，Boosting 事实上是一族算法、该族算法有一个类似的框架：</p>
 <ul>
 <li>根据当前的数据训练出一个弱模型</li>
@@ -654,7 +654,7 @@ p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\l
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -665,7 +665,7 @@ p\left( G\left( x \right) \neq f\left( x \right) \right) = \sum_{j = 0}^{\left\l
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

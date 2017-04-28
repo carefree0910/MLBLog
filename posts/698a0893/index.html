@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Python,综述," />
+  <meta name="keywords" content="综述,Python," />
 
 
 
@@ -93,13 +93,13 @@
 
 
 <meta name="description" content="上一篇文章大概地介绍了一下机器学习的各种概念，这一篇文章我们则会主要讲讲脚本语言 Python 相关的一些东西。本文题目是在 Python 界流传甚广的“谚语”，它讲述了 Python 强大的功能与易于上手的特性">
-<meta name="keywords" content="Python,综述">
+<meta name="keywords" content="综述,Python">
 <meta property="og:type" content="article">
 <meta property="og:title" content="人生苦短，我用 Python">
 <meta property="og:url" content="http://www.carefree0910.com/posts/698a0893/index.html">
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="上一篇文章大概地介绍了一下机器学习的各种概念，这一篇文章我们则会主要讲讲脚本语言 Python 相关的一些东西。本文题目是在 Python 界流传甚广的“谚语”，它讲述了 Python 强大的功能与易于上手的特性">
-<meta property="og:updated_time" content="2017-04-20T02:03:18.000Z">
+<meta property="og:updated_time" content="2017-04-28T10:53:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="人生苦短，我用 Python">
 <meta name="twitter:description" content="上一篇文章大概地介绍了一下机器学习的各种概念，这一篇文章我们则会主要讲讲脚本语言 Python 相关的一些东西。本文题目是在 Python 界流传甚广的“谚语”，它讲述了 Python 强大的功能与易于上手的特性">
@@ -408,7 +408,7 @@
 <h1 id="为何选择-Python"><a href="#为何选择-Python" class="headerlink" title="为何选择 Python"></a>为何选择 Python</h1><p>援引开源运动的领袖人物 Eric Raymond 的说法：“Python 语言非常干净，设计优雅，具有出色的模块化特性。其最出色的地方在于，它鼓励清晰易读的代码，特别适合以渐进开发的方式构造项目”。Python 的可读性使得即使是刚学不久的人也看懂大部分的代码，Python 庞大的社区和大量的开发文档更是使得初学者能够快速地实现许许多多令人惊叹的功能。对于 Python 的程序，人们甚至有时会戏称其为“可执行的伪代码（executable pseudo-code）”以突显它的清晰性和可读性</p>
 <p>Python 的强大是毋庸置疑的，上文提到的 Eric Raymond 甚至称其“过于强大了”。与之相对应的、就是 Python 的速度比较慢。然而比起 Python 开发环境提供的海量高级数据结构（如列表、元组、字典、集合等）和数之不尽的第三方库、再加上高速的 CPU 和近代发展起来的 GPU 编程，速度的问题就显得没那么尖锐。况且 Python 还能通过各种途径来使用 C / C++ 代码来编写核心代码，其强大的“胶水”功能使其速度（在程序员能力允许的情况下）和纯粹的 C / C++ 相比已经相去不远。一个典型的例子、也是我们会在本书常常运用到的、就是 Python 中 Numpy 这个第三方库。编写它的语言正是底层语言（C 和 Fortran），其支持向量、矩阵操作的特性和优异的速度使得 Python 在科学计算这一领域大放异彩</p>
 <p><strong><em>注意：Python 及本博客会用到的两个非常优异的第三方库——Numpy 和 Tensorflow 的用法摘要我们会开单独的章节进行说明</em></strong></p>
-<h1 id="Python-在机器学习领域的优势"><a href="#Python-在机器学习领域的优势" class="headerlink" title="Python 在机器学习领域的优势"></a>Python 在机器学习领域的优势</h1><p>虽然在上一小节叙述了 Python 的种种好处，但不可否认的是，确实存在诸如 MATLAB 和 Mathematica 这样的高级程序语言、它们对机器学习的支持也不错，MATLAB 甚至还自带许多机器学习的应用。但是作为一个问心无愧的程序员，我们还是需要提倡支持正版、而 MATLAB 的正版软件需要数千美金。与之相对，由于 Python 是开源项目，几乎所有必要的组件都是完全免费的</p>
+<h1 id="Python-在机器学习领域的优势"><a href="#Python-在机器学习领域的优势" class="headerlink" title="Python 在机器学习领域的优势"></a>Python 在机器学习领域的优势</h1><p>虽然在上一节叙述了 Python 的种种好处，但不可否认的是，确实存在诸如 MATLAB 和 Mathematica 这样的高级程序语言、它们对机器学习的支持也不错，MATLAB 甚至还自带许多机器学习的应用。但是作为一个问心无愧的程序员，我们还是需要提倡支持正版、而 MATLAB 的正版软件需要数千美金。与之相对，由于 Python 是开源项目，几乎所有必要的组件都是完全免费的</p>
 <p>之前也提到过 Python 的速度问题，但是更快更底层的语言、比如 C 和 C++，若使用它们来学习机器学习的话、会不可避免地引发这么一个问题：即使是实现一个非常简单的功能、也需要进行大量的编写和 debug 的过程；在这期间，程序员很有可能忘掉学习机器学习的初衷而迷失在代码的海洋中。笔者曾经尝试过将 Python 上的神经网络框架移植到 C++ 上，这之间的折腾至今难忘</p>
 <p>此外，笔者认为、使用 Python 来学习机器学习是和“不要过早优化”这句编程界金句有着异曲同工之妙的。Python（几乎）唯一的缺陷——速度，在初期进行快速检验算法、思想正误及开发工作时，其实基本不是重要问题。这之中的道理是平凡的：如果解决问题的思想存在问题，那么即使拼命去提高程序的运行效率、也只能使问题越来越大而已。这种时候，先使用 Python 进行快速实现、有必要时再用底层代码重写核心代码，从各方面来说都是一个更好的选择</p>
 <p><del>（有没有觉得这个人真能扯）</del></p>
@@ -463,9 +463,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Python/" rel="tag"># Python</a>
-          
             <a href="/tags/综述/" rel="tag"># 综述</a>
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
           
         </div>
       
@@ -566,7 +566,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -577,7 +577,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

@@ -100,7 +100,7 @@
 <meta property="og:site_name" content="Python 与机器学习">
 <meta property="og:description" content="由前文的讨论可知，问题的关键主要在如下两点：  如何根据弱模型的表现更新训练集的权重 如何根据弱模型的表现决定弱模型的话语权  我们接下来就看看 AdaBoost 算法是怎样解决上述两个问题的。事实上，能够将这两个问题的解决方案有机地糅合在一起、正是 AdaBoost 的巧妙之处之一">
 <meta property="og:image" content="http://www.carefree0910.com/posts/f5f50863/p1.png">
-<meta property="og:updated_time" content="2017-04-25T15:50:26.000Z">
+<meta property="og:updated_time" content="2017-04-28T10:51:07.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AdaBoost 算法">
 <meta name="twitter:description" content="由前文的讨论可知，问题的关键主要在如下两点：  如何根据弱模型的表现更新训练集的权重 如何根据弱模型的表现决定弱模型的话语权  我们接下来就看看 AdaBoost 算法是怎样解决上述两个问题的。事实上，能够将这两个问题的解决方案有机地糅合在一起、正是 AdaBoost 的巧妙之处之一">
@@ -449,7 +449,7 @@ g\left( x \right) = sign\left( f\left( x \right) \right) = \text{sign}\left( \su
 <p><strong><em>注意：虽然笔者认为在 Boosting 中的弱模型就应该选择足够弱的模型，但确实亦有对强模型（如核 SVM）应用 Boosting 也很好的说法。详细而严谨的讨论会牵扯大量的数学理论、这里就不详细展开了</em></strong></p>
 <p>可能观众老爷们此时又会产生一个新的疑问：如果说 Boosting 中的弱模型不宜太强的话，是不是说 Bagging 中的个体模型也不宜太强呢？需要指出的是，虽然从理论上来说使用弱模型进行集成就已足以获得一个相当不错的最终模型，但使用较强的模型来进行集成从原理上是不太矛盾的。考虑到不同的场合，有时确实可以选用较强的模型来作为个体模型</p>
 <p>那么所谓的不太强的弱模型大概是个什么东西呢？一个比较直观的例子就是限制层数的决策树。极端的情况就是限定它只能有一层、亦即上一章我们提到过的“决策树桩”，对应的进行了提升后的模型就是相当有名的提升树（Boosting Tree），它被认为是统计学习中性能最好的方法之一、既可以用来做分类也可以拿来做回归，是个相当强力的模型</p>
-<h1 id="AdaBoost-的实现"><a href="#AdaBoost-的实现" class="headerlink" title="AdaBoost 的实现"></a>AdaBoost 的实现</h1><p>从第一节的算法讲解其实可以看出，虽然 AdaBoost 算法本身很不平凡，但它给出的步骤都是相当便于实现的，基本上一个步骤就对应着 Python 里面的一行代码。在实现的过程中，困难之处可能主要在于如何让实现出来的 AdaBoost 框架易于扩展并具有方便调用的接口，而不在于实现算法本身。同时，为了能够更好地理解 AdaBoost 算法，我们需要对其性能作一系列的分析</p>
+<h1 id="AdaBoost-的实现"><a href="#AdaBoost-的实现" class="headerlink" title="AdaBoost 的实现"></a>AdaBoost 的实现</h1><p>从之前的算法讲解其实可以看出，虽然 AdaBoost 算法本身很不平凡，但它给出的步骤都是相当便于实现的，基本上一个步骤就对应着 Python 里面的一行代码。在实现的过程中，困难之处可能主要在于如何让实现出来的 AdaBoost 框架易于扩展并具有方便调用的接口，而不在于实现算法本身。同时，为了能够更好地理解 AdaBoost 算法，我们需要对其性能作一系列的分析</p>
 <p>由于 AdaBoost 是一个用于提升弱模型的算法，所以我们整体的实现思路大致是（不失一般性、我们先讨论二类分类问题）：</p>
 <ul>
 <li>搭建 AdaBoost 框架</li>
@@ -613,7 +613,7 @@ g\left( x \right) = sign\left( f\left( x \right) \right) = \text{sign}\left( \su
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -624,7 +624,7 @@ g\left( x \right) = sign\left( f\left( x \right) \right) = \text{sign}\left( \su
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

@@ -1,0 +1,1183 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数学,算法,Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="前文已经提过，由于对偶形式中的样本点仅以内积的形式出现、所以利用核技巧能将线性算法“升级”为非线性算法。有一个与核技巧（Kernel Trick）类似的概念叫核方法（Kernel Method），这两者的区别可以简单地从字面意思去认知：当我们提及核方法（Method）时、我们比较注重它背后的原理；当我们提及核技巧（Trick）时、我们更注重它实际的应用。考虑到本书的主旨、我们还是选择了核技巧这一说">
+<meta name="keywords" content="数学,算法,Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从线性到非线性">
+<meta property="og:url" content="http://www.carefree0910.com/posts/924abfe1/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="前文已经提过，由于对偶形式中的样本点仅以内积的形式出现、所以利用核技巧能将线性算法“升级”为非线性算法。有一个与核技巧（Kernel Trick）类似的概念叫核方法（Kernel Method），这两者的区别可以简单地从字面意思去认知：当我们提及核方法（Method）时、我们比较注重它背后的原理；当我们提及核技巧（Trick）时、我们更注重它实际的应用。考虑到本书的主旨、我们还是选择了核技巧这一说">
+<meta property="og:image" content="http://www.carefree0910.com/posts/924abfe1/p1.png">
+<meta property="og:updated_time" content="2017-04-28T12:18:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从线性到非线性">
+<meta name="twitter:description" content="前文已经提过，由于对偶形式中的样本点仅以内积的形式出现、所以利用核技巧能将线性算法“升级”为非线性算法。有一个与核技巧（Kernel Trick）类似的概念叫核方法（Kernel Method），这两者的区别可以简单地从字面意思去认知：当我们提及核方法（Method）时、我们比较注重它背后的原理；当我们提及核技巧（Trick）时、我们更注重它实际的应用。考虑到本书的主旨、我们还是选择了核技巧这一说">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/924abfe1/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/924abfe1/"/>
+
+
+
+
+
+  <title> 从线性到非线性 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/924abfe1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从线性到非线性
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T11:18:01+08:00">
+                2017-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
+                    <span itemprop="name">支持向量机</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前文已经提过，由于对偶形式中的样本点仅以内积的形式出现、所以利用核技巧能将线性算法“升级”为非线性算法。有一个与核技巧（Kernel Trick）类似的概念叫核方法（Kernel Method），这两者的区别可以简单地从字面意思去认知：当我们提及核方法（Method）时、我们比较注重它背后的原理；当我们提及核技巧（Trick）时、我们更注重它实际的应用。考虑到本书的主旨、我们还是选择了核技巧这一说法</p>
+<p><strong><em>注意：以上关于核技巧和核方法这两个名词的区分不是一种共识、而是我个人为了简化问题而作的一种形象的说明，所以切忌将其作为严谨的叙述</em></strong></p>
+<a id="more"></a>
+<h1 id="核技巧简述"><a href="#核技巧简述" class="headerlink" title="核技巧简述"></a>核技巧简述</h1><p>虽说重视应用、但一些基本的概念还是需要稍微了解的。核方法本身要深究的话会牵扯到诸如正定核、内积空间、希尔伯特空间乃至于再生核希尔伯特空间（Reproducing Kernel Hilbert Space，常简称为 RKHS）、这些东西又会牵扯到泛函的相关理论，可谓是一个可以单独拿来出书的知识点。幸运的是，单就核技巧而言、我们仅需要知道其中的三个定理即可，这三个定理分别说明了核技巧的合理性、普适性和高效性。不过在叙述这三个定理之前，我们可以先来看看核技巧的直观解释</p>
+<p>核技巧往简单地说，就是将一个低维的线性不可分的数据映射到一个高维的空间、并期望映射后的数据在高维空间里是线性可分的。我们以异或数据集为例：在二维空间中、异或数据集是线性不可分的；但是通过将其映射到三维空间、我们可以非常简单地让其在三维空间中变得线性可分。比如定义映射：</p>
+<script type="math/tex; mode=display">
+\phi\left( x,y \right) = \left\{ \begin{matrix}
+\left( x,y,1 \right),\ \ & xy > 0 \\
+\left( x,y,0 \right),\ \ & xy \leq 0 \\
+\end{matrix} \right.\</script><p>该映射的效果如下图所示：</p>
+<img src="/posts/924abfe1/p1.png" alt="p1.png" title="">
+<p>可以看到，虽然左图的数据集线性不可分、但显然右图的数据集是线性可分的，这就是核技巧工作原理的一个不太严谨但仍然合理的解释</p>
+<p><strong><em>注意：这里我们暂时采用了“从低维到高维的映射”这一说法、但该说法并不完全严谨，原因会在后文说明、这里只需留一个心眼即可</em></strong></p>
+<p>从直观上来说，确实容易想象、同一份数据在越高维的空间中越有可能线性可分，但从理论上是否确实如此呢？1965 年提出的 Cover 定理解决了这个问题，它的具体叙述如下：若设 d 维空间中 N 个点线性可分的概率为<script type="math/tex">p(d,N)</script>，那么就有：</p>
+<script type="math/tex; mode=display">
+p\left( d,N \right) = \frac{2\sum_{i = 0}^{m}C_{N - 1}^{i}}{2^{N}} = \left\{ \begin{matrix}
+\frac{\sum_{i = 1}^{d}C_{N - 1}^{i}}{2^{N - 1}},\ \ & N > d + 1 \\
+1,\ \ & N \leq d + 1 \\
+\end{matrix} \right.\</script><p>其中</p>
+<script type="math/tex; mode=display">
+m = \min{(d,\ N - 1)}</script><p>定理的证明细节从略，我们只需要知道它证明了当空间的维数 d 越大时、其中的 N 个点线性可分的概率就越大，这构成了核技巧的理论基础之一</p>
+<p>至此，似乎问题就转化为了如何寻找合适的映射<script type="math/tex">\phi</script>、使得数据集在被它映射到高维空间后变得线性可分。不过可以想象的是，现实任务中的数据集要比上文我们拿来举例的异或数据集要复杂得多、直接构造一个恰当的<script type="math/tex">\phi</script>的难度甚至可能高于解决问题本身。而核技巧的巧妙之处就在于，它能将构造映射这个过程再次进行转化、从而使得问题变得简易：它通过核函数来避免显式定义映射<script type="math/tex">\phi</script>。往简单里说、核技巧会通过用核函数</p>
+<script type="math/tex; mode=display">
+K\left( x_{i},x_{j} \right) = \phi\left( x_{i} \right) \cdot \phi(x_{j})</script><p>替换各式算法中出现的内积</p>
+<script type="math/tex; mode=display">
+x_{i} \cdot x_{j}</script><p>来完成将数据从低维映射到高维的过程。换句话说、核技巧的思想如下：</p>
+<ul>
+<li>将算法表述成样本点内积的组合（这经常能通过算法的对偶形式实现）</li>
+<li>设法找到核函数<script type="math/tex">K\left( x_i,x_j\right)</script>，它能返回样本点<script type="math/tex">x_i</script>、<script type="math/tex">x_j</script>被<script type="math/tex">\phi</script>作用后的内积</li>
+<li>用<script type="math/tex">K\left( x_i,x_j\right)</script>替换<script type="math/tex">x_i\cdot x_j</script>、完成低维到高维的映射（同时也完成了从线性算法到非线性算法的转换）</li>
+</ul>
+<p>而核技巧事实上能够应用的场景更为宽泛——在 2002 年由 Sch<script type="math/tex">\ddot{o}</script>lkopf 和 Smola 证明的表示定理告诉我们：设<script type="math/tex">\mathcal{H}</script>为核函数<script type="math/tex">K</script>对应的映射后的空间（RKHS），<script type="math/tex">\left\| h \right\|_{\mathcal{H}}</script>表示<script type="math/tex">\mathcal{H}</script>中<script type="math/tex">h</script>的范数，那么对于任意单调递增的函数<script type="math/tex">C</script>和任意非负损失函数<script type="math/tex">L</script>、优化问题</p>
+<script type="math/tex; mode=display">
+\min_{h\in\mathcal{H}}{L\left( h\left( x_{1} \right),\ldots,h\left( x_{N} \right) \right) + C(\left\| h \right\|_{\mathcal{H}})}</script><p>的解总可以表述为核函数<script type="math/tex">K</script>的线性组合</p>
+<script type="math/tex; mode=display">
+h^{*}\left( x \right) = \sum_{i = 1}^{N}{\alpha_{i}K(x,x_{i})}</script><p>这意味着对于任意一个损失函数和一个单调递增的正则化项组成的优化问题、我们都能够对其应用核技巧。所以至此、大多数的问题就转化为如何找到能够表示成高维空间中内积的核函数了。幸运的是、1909 年提出的 Mercer 定理解决了这个问题，它的具体叙述如下：<script type="math/tex">K\left( x_{i},x_{j} \right)</script>若满足</p>
+<script type="math/tex; mode=display">
+K\left( x_{i},x_{j} \right) = K\left( x_{j},x_{i} \right)</script><p>亦即如果<script type="math/tex">K\left( x_{i},x_{j} \right)</script>是对称函数的话、那么它具有 Hilbert 空间中内积形式的充要条件有以下两个：</p>
+<ul>
+<li>对任何平方可积<script type="math/tex">g</script>、满足  <script type="math/tex; mode=display">
+\int K\left( x_{i},x_{j} \right)g\left( x_{i} \right)g\left( x_{j} \right)dx_{i}dx_{j} \geq 0</script></li>
+<li>对含任意 N 个样本的数据集<script type="math/tex">D=\left\{ x_1,...,x_N\right\}</script>、核矩阵：  <script type="math/tex; mode=display">
+\mathbf{K} = \begin{bmatrix}
+K\left( x_{1},x_{1} \right) & \ldots & K\left( x_{1},x_{N} \right) \\
+\vdots & \ddots & \vdots \\
+K\left( x_{N},x_{1} \right) & \ldots & K\left( x_{N},x_{N} \right) \\
+\end{bmatrix}_{N \times N} = \left\lbrack K_{ij} \right\rbrack_{N \times N}</script>是半正定矩阵</li>
+</ul>
+<p><strong><em>注意：通常我们会称满足这两个充要条件之一的函数为 Mercer 核函数而把核函数定义得更宽泛。由于本书不打算在理论上深入太多、所以一律将 Mercer 核函数简称为核函数。此外，虽说 Mercer 核函数确实具有 Hilbert 空间中的内积形式、但此时的 Hilbert 空间并不一定具有“维度”这么好的概念（或说、可以认为此时 Hilbert 空间的维度为无穷大，比如下面马上就要讲到的 RBF 核、它映射后的空间就是无穷维的）。这也正是为何前文说“从低维到高维的映射”不完全严谨</em></strong></p>
+<p>Mercer 定理为寻找核函数带来了极大的便利。可以证明如下两族函数都是核函数：</p>
+<ul>
+<li>多项式核  <script type="math/tex; mode=display">
+K\left( x_{i},x_{j} \right) = \left( x_{i} \cdot x_{j} + 1 \right)^{p}</script></li>
+<li>径向基（Radial Basis Function，常简称为RBF）核  <script type="math/tex; mode=display">
+K\left( x_{i},x_{j} \right) = \exp\left( - \gamma\left\| x_{i} - x_{j} \right\|^{2} \right)</script></li>
+</ul>
+<h1 id="核技巧的应用"><a href="#核技巧的应用" class="headerlink" title="核技巧的应用"></a>核技巧的应用</h1><p>我们接下来会实现的也正是这两族核函数对应的、应用了核技巧的算法，具体而言、我们会利用核技巧来将感知机和支持向量机算法从原始的线性版本“升级”为非线性版本</p>
+<p>由简入繁、先从核感知机讲起；由于感知机对偶算法十分简单、对其应用核技巧相应的也非常平凡——直接用核函数替换掉相应内积即可。不过需要注意的是，由于我们采用的是随机梯度下降、所以算法中也应尽量只更新局部参数以避免进行无用的计算：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
+<li><p><strong>过程</strong>：</p>
+<ol>
+<li><p>初始化参数：  </p>
+<script type="math/tex; mode=display">
+\alpha = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script><script type="math/tex; mode=display">
+\hat{y} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script><p>同时计算核矩阵：  </p>
+<script type="math/tex; mode=display">
+\mathbf{K} = \left\lbrack K\left( x_{i},x_{j} \right) \right\rbrack_{N \times N}</script></li>
+<li><p>对<script type="math/tex">j = 1,\ldots,M</script>：  </p>
+<script type="math/tex; mode=display">
+E = \left\{ \left( x_{i},y_{i} \right) \middle| {\hat{y}}_{i} \leq 0 \right\}</script><ol>
+<li>若<script type="math/tex">E = \varnothing</script>（亦即没有误分类的样本点）则退出循环体</li>
+<li>否则，任取<script type="math/tex">E</script>中的一个样本点<script type="math/tex">(x_{i},y_{i})</script>并利用其下标更新局部参数：  <script type="math/tex; mode=display">
+\alpha_{i} \leftarrow \alpha_{i} + \eta</script><script type="math/tex; mode=display">
+dw = db = \eta y_{i}</script></li>
+<li>利用<script type="math/tex">dw</script>和<script type="math/tex">db</script>更新预测向量<script type="math/tex">\hat{y}</script>：  <script type="math/tex; mode=display">
+\hat{y} \leftarrow \hat{y} + dw\mathbf{K}_{i\mathbf{\cdot}} + db\mathbf{1}</script>其中、<script type="math/tex">\mathbf{K}_{i\mathbf{\cdot}}</script>表示<script type="math/tex">\mathbf{K}</script>的第 i 行、<script type="math/tex">\mathbf{1}</script>表示全为 1 的向量</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：感知机模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( \sum_{i = 1}^{N}{\alpha_{i}y_{i}\left( K\left( x_{i},x \right) + 1 \right)} \right)</script></li>
+</ol>
+<p>再来看如何对 SVM 应用核技巧。虽说在对偶算法上应用核技巧是非常自然、直观的，但是直接在原始算法上应用核技巧也无不可</p>
+<p>注意原始问题可以表述为：</p>
+<script type="math/tex; mode=display">
+\min_{w,b}\hat{L}\left( w,b,x,y \right) = \min_{w,b}{\frac{1}{2}\left\| w \right\|^{2} + \sum_{i = 1}^{N}{\max(0,1 - y_{i}(w \cdot x_{i} + b)}}</script><p>若令<script type="math/tex">w = \sum_{i = 1}^{N}{u_{i}\phi(x_{i})} = u \cdot \phi(x)</script>、其中：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+u &= (u_{1},\ldots,u_{N}) \\
+\phi\left( x \right) &= \left( \phi\left( x_{1} \right),\ldots,\phi\left( x_{N} \right) \right)^{T}
+\end{align}</script><p>则可知上述问题能够通过<script type="math/tex">\phi</script>映射到高维空间上：</p>
+<script type="math/tex; mode=display">
+\min_{w,b}{\frac{1}{2}u^{T}\mathbf{K}u + \sum_{i = 1}^{N}{\max(0,1 - y_{i}\left( \sum_{j = 1}^{N}{u_{i}\phi\left( x_{j} \right) \cdot \phi\left( x_{i} \right)} \right))}}</script><p>亦即</p>
+<script type="math/tex; mode=display">
+\min_{w,b}{\frac{1}{2}u^{T}\mathbf{K}u + \sum_{i = 1}^{N}{max(0,1 - y_{i}u \cdot \mathbf{K}_{i\mathbf{\cdot}})}}</script><p>利用一定的技巧是可以直接利用梯度下降法直接对这个无约束最优化问题求解的，不过相关的数学理论基础都相当繁复、实现起来也有些麻烦；尽管如此、还是有许多优秀的算法是基于上述思想的</p>
+<p>直观起见、我们还是将重点放在如何对 SMO 应用核技巧的讨论上。由于前文已经说明了 SMO 的大致步骤，所以我们先补充说明当时没有讲到的、选出两个变量后应该如何继续求解，然后再来看具体的算法应该如何叙述</p>
+<script type="math/tex; mode=display">
+\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}K_{ij}}} + \sum_{i = 1}^{N}\alpha_{i}}</script><p>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有</p>
+<script type="math/tex; mode=display">
+\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script><p>不妨设<script type="math/tex">i=1</script>、<script type="math/tex">j=2</script>，那么在针对<script type="math/tex">\alpha_1</script>、<script type="math/tex">\alpha_2</script>的情况下，<script type="math/tex">\alpha_3,...,\alpha_N</script>是固定的、且上述最优化问题可以转化为：</p>
+<script type="math/tex; mode=display">\max_{\alpha_1,\alpha_2}{- \frac{1}{2}\left( K_{11}\alpha_{1}^{2} + y_{1}y_{2}K_{12}\alpha_{1}\alpha_{2} + K_{22}\alpha_{2}^{2} \right) - \left( y_{1}\alpha_{1}\sum_{i = 3}^{N}{y_{i}\alpha_{i}K_{i1}} + y_{2}\alpha_{2}\sum_{i = 3}^{N}K_{i2} \right) + {(\alpha}_{1} + \alpha_{2})}</script><p>使得对<script type="math/tex">i = 1</script>和<script type="math/tex">i = 2</script>、有</p>
+<script type="math/tex; mode=display">
+y_{1}\alpha_{1} + y_{2}\alpha_{2} = - \sum_{i = 3}^{N}{y_{i}\alpha_{i} = const}</script><script type="math/tex; mode=display">
+0 \leq \alpha_{i} \leq C</script><p>其中<script type="math/tex">const</script>为常数。可以看出此时问题确实转化为了一个带约束的二次函数求极值问题、从而能够比较简单地求出其解析解。推导过程从略、以下就直接在算法中写出结果：</p>
+<ol>
+<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、容许误差<script type="math/tex">\epsilon</script>，其中：  <script type="math/tex; mode=display">
+x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
+<li><p><strong>过程</strong>：</p>
+<ol>
+<li>初始化参数：  <script type="math/tex; mode=display">
+\alpha = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script><script type="math/tex; mode=display">
+\hat{y} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script>同时计算核矩阵：  <script type="math/tex; mode=display">
+\mathbf{K} = \left\lbrack K\left( x_{i},x_{j} \right) \right\rbrack_{N \times N}</script></li>
+<li><p>对<script type="math/tex">j = 1,\ldots,M</script>：</p>
+<ol>
+<li>选出违反 KKT 条件最严重的样本点<script type="math/tex">(x_{i},y_{i})</script>，若其违反程度小于<script type="math/tex">\epsilon</script>、则退出循环体</li>
+<li><p>否则、选出异于i的任一个下标 j，针对<script type="math/tex">\alpha_{i}</script>和<script type="math/tex">\alpha_{j}</script>构造一个新的只有两个变量二次规划问题并求出解析解。具体而言，首先要更新的是<script type="math/tex">\alpha_{2}</script>、它由以下几个参数定出：  </p>
+<script type="math/tex; mode=display">
+\begin{align}
+e_{i} &= {\hat{y}}_{i} - y_{i}\ (i = 1,2) \\
+dK &= K_{11} + K_{22} - 2K_{12} \\
+\alpha_{2}^{new,raw} &= \alpha_{2} + \frac{y_{2}\left( e_{1} - e_{2} \right)}{dK}
+\end{align}</script><p>考虑到约束条件、我们需要定出新的<script type="math/tex">\alpha_{2}</script>下上界：  </p>
+<script type="math/tex; mode=display">
+\begin{align}
+l &= \left\{ \begin{matrix}
+max(0,\alpha_{2} - \alpha_{1}),\ \ & y_{1} \neq y_{2} \\
+max(0,\alpha_{2} + \alpha_{1} - C),\ \ & y_{1} = y_{2} \\
+\end{matrix} \right.\ \\
+
+h &= \left\{ \begin{matrix}
+min(C,C + \alpha_{2} - \alpha_{1}),\ \ & y_{1} \neq y_{2} \\
+max(C,\alpha_{2} + \alpha_{1}),\ \ & y_{1} = y_{2} \\
+\end{matrix} \right.\
+\end{align}</script><p>继而根据<script type="math/tex">l</script>和<script type="math/tex">h</script>对<script type="math/tex">\alpha_{2}^{new,raw}</script>进行“裁剪”即可：  </p>
+<script type="math/tex; mode=display">
+\alpha_{2} \leftarrow \left\{ \begin{matrix}
+l,\ \ &\alpha_{2}^{new,raw} < l \\
+\alpha_{2}^{new,raw},\ \ &{l \leq \alpha}_{2}^{new,raw} \\
+h,\ \ &\alpha_{2}^{new,raw} > h \\
+\end{matrix} \right.\  \leq h</script><p>这里要注意记录<script type="math/tex">\alpha_{2}</script>的增量：  </p>
+<script type="math/tex; mode=display">
+\Delta\alpha_{2} = \alpha_{2}^{\text{new}} - \alpha_{2}^{\text{old}}</script></li>
+<li>利用<script type="math/tex">\Delta\alpha_{2}</script>更新<script type="math/tex">\alpha_{1}</script>、同时注意记录<script type="math/tex">\alpha_{1}</script>的增量：  <script type="math/tex; mode=display">
+\begin{align}
+\alpha_{1} &\leftarrow \alpha_{1} - y_{1}y_{2}\Delta\alpha_{2} \\
+\Delta\alpha_{1} &= \alpha_{1}^{\text{new}} - \alpha_{1}^{\text{old}}
+\end{align}</script></li>
+<li>利用<script type="math/tex">\Delta\alpha_{1}</script>、<script type="math/tex">\Delta\alpha_{2}</script>进行局部更新：  <script type="math/tex; mode=display">
+\begin{align}
+dw &= (y_{1}\Delta\alpha_{1},y_{2}\Delta\alpha_{2}) \\
+db &= \frac{b_{1} + b_{2}}{2}
+\end{align}</script>其中  <script type="math/tex; mode=display">
+\begin{align}
+b_{1} &= - e_{1} - y_{1}K_{11}\Delta\alpha_{1} - y_{2}K_{12}\Delta\alpha_{2} \\
+b_{2} &= - e_{2} - y_{1}K_{12}\Delta\alpha_{1} - y_{2}K_{22}\Delta\alpha_{2}
+\end{align}</script></li>
+<li>利用<script type="math/tex">dw</script>和<script type="math/tex">db</script>更新预测向量<script type="math/tex">\hat{y}</script>：  <script type="math/tex; mode=display">
+\hat{y} \leftarrow \hat{y} + dw_{1}\mathbf{K}_{1\mathbf{\cdot}} + dw_{2}\mathbf{K}_{2\mathbf{\cdot}} + db\mathbf{1}</script>其中、`$\mathbf{K}_{\mathbf{i}\mathbf{\cdot}}$表示$\mathbf{K}$的第i行、$\mathbf{1}$表示全为1的向量</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>输出</strong>：感知机模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( \sum_{i = 1}^{N}{\alpha_{i}y_{i}K\left( x_{i},x \right)} + b \right)</script>、其中：</li>
+</ol>
+<script type="math/tex; mode=display">
+b = y_{k} - \sum_{i = 1}^{N}{y_{i}\alpha_{i}K_{ik}}</script><p>这里的下标 k 满足</p>
+<script type="math/tex; mode=display">
+0 < \alpha_{k} < C</script><p>可以用反证法证明这样的下标 k 必存在、具体步骤从略</p>
+<p>从这两种算法应用核技巧的方式可以看出，虽然它们应用的训练算法完全不同（一个是随机梯度下降、一个是序列最小最优化）、但它们每一次迭代中做的事情却有相当多是一致的；为了合理重复利用代码、我们可以先把对应的实现都抽象出来：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">KernelBase</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._fit_args, self._args_names：记录循环体中所需额外参数的信息的属性</div><div class="line">        self._x, self._y, self._gram：记录数据集和Gram矩阵的属性</div><div class="line">            self._w, self._b, self._alpha：记录各种参数的属性</div><div class="line">        self._kernel, self._kernel_name, self._kernel_param：记录核函数相关信息的属性</div><div class="line">            self._prediction_cache, self._dw_cache, self._db_cache：记录 、dw、db的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(KernelBase, self).__init__()</div><div class="line">        self._fit_args, self._fit_args_names = <span class="keyword">None</span>, []</div><div class="line">        self._x = self._y = self._gram = <span class="keyword">None</span></div><div class="line">        self._w = self._b = self._alpha = <span class="keyword">None</span></div><div class="line">        self._kernel = self._kernel_name = self._kernel_param = <span class="keyword">None</span></div><div class="line">        self._prediction_cache = self._dw_cache = self._db_cache = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="comment"># 定义计算多项式核矩阵的函数</span></div><div class="line"><span class="meta">    @staticmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_poly</span><span class="params">(x, y, p)</span>:</span></div><div class="line">        <span class="keyword">return</span> (x.dot(y.T) + <span class="number">1</span>) ** p</div><div class="line"></div><div class="line">    <span class="comment"># 定义计算RBF核矩阵的函数</span></div><div class="line"><span class="meta">    @staticmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_rbf</span><span class="params">(x, y, gamma)</span>:</span></div><div class="line">        <span class="keyword">return</span> np.exp(-gamma * np.sum((x[..., <span class="keyword">None</span>, :] - y) ** <span class="number">2</span>, axis=<span class="number">2</span>))</div></pre></td></tr></table></figure>
+<p>其中定义 RBF 核函数时用到了升维的操作、这算是 Numpy 的高级使用技巧之一；具体的思想和机制会在后续的文章中进行简要说明、这里就暂时按下不表</p>
+<p>以上我们就搭好了基本的框架、接下来要做的就是继续把具有普适性的训练过程进行抽象和实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 默认使用RBF核、默认迭代次数epoch为一万次</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, kernel=<span class="string">"rbf"</span>, epoch=<span class="number">10</span> ** <span class="number">4</span>, **kwargs)</span>:</span></div><div class="line">    self._x, self._y = np.atleast_2d(x), np.array(y)</div><div class="line">    <span class="keyword">if</span> kernel == <span class="string">"poly"</span>:</div><div class="line">        <span class="comment"># 对于多项式核、默认使用KernelConfig中的default_p作为p的取值</span></div><div class="line">        _p = kwargs.get(<span class="string">"p"</span>, KernelConfig.default_p)</div><div class="line">        self._kernel_name = <span class="string">"Polynomial"</span></div><div class="line">        self._kernel_param = <span class="string">"degree = &#123;&#125;"</span>.format(_p)</div><div class="line">        self._kernel = <span class="keyword">lambda</span> _x, _y: KernelBase._poly(_x, _y, _p)</div><div class="line">    <span class="keyword">elif</span> kernel == <span class="string">"rbf"</span>:</div><div class="line">         <span class="comment"># 对于RBF核、默认使用样本x的维数n的倒数1/n作为的取值</span></div><div class="line">        _gamma = kwargs.get(<span class="string">"gamma"</span>, <span class="number">1</span> / self._x.shape[<span class="number">1</span>])</div><div class="line">        self._kernel_name = <span class="string">"RBF"</span></div><div class="line">        self._kernel_param = <span class="string">"gamma = &#123;&#125;"</span>.format(_gamma)</div><div class="line">        self._kernel = <span class="keyword">lambda</span> _x, _y: KernelBase._rbf(_x, _y, _gamma)</div><div class="line">    <span class="comment"># 初始化参数</span></div><div class="line">    self._alpha, self._w, self._prediction_cache = (</div><div class="line">        np.zeros(len(x)), np.zeros(len(x)), np.zeros(len(x)))</div><div class="line">    self._gram = self._kernel(self._x, self._x)</div><div class="line">    self._b = <span class="number">0</span></div><div class="line">    <span class="comment"># 调用 _prepare方法进行特殊参数的初始化（比如SVM中的惩罚因子C）</span></div><div class="line">    self._prepare(**kwargs)</div><div class="line">    <span class="comment"># 获取在循环体中会用到的参数</span></div><div class="line">    _fit_args = []</div><div class="line">    <span class="keyword">for</span> _name, _arg <span class="keyword">in</span> zip(self._fit_args_names, self._fit_args):</div><div class="line">        <span class="keyword">if</span> _name <span class="keyword">in</span> kwargs:</div><div class="line">            _arg = kwargs[_name]</div><div class="line">        _fit_args.append(_arg)</div><div class="line">    <span class="comment"># 迭代、直至达到迭代次数epoch或 _fit核心方法返回真值</span></div><div class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">        <span class="keyword">if</span> self._fit(sample_weight, *_fit_args):</div><div class="line">            <span class="keyword">break</span></div><div class="line">    <span class="comment"># 利用和训练样本来更新w和b</span></div><div class="line">    self._update_params()</div></pre></td></tr></table></figure>
+<p>注意到我们调用了一个叫<code>KernelConfig</code>的类、它的定义很简单：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">KernelConfig</span>:</span></div><div class="line">    default_c = <span class="number">1</span></div><div class="line">    default_p = <span class="number">3</span></div></pre></td></tr></table></figure>
+<p>亦即默认惩罚因子<script type="math/tex">C</script>为 1、多项式核的次数<script type="math/tex">p</script>为 3。同时需要注意的是，我们在循环体里面调用了<code>_fit</code>核心方法、在最后调用了<code>_update_params</code>方法，这两个方法都是留给子类定义的；不过比较巧妙的是，无论是记录<script type="math/tex">\hat{y}</script>的<code>_prediction_cache</code>的更新还是预测函数<code>predict</code>的定义、都可以写成同一种形式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义更新预测向量 _prediction_cache的函数</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_update_pred_cache</span><span class="params">(self, *args)</span>:</span></div><div class="line">    self._prediction_cache += self._db_cache</div><div class="line">    <span class="keyword">if</span> len(args) == <span class="number">1</span>:</div><div class="line">        self._prediction_cache += self._dw_cache * self._gram[args[<span class="number">0</span>]]</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        self._prediction_cache += self._dw_cache.dot(self._gram[args, ...])</div><div class="line"></div><div class="line"><span class="comment"># 定义预测函数</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x, get_raw_results=False)</span>:</span></div><div class="line">    <span class="comment"># 计算测试集和训练集之间的核矩阵并利用它来做决策</span></div><div class="line">    x = self._kernel(np.atleast_2d(x), self._x)</div><div class="line">    y_pred = x.dot(self._w) + self._b</div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> get_raw_results:</div><div class="line">        <span class="keyword">return</span> np.sign(y_pred)</div><div class="line">    <span class="keyword">return</span> y_pred</div></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/d455305a/" rel="prev" title="从感知机到支持向量机">
+                <i class="fa fa-chevron-left"></i> 从感知机到支持向量机
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/917ccef9/" rel="next" title="核模型的实现与评估">
+                核模型的实现与评估 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#核技巧简述"><span class="nav-number">1.</span> <span class="nav-text">核技巧简述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核技巧的应用"><span class="nav-number">2.</span> <span class="nav-text">核技巧的应用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
