@@ -396,8 +396,8 @@
 <li><a href="/posts/1607712a/" title="朴素贝叶斯（Naive Bayes）">朴素贝叶斯（Naive Bayes）</a></li>
 <li><a href="/posts/dd35ec8b/" title="决策树（Decision Tree）">决策树（Decision Tree）</a></li>
 <li><a href="/posts/d8e97c87/" title="集成学习（Ensemble Learning）">集成学习（Ensemble Learning）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/e_SVM" target="_blank" rel="external">支持向量机（Support Vector Machine）</a></li>
-<li><a href="https://github.com/carefree0910/MachineLearning/tree/master/f_NN" target="_blank" rel="external">神经网络（Neural Network）</a></li>
+<li><a href="/posts/487ba3a6/" title="支持向量机（Support Vector Machine）">支持向量机（Support Vector Machine）</a></li>
+<li><a href="/posts/d94622d/" title="神经网络（Neural Network）">神经网络（Neural Network）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/g_CNN" target="_blank" rel="external">卷积神经网络（Convolutional Neural Network）</a></li>
 <li><a href="https://github.com/carefree0910/MachineLearning/tree/master/_Dist" target="_blank" rel="external">具体的应用实例（Applications）</a></li>
 </ul>
@@ -445,7 +445,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/487ba3a6/">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/d94622d/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="射命丸咲">
@@ -467,8 +467,8 @@
             
               
                 
-                <a class="post-title-link" href="/posts/487ba3a6/" itemprop="url">
-                  支持向量机综述
+                <a class="post-title-link" href="/posts/d94622d/" itemprop="url">
+                  神经网络综述
                 </a>
               
             
@@ -484,8 +484,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T09:21:08+08:00">
-                2017-04-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T10:20:11+08:00">
+                2017-05-05
               </time>
             
 
@@ -507,8 +507,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
-                    <span itemprop="name">支持向量机</span>
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
                   </a>
                 </span>
 
@@ -544,20 +544,19 @@
       
         
           
-            <p>目前为止讲过的模型中，朴素贝叶斯模型属于生成模型：它的训练过程其实很难称之为“训练”——毕竟它只是对输入的训练数据集进行了若干“计数”的操作；决策树模型的训练过程虽然确实有一些训练的意思在里面，但其本质——各种信息不确定性的度量仍然脱不出“计数”的范畴。换句话说，朴素贝叶斯和决策树的核心步骤似乎都只是“计数”而已。随机森林和 AdaBoost 自不用提，它们都只是将已有的模型进行集成、其本身的训练过程可谓不是主体</p>
-<p>然而我们都知道、机器学习当然不只是“计数”那么简单的一回事。因此我们拟在本系列及以后的系列中介绍另一大类训练方法——梯度下降法（Gradient Decent；有时我们也称之为最速下降法（Steepest Descent））。就本系列而言，我们会先介绍一个比较简易的、应用到了梯度下降法的模型——感知机（Perceptron），然后我们会介绍一个思想和感知机类似、但是应用场景更加广泛的模型——支持向量机（Support Vector Machine，常简称为SVM）</p>
+            <p>之前所介绍的算法可算是比较“经典”、“传统”的算法；它们其实都属于统计学习方法、有着相当深厚的统计学理论作为支撑。而本章所讲的神经网络（Neural Network，常简称为 NN）则是近代比较火热的算法。尽管该算法的提出已经颇有些年头，相应的数学理论亦提出了不少，而且也有不少人认为它归于统计学习方法，但相当多的人还是认为，该算法更像一门“手艺”</p>
 <p>以下是目录：</p>
 <ul>
-<li><a href="/posts/93db8ec2/" title="感知机模型">感知机模型</a></li>
-<li><a href="/posts/d455305a/" title="从感知机到支持向量机">从感知机到支持向量机</a></li>
-<li><a href="/posts/924abfe1/" title="从线性到非线性">从线性到非线性</a></li>
-<li><a href="/posts/917ccef9/" title="核模型的实现与评估">核模型的实现与评估</a></li>
-<li><a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a></li>
+<li><a href="/posts/3fa9a563/" title="从感知机到多层感知机">从感知机到多层感知机</a></li>
+<li><a href="/posts/2a8cdd6/" title="前向传导算法">前向传导算法</a></li>
+<li><a href="/posts/437097cd/" title="反向传播算法">反向传播算法</a></li>
+<li><a href="/posts/a33ff165/" title="特殊的层结构">特殊的层结构</a></li>
+<li><a href="/posts/55a23cf0/" title="参数的更新">参数的更新</a></li>
+<li><a href="/posts/3bb962a6/" title="朴素的网络结构">朴素的网络结构</a></li>
+<li><a href="/posts/65c8a24f/" title="“大数据”下的网络结构">“大数据”下的网络结构</a></li>
 <li><a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></li>
-<li><a href="/posts/5b3e9c59/" title="“支持向量机”小结">“支持向量机”小结</a>
-</li>
+<li><a href="/posts/66bacb27/" title="“神经网络”小结">“神经网络”小结</a></li>
 </ul>
-<p>需要指出的是、本系列的前三篇文章讨论的都是二类分类问题，回归问题和把二类算法拓展成多类算法的手段会放在<a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a>中进行简要介绍（注意虽然我们上一个系列叙述 AdaBoost 算法时同样也只针对二类分类问题进行了说明、但是应用<a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a>中的内容是可以将上一个系列涉及到的的诸多 AdaBoost 二分类模型推广成多分类模型的）</p>
 
           
         
@@ -601,7 +600,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/93db8ec2/">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/3fa9a563/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="射命丸咲">
@@ -623,8 +622,8 @@
             
               
                 
-                <a class="post-title-link" href="/posts/93db8ec2/" itemprop="url">
-                  感知机模型
+                <a class="post-title-link" href="/posts/3fa9a563/" itemprop="url">
+                  从感知机到多层感知机
                 </a>
               
             
@@ -640,8 +639,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T09:31:37+08:00">
-                2017-04-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T20:25:50+08:00">
+                2017-05-05
               </time>
             
 
@@ -663,8 +662,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
-                    <span itemprop="name">支持向量机</span>
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
                   </a>
                 </span>
 
@@ -699,10 +698,10 @@
 
       
         
-          <p>本篇文章所叙述的感知机模型是我们第一次应用到梯度下降法的模型，它的算法相当简单、但其框架却相当具有代表性。虽然说感知机模型只能处理非常特殊的问题（线性可分的数据集的分类问题）、但它的思想却是值得琢磨的</p>
+          <p>“神经网络”这个概念本身其实是一个庞大的交叉学科，而在机器学习领域里、“神经网络”则是“人工神经网络（Artificial Neural Network）”的简称。顾名思义，本系列所将介绍的神经网络模型多少借鉴了神经生理学关于神经网络的研究、并尝试通过数学建模来描述机器智能，这也正是为何许多机器学习相关书籍对神经网络的介绍都会从“真正的”神经网络开始（比如介绍细胞体、树突、轴突和突触之类的）。然而笔者认为，直到目前为止、我们一般应用的神经网络结构其实和真正的神经网络之结构之间的差距还是相当大的；如果按照生物学意义上的神经网络来理解人工神经网络的话，虽说从直观上来说可能更加易懂、但在逻辑和原理的层面上反而会造成混淆</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/93db8ec2/#more" rel="contents">
+            <a class="btn" href="/posts/3fa9a563/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -748,7 +747,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/d455305a/">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/2a8cdd6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="射命丸咲">
@@ -770,8 +769,8 @@
             
               
                 
-                <a class="post-title-link" href="/posts/d455305a/" itemprop="url">
-                  从感知机到支持向量机
+                <a class="post-title-link" href="/posts/2a8cdd6/" itemprop="url">
+                  前向传导算法
                 </a>
               
             
@@ -787,8 +786,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T10:42:17+08:00">
-                2017-04-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T20:51:11+08:00">
+                2017-05-05
               </time>
             
 
@@ -810,8 +809,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
-                    <span itemprop="name">支持向量机</span>
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
                   </a>
                 </span>
 
@@ -846,12 +845,11 @@
 
       
         
-          <p>感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：</p>
-<img src="/posts/d455305a/p1.png" alt="p1.png" title="">
-<p>可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容</p>
+          <p>时至今日，在各个编程语言的世界里、神经网络的成熟的库都可谓不在少数；这可能就导致有许多人虽然能够熟练应用神经网络、但对于其内部机制却不甚了解。事实上就笔者所展开的简单调查来看，有不少平时经常用到神经网络的程序员其实对神经网络的数学部分有一种“望而生畏”的感觉、其中各种梯度的计算更是让他们发出“眼花缭乱”的感叹</p>
+<p>虽然很想说一些令人鼓舞的话，但是如果从繁复性来说、神经网络算法确实是我们目前为止介绍过的算法中推导步骤最多的；不过可以保证的是，如果把算法的逻辑理清，那么静下心来好好演算一下的话、就会觉得它比想象中的简单</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/d455305a/#more" rel="contents">
+            <a class="btn" href="/posts/2a8cdd6/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -897,7 +895,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/924abfe1/">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/437097cd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="射命丸咲">
@@ -919,8 +917,8 @@
             
               
                 
-                <a class="post-title-link" href="/posts/924abfe1/" itemprop="url">
-                  从线性到非线性
+                <a class="post-title-link" href="/posts/437097cd/" itemprop="url">
+                  反向传播算法
                 </a>
               
             
@@ -936,8 +934,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T11:18:01+08:00">
-                2017-04-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T21:27:21+08:00">
+                2017-05-05
               </time>
             
 
@@ -959,8 +957,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
-                    <span itemprop="name">支持向量机</span>
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
                   </a>
                 </span>
 
@@ -995,11 +993,10 @@
 
       
         
-          <p>前文已经提过，由于对偶形式中的样本点仅以内积的形式出现、所以利用核技巧能将线性算法“升级”为非线性算法。有一个与核技巧（Kernel Trick）类似的概念叫核方法（Kernel Method），这两者的区别可以简单地从字面意思去认知：当我们提及核方法（Method）时、我们比较注重它背后的原理；当我们提及核技巧（Trick）时、我们更注重它实际的应用。考虑到本书的主旨、我们还是选择了核技巧这一说法</p>
-<p><strong><em>注意：以上关于核技巧和核方法这两个名词的区分不是一种共识、而是我个人为了简化问题而作的一种形象的说明，所以切忌将其作为严谨的叙述</em></strong></p>
+          <p>本文要讲的就是可能最让我们头疼的反向传播（Backpropagation，常简称为 BP）算法了。事实上，如果不是要做理论研究而只是想快速应用神经网络来干活的话，了解如何使用 Tensorflow 等帮我们处理梯度的成熟的框架可能会比了解算法细节要更好一些（我们会把本章实现的模型的 Tensorflow 版本放在下一个系列中进行说明）。但即使如此，了解神经网络背后的原理总是有益的，在某种意义上它也能告诉我们应该选择怎样的神经网络结构来进行具体的训练</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/924abfe1/#more" rel="contents">
+            <a class="btn" href="/posts/437097cd/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1045,7 +1042,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/917ccef9/">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/a33ff165/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="射命丸咲">
@@ -1067,8 +1064,8 @@
             
               
                 
-                <a class="post-title-link" href="/posts/917ccef9/" itemprop="url">
-                  核模型的实现与评估
+                <a class="post-title-link" href="/posts/a33ff165/" itemprop="url">
+                  特殊的层结构
                 </a>
               
             
@@ -1084,8 +1081,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T12:10:51+08:00">
-                2017-04-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T22:47:43+08:00">
+                2017-05-05
               </time>
             
 
@@ -1107,8 +1104,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
-                    <span itemprop="name">支持向量机</span>
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
                   </a>
                 </span>
 
@@ -1143,10 +1140,10 @@
 
       
         
-          <p>有了上一篇文章的诸多准备、我们就能以之为基础实现核感知机和 SVM 了。不过需要指出的是，由于我们实现的 SVM 是一个朴素的版本、所以如果是要在实际任务中应用 SVM 的话，还是应该使用由前人开发、维护并经过长年考验的成熟的库（比如 LibSVM 等）；这些库能够处理更大的数据和更多的边值情况、运行的速度也会快上很多，这是因为它们通常都使用了底层语言来实现核心算法、且在算法上也做了许多数值稳定性和数值优化的处理</p>
+          <p>在神经网络模型中有一类特殊的 Layer 结构——它们不会独立地存在、而会“依附”在某个 Layer 之后以实现某种特定的功能。一般我们会称这种特殊的 Layer 结构为附加层（SubLayer）</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/917ccef9/#more" rel="contents">
+            <a class="btn" href="/posts/a33ff165/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1192,7 +1189,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/1dc4445a/">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/55a23cf0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="射命丸咲">
@@ -1214,8 +1211,8 @@
             
               
                 
-                <a class="post-title-link" href="/posts/1dc4445a/" itemprop="url">
-                  多分类与支持向量回归
+                <a class="post-title-link" href="/posts/55a23cf0/" itemprop="url">
+                  参数的更新
                 </a>
               
             
@@ -1231,8 +1228,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T18:43:38+08:00">
-                2017-04-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T23:06:13+08:00">
+                2017-05-05
               </time>
             
 
@@ -1254,8 +1251,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
-                    <span itemprop="name">支持向量机</span>
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
                   </a>
                 </span>
 
@@ -1290,10 +1287,315 @@
 
       
         
-          <p>本篇文章将简要说明几种将二分类模型拓展为多分类模型的普适性方法，它们不仅能对前三篇文章叙述的感知机和 SVM 进行应用、同时还能应用于在上一个系列中进行了说明的 AdaBoost 二分类模型；在本篇的第四节（也是最后一节）、我们则会简要地说明一下如何将支持向量机的思想应用在回归问题上</p>
+          <p>我们之前曾简单地描述过如何使用随机梯度下降来更新参数，本文则主要会介绍一些应用得更多、效果更好的算法。正如上个系列最后所提及的，这些梯度下降的拓展算法从思想上来说和梯度下降法类似、区别则可以简练地概括如下两点：</p>
+<ul>
+<li>更新方向不是简单地取为梯度</li>
+<li>学习速率不是简单地取为常值</li>
+</ul>
+<p>虽然我们不会深入地叙述这些算法背后复杂的数学基础、但我们会对每种算法都提供一些直观的解释。需要指出的是、这些算法都是利用局部梯度来获得一个更好的“梯度”、从而使得“梯度下降”变得更优</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/1dc4445a/#more" rel="contents">
+            <a class="btn" href="/posts/55a23cf0/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/3bb962a6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/posts/3bb962a6/" itemprop="url">
+                  朴素的网络结构
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T23:51:38+08:00">
+                2017-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>这一节主要介绍一下如何进行最简单的封装，对于更加完善的实现则会放在下一节。由于我本人实现的最终版本有上千行，囿于篇幅、无法在这里进行叙述，感兴趣的观众老爷们可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/NN/Basic/Networks.py">这里</a></p>
+<p>总结前文说明过的诸多子结构、不难得知我们用于封装它们的朴素网络结构至少需要实现如下这些功能：</p>
+<ul>
+<li>加入一个 Layer</li>
+<li>获取各个模型参数对应的优化器</li>
+<li>协调各个子结构以实现前向传导算法和反向传播算法</li>
+</ul>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/posts/3bb962a6/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/65c8a24f/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/posts/65c8a24f/" itemprop="url">
+                  “大数据”下的网络结构
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-06T09:14:58+08:00">
+                2017-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>本文标题处的“大数据”打上了引号，是因为我们所要讨论的不是当今十分火热的、真正的大数据问题、而是讨论当问题规模“相当大”时应该如何处理。我们虽然在上篇文章中实现了一个切实可用的神经网络、但它确实显得过于朴实。本文会说明如何在这个朴实模型的基础上进行拓展，这些拓展的手法不单适用于神经网络、还适用于诸多旨在解决现实生活中规模相对较大的任务的模型</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/posts/65c8a24f/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1378,8 +1680,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T19:01:43+08:00">
-                2017-04-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-06T09:38:59+08:00">
+                2017-05-06
               </time>
             
 
@@ -1401,8 +1703,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
-                    <span itemprop="name">支持向量机</span>
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
                   </a>
                 </span>
 
@@ -1437,7 +1739,7 @@
 
       
         
-          <p>这篇文章会叙述之前没有解决的纯数学问题，会涉及到相当庞杂的数学概念与思想，其中一些推导的难度相对而言可能会比较大</p>
+          <p>本文会叙述之前没有解决的纯数学问题、同时会在有需要的地方附上相应的代码；虽然这些数学问题仅会涉及到求导相关的知识、但是仍然具有一定难度</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/posts/613bbb2f/#more" rel="contents">
@@ -1477,313 +1779,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/5b3e9c59/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="射命丸咲">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Python 与机器学习">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/posts/5b3e9c59/" itemprop="url">
-                  “支持向量机”小结
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T19:25:48+08:00">
-                2017-04-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/支持向量机/" itemprop="url" rel="index">
-                    <span itemprop="name">支持向量机</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body han-init-context" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li>感知机利用 SGD 能保证对线性可分数据集正确分类（无论学习速率为多少）、但它没怎么考虑泛化能力的问题</li>
-<li>线性 SVM 通过引入间隔（硬、软）最大化的概念来增强模型的泛化能力</li>
-<li>核技巧能够将线性算法“升级”为非线性算法，通过将原始问题转化为对偶问题能够非常自然地对核技巧进行应用</li>
-<li>对于一个二分类模型，有许多方法能够直接将它拓展为多分类问题</li>
-<li>SVM 的思想能用于做回归（SVR）；具体而言、SVR 容许模型输出和真值之间存在<script type="math/tex">\epsilon</script>的差距以期望提高泛化能力</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/d8e97c87/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="射命丸咲">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Python 与机器学习">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/posts/d8e97c87/" itemprop="url">
-                  集成学习综述
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T17:27:57+08:00">
-                2017-04-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集成学习/" itemprop="url" rel="index">
-                    <span itemprop="name">集成学习</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body han-init-context" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>目前为止我们已经讲过了若干的分类器了。从它们的复杂程度可以感受到，它们有些是比较“强”的、有些是比较“弱”的。这一章我们将会阐述所谓的“强”与“弱”的定义、它们之间的联系以及阐述如何将一个“弱分类器”通过集成学习来集成出一个“强分类器”。而由于集成学习有许多种具体的方法，我们会挑选出其中的随机森林和 AdaBoost 来作比较详细的说明</p>
-<p>以下是目录：</p>
-<ul>
-<li><a href="/posts/7081b0ee/" title="“集成”的思想">“集成”的思想</a></li>
-<li><a href="/posts/c0a9c025/" title="随机森林算法">随机森林算法</a></li>
-<li><a href="/posts/f5f50863/" title="AdaBoost 算法">AdaBoost 算法</a></li>
-<li><a href="/posts/fb0d2f02/" title="集成模型的性能分析">集成模型的性能分析</a></li>
-<li><a href="/posts/707464b/" title="AdaBoost 算法的解释">AdaBoost 算法的解释</a></li>
-<li><a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></li>
-<li><a href="/posts/48a0211a/" title="“集成学习”小结">“集成学习”小结</a></li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1828,7 +1828,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1839,7 +1839,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>

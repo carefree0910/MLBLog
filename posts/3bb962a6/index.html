@@ -1,0 +1,1013 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="这一节主要介绍一下如何进行最简单的封装，对于更加完善的实现则会放在下一节。由于我本人实现的最终版本有上千行，囿于篇幅、无法在这里进行叙述，感兴趣的观众老爷们可以参见这里 总结前文说明过的诸多子结构、不难得知我们用于封装它们的朴素网络结构至少需要实现如下这些功能：  加入一个 Layer 获取各个模型参数对应的优化器 协调各个子结构以实现前向传导算法和反向传播算法">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="朴素的网络结构">
+<meta property="og:url" content="http://www.carefree0910.com/posts/3bb962a6/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="这一节主要介绍一下如何进行最简单的封装，对于更加完善的实现则会放在下一节。由于我本人实现的最终版本有上千行，囿于篇幅、无法在这里进行叙述，感兴趣的观众老爷们可以参见这里 总结前文说明过的诸多子结构、不难得知我们用于封装它们的朴素网络结构至少需要实现如下这些功能：  加入一个 Layer 获取各个模型参数对应的优化器 协调各个子结构以实现前向传导算法和反向传播算法">
+<meta property="og:image" content="http://www.carefree0910.com/posts/3bb962a6/p1.png">
+<meta property="og:updated_time" content="2017-05-06T02:08:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="朴素的网络结构">
+<meta name="twitter:description" content="这一节主要介绍一下如何进行最简单的封装，对于更加完善的实现则会放在下一节。由于我本人实现的最终版本有上千行，囿于篇幅、无法在这里进行叙述，感兴趣的观众老爷们可以参见这里 总结前文说明过的诸多子结构、不难得知我们用于封装它们的朴素网络结构至少需要实现如下这些功能：  加入一个 Layer 获取各个模型参数对应的优化器 协调各个子结构以实现前向传导算法和反向传播算法">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/3bb962a6/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/3bb962a6/"/>
+
+
+
+
+
+  <title> 朴素的网络结构 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/3bb962a6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                朴素的网络结构
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T23:51:38+08:00">
+                2017-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这一节主要介绍一下如何进行最简单的封装，对于更加完善的实现则会放在下一节。由于我本人实现的最终版本有上千行，囿于篇幅、无法在这里进行叙述，感兴趣的观众老爷们可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/NN/Basic/Networks.py" target="_blank" rel="external">这里</a></p>
+<p>总结前文说明过的诸多子结构、不难得知我们用于封装它们的朴素网络结构至少需要实现如下这些功能：</p>
+<ul>
+<li>加入一个 Layer</li>
+<li>获取各个模型参数对应的优化器</li>
+<li>协调各个子结构以实现前向传导算法和反向传播算法</li>
+</ul>
+<a id="more"></a>
+<p>接下来就看看具体的实现。先看其基本框架：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> f_NN.Layers <span class="keyword">import</span> *</div><div class="line"><span class="keyword">from</span> f_NN.Optimizers <span class="keyword">import</span> *</div><div class="line"></div><div class="line"><span class="keyword">from</span> Util.Bases <span class="keyword">import</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NaiveNN</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._layers、self._weights、self._bias：记录着所有Layer、权值矩阵、偏置量</div><div class="line">        self._w_optimizer、self._b_optimizer：记录着所有权值矩阵的和偏置量的优化器</div><div class="line">        self._current_dimension：记录着当前最后一个Layer所含的神经元个数</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(NaiveNN, self).__init__()</div><div class="line">        self._layers, self._weights, self._bias = [], [], []</div><div class="line">        self._w_optimizer = self._b_optimizer = <span class="keyword">None</span></div><div class="line">        self._current_dimension = <span class="number">0</span></div></pre></td></tr></table></figure>
+<p>接下来实现加入 Layer 的功能。由于我们只打算进行朴素实现、所以应该对输入模型的 Layer 的格式做出一些限制以减少代码量。具体而言、我们对输入模型的 Layer 做出如下三个约束：</p>
+<ul>
+<li>如果该 Layer 是第一次输入模型的 Layer 的话（亦即<script type="math/tex">L_{1}</script>）、则要求 Layer 的<code>shape</code>属性是一个二元元组，此时<code>shape[0]</code>即为输入数据的维度、<code>shape[1]</code>即为<script type="math/tex">L_{1}</script>的神经元个数<script type="math/tex">n_{1}</script></li>
+<li>否则（亦即<script type="math/tex">L_{i},i \geq 2</script>）、我们要求 Layer 输入模型时的<code>shape</code>属性是一元元组，其唯一的元素记录的就是该<code>Layer</code>的神经元个数<script type="math/tex">n_{i}</script></li>
+</ul>
+<p>比如说、如果我们想设计含有如下结构的神经网络：</p>
+<ul>
+<li>含有一层 ReLU 隐藏层，该层有 24 个神经元</li>
+<li>损失函数为 Sigmoid<script type="math/tex">+</script>Cross Entropy 的组合</li>
+</ul>
+<p>那么在实现完毕后、需要能够通过如下三行代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">nn = NaiveNN()</div><div class="line">nn.add(ReLU((x.shape[<span class="number">1</span>], <span class="number">24</span>)))</div><div class="line">nn.add(CostLayer((y.shape[<span class="number">1</span>],), <span class="string">"CrossEntropy"</span>, transform=<span class="string">"Sigmoid"</span>))</div></pre></td></tr></table></figure>
+<p>来把对应的结构搭建完毕（其中 x、y 是训练集）。以下即为具体实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(self, layer)</span>:</span></div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> self._layers:</div><div class="line">        <span class="comment"># 如果是第一次加入layer、则初始化相应的属性</span></div><div class="line">        self._layers, self._current_dimension = [layer], layer.shape[<span class="number">1</span>]</div><div class="line">        <span class="comment"># 调用初始化权值矩阵和偏置量的方法</span></div><div class="line">        self._add_params(layer.shape)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        _next = layer.shape[<span class="number">0</span>]</div><div class="line">        layer.shape = (self._current_dimension, _next)</div><div class="line">        <span class="comment"># 调用进一步处理Layer的方法</span></div><div class="line">        self._add_layer(layer, self._current_dimension, _next)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_add_params</span><span class="params">(self, shape)</span>:</span></div><div class="line">    self._weights.append(np.random.randn(*shape))</div><div class="line">    self._bias.append(np.zeros((<span class="number">1</span>, shape[<span class="number">1</span>])))</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_add_layer</span><span class="params">(self, layer, *args)</span>:</span></div><div class="line">    _current, _next = args</div><div class="line">    self._add_params((_current, _next))</div><div class="line">    self._current_dimension = _next</div><div class="line">    self._layers.append(layer)</div></pre></td></tr></table></figure>
+<p>然后就需要获取各个模型参数对应的优化器并实现前向传导算法和反向传播算法了。鉴于我们实现的是朴素的版本、我们只允许用户自定义学习速率、优化器使用的算法及总的迭代次数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, lr=<span class="number">0.001</span>, optimizer=<span class="string">"Adam"</span>, epoch=<span class="number">10</span>)</span>:</span></div><div class="line">    <span class="comment"># 调用相应方法来初始化优化器</span></div><div class="line">    self._init_optimizers(optimizer, lr, epoch)</div><div class="line">    layer_width = len(self._layers)</div><div class="line">    <span class="comment"># 训练的主循环</span></div><div class="line">    <span class="comment"># 需要注意的是，在每次迭代中、我们是用训练集中所有样本来进行训练的</span></div><div class="line">    <span class="keyword">for</span> counter <span class="keyword">in</span> range(epoch):</div><div class="line">        self._w_optimizer.update()</div><div class="line">        self._b_optimizer.update()</div><div class="line">        <span class="comment"># 调用相应方法来进行前向传导算法、把所得的激活值都存储下来</span></div><div class="line">        _activations = self._get_activations(x)</div><div class="line">        <span class="comment"># 调用CostLayer的bp_first方法来进行BP算法的第一步</span></div><div class="line">        _deltas = [self._layers[<span class="number">-1</span>].bp_first(y, _activations[<span class="number">-1</span>])]</div><div class="line">        <span class="comment"># BP算法主体</span></div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">-1</span>, -len(_activations), <span class="number">-1</span>):</div><div class="line">            _deltas.append(self._layers[i - <span class="number">1</span>].bp(</div><div class="line">                _activations[i - <span class="number">1</span>], self._weights[i], _deltas[<span class="number">-1</span>]</div><div class="line">            ))</div><div class="line">        <span class="comment"># 利用各个局部梯度来更新模型参数</span></div><div class="line">        <span class="comment"># 注意由于最后一个是CostLayer对应的占位符、所以无需对其更新</span></div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(layer_width - <span class="number">1</span>, <span class="number">0</span>, <span class="number">-1</span>):</div><div class="line">            self._opt(i, _activations[i - <span class="number">1</span>], _deltas[layer_width - i - <span class="number">1</span>])</div><div class="line">        self._opt(<span class="number">0</span>, x, _deltas[<span class="number">-1</span>])</div></pre></td></tr></table></figure>
+<p>这里用到了三个方法、它们的作用为：</p>
+<ul>
+<li><code>self._init_optimizers</code>：根据优化器的名字、学习速率和迭代次数来初始化优化器</li>
+<li><code>self._get_activations</code>：进行前向传导算法</li>
+<li><code>self._opt</code>：利用局部梯度和优化器来更新模型的各个参数</li>
+</ul>
+<p>它们的具体实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_init_optimizers</span><span class="params">(self, optimizer, lr, epoch)</span>:</span></div><div class="line">    <span class="comment"># 利用定义好的优化器工厂来初始化优化器</span></div><div class="line">    <span class="comment"># 注意由于最后一层是CostLayer对应的占位符、所以无需把它输进优化器</span></div><div class="line">    _opt_fac = OptFactory()</div><div class="line">    self._w_optimizer = _opt_fac.get_optimizer_by_name(</div><div class="line">        optimizer, self._weights[:<span class="number">-1</span>], lr, epoch)</div><div class="line">    self._b_optimizer = _opt_fac.get_optimizer_by_name(</div><div class="line">        optimizer, self._bias[:<span class="number">-1</span>], lr, epoch)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_activations</span><span class="params">(self, x)</span>:</span></div><div class="line">    _activations = [self._layers[<span class="number">0</span>].activate(x, self._weights[<span class="number">0</span>], self._bias[<span class="number">0</span>])]</div><div class="line">    <span class="keyword">for</span> i, layer <span class="keyword">in</span> enumerate(self._layers[<span class="number">1</span>:]):</div><div class="line">        _activations.append(layer.activate(</div><div class="line">            _activations[<span class="number">-1</span>], self._weights[i + <span class="number">1</span>], self._bias[i + <span class="number">1</span>]))</div><div class="line">    <span class="keyword">return</span> _activations</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_opt</span><span class="params">(self, i, _activation, _delta)</span>:</span></div><div class="line">    self._weights[i] += self._w_optimizer.run(</div><div class="line">        i, _activation.T.dot(_delta)</div><div class="line">    )</div><div class="line">    self._bias[i] += self._b_optimizer.run(</div><div class="line">        i, np.sum(_delta, axis=<span class="number">0</span>, keepdims=<span class="keyword">True</span>)</div><div class="line">    )</div></pre></td></tr></table></figure>
+<p>最后就是模型的预测了，这一部分的实现非常直观易懂：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x, get_raw_results=False)</span>:</span></div><div class="line">    y_pred = self._get_prediction(np.atleast_2d(x))</div><div class="line">    <span class="keyword">if</span> get_raw_results:</div><div class="line">        <span class="keyword">return</span> y_pred</div><div class="line">    <span class="keyword">return</span> np.argmax(y_pred, axis=<span class="number">1</span>)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_prediction</span><span class="params">(self, x)</span>:</span></div><div class="line">    <span class="comment"># 直接取前向传导算法得到的最后一个激活值即可</span></div><div class="line">    <span class="keyword">return</span> self._get_activations(x)[<span class="number">-1</span>]</div></pre></td></tr></table></figure>
+<p>至此、一个朴素的神经网络结构就实现完了；虽说该模型有诸多不足之处，但其基本的框架和模式却都是有普适性的、且它的表现也已经相当不错。可以通过在螺旋线数据集上做几组实验来直观地感受一下这个朴素神经网络的分类能力、结果如下图所示：</p>
+<img src="/posts/3bb962a6/p1.png" alt="p1.png" title="">
+<p>左图是 4 条螺旋线的二类分类问题、准确率为 92.75%；右图为 7 条螺旋线的七类分类问题、准确率为 100%；神经网络的结构则都是两层含 24 个神经元的 ReLU 加 Softmax<script type="math/tex">+</script>Cross Entropy 组合的这个结构，迭代次数则为 1000 次、平均训练时间分别为 0.74秒（左图）和 1.04秒（右图）。注意到虽然我们使用的螺旋线数据集的“旋转程度”比之前使用过的螺旋线数据集的都要大不少、但是神经网络的表现仍然相当不错</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/55a23cf0/" rel="prev" title="参数的更新">
+                <i class="fa fa-chevron-left"></i> 参数的更新
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/65c8a24f/" rel="next" title="“大数据”下的网络结构">
+                “大数据”下的网络结构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

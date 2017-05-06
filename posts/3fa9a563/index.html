@@ -1,0 +1,1019 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="综述," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="“神经网络”这个概念本身其实是一个庞大的交叉学科，而在机器学习领域里、“神经网络”则是“人工神经网络（Artificial Neural Network）”的简称。顾名思义，本系列所将介绍的神经网络模型多少借鉴了神经生理学关于神经网络的研究、并尝试通过数学建模来描述机器智能，这也正是为何许多机器学习相关书籍对神经网络的介绍都会从“真正的”神经网络开始（比如介绍细胞体、树突、轴突和突触之类的）。然而">
+<meta name="keywords" content="综述">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从感知机到多层感知机">
+<meta property="og:url" content="http://www.carefree0910.com/posts/3fa9a563/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="“神经网络”这个概念本身其实是一个庞大的交叉学科，而在机器学习领域里、“神经网络”则是“人工神经网络（Artificial Neural Network）”的简称。顾名思义，本系列所将介绍的神经网络模型多少借鉴了神经生理学关于神经网络的研究、并尝试通过数学建模来描述机器智能，这也正是为何许多机器学习相关书籍对神经网络的介绍都会从“真正的”神经网络开始（比如介绍细胞体、树突、轴突和突触之类的）。然而">
+<meta property="og:image" content="http://www.carefree0910.com/posts/3fa9a563/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/3fa9a563/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/3fa9a563/p3.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/3fa9a563/p4.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/3fa9a563/p5.png">
+<meta property="og:updated_time" content="2017-05-06T02:10:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从感知机到多层感知机">
+<meta name="twitter:description" content="“神经网络”这个概念本身其实是一个庞大的交叉学科，而在机器学习领域里、“神经网络”则是“人工神经网络（Artificial Neural Network）”的简称。顾名思义，本系列所将介绍的神经网络模型多少借鉴了神经生理学关于神经网络的研究、并尝试通过数学建模来描述机器智能，这也正是为何许多机器学习相关书籍对神经网络的介绍都会从“真正的”神经网络开始（比如介绍细胞体、树突、轴突和突触之类的）。然而">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/3fa9a563/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/3fa9a563/"/>
+
+
+
+
+
+  <title> 从感知机到多层感知机 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/3fa9a563/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从感知机到多层感知机
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T20:25:50+08:00">
+                2017-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>“神经网络”这个概念本身其实是一个庞大的交叉学科，而在机器学习领域里、“神经网络”则是“人工神经网络（Artificial Neural Network）”的简称。顾名思义，本系列所将介绍的神经网络模型多少借鉴了神经生理学关于神经网络的研究、并尝试通过数学建模来描述机器智能，这也正是为何许多机器学习相关书籍对神经网络的介绍都会从“真正的”神经网络开始（比如介绍细胞体、树突、轴突和突触之类的）。然而笔者认为，直到目前为止、我们一般应用的神经网络结构其实和真正的神经网络之结构之间的差距还是相当大的；如果按照生物学意义上的神经网络来理解人工神经网络的话，虽说从直观上来说可能更加易懂、但在逻辑和原理的层面上反而会造成混淆</p>
+<a id="more"></a>
+<p>为此我们就跳过“老生常谈”般的、介绍生物学意义上的神经网络的部分并直接把数学建模后的结果进行说明：近现代最常用的NN模型其实脱胎于 1943 年由 W. S. McCulloch 和 W. H. Pitts 提出的 McCulloch-Pitts 神经元模型（常简称为 M-P 神经元模型），它针对单个的神经元进行了数学建模。具体而言、M-P 模型是具有如下三个功能的模型：</p>
+<ul>
+<li>能够接收 n 个 M-P 模型传递过来的信号</li>
+<li>能够在信号的传递过程中为信号分配权重</li>
+<li>能够将得到的信号进行汇总、变换并输出</li>
+</ul>
+<p>可以通过下图来直观认知 M-P 模型的结构：</p>
+<img src="/posts/3fa9a563/p1.png" alt="p1.png" title="">
+<p>图中的<script type="math/tex">x_{1},\ldots,x_{n}</script>即为 n 个 M-P 模型的输出信号、<script type="math/tex">w_{1},\ldots,w_{n}</script>即为这 n 个信号对应的权值；<script type="math/tex">\phi</script>即为所示神经元对输入信号的变换函数、y 即为模型的输出。一般而言我们可以把 y 写成：</p>
+<script type="math/tex; mode=display">
+y = \phi\left( \sum_{i = 1}^{n}{w_{i}x_{i}} + b \right)</script><p>其中 b 为神经元对输入信号的“平移”。我们通常会称<script type="math/tex">\phi</script>为激活函数而称 b 为偏置量，有关它们的详细讨论会在<a href="/posts/2a8cdd6/" title="前向传导算法">前向传导算法</a>中进行、这里就暂时先按下不表</p>
+<p>有了 M-P 神经元模型的话、基于它来定义神经网络似乎就不是一件困难的事了；事实上、只需要把许多 M-P 神经元按照一定的层次结构进行连接即可。一个非常自然的想法就是构建一个有向无环图（DAG 图），其输入节点和输出节点视具体问题而定。比如若想通过三维的输入来得到二维的输出、我们可以简单地以 M-P 模型为有向无环图中的节点来构造一个如下图所示的有向无环图：</p>
+<img src="/posts/3fa9a563/p2.png" alt="p2.png" title="">
+<p>如果人工神经网络模型真的能够对任意 DAG 图都能进行高效训练的话、那么说它和真正的神经网络能够互相类比可能也不算夸张；然而遗憾的是，由于现在我们对矩阵运算的依赖程度很大（因为矩阵运算是被高度优化了的），所以目前主流的神经网络模型结构基本都是一类及其特殊的 DAG 图。具体而言、主流人工神经网络模型是以“层（Layer）”（而不是以“节点”）为基本单位的，其结构大致如下图所示：</p>
+<img src="/posts/3fa9a563/p3.png" alt="以“层”为基本单位" title="以“层”为基本单位">
+<p>其中，输入（层）、变换层和输出（层）都可以想象为是若干 M-P 神经元“排列在一起”而组成的“神经层”、从而整张神经网络即为由若干神经层“堆叠而成”的一个结构。不难想象在这种情况下、同一层中的所有 M-P 神经元会共享激活函数<script type="math/tex">\phi</script>和偏置量 b，所以通常我们会针对层结构定义<script type="math/tex">\phi</script>和 b 而不是针对单个的神经元定义<script type="math/tex">\phi</script>和 b</p>
+<p>如果确实想以“节点”为基本单位、那么上图所示结构可以化为如下图所示的模型：</p>
+<img src="/posts/3fa9a563/p4.png" alt="以“节点”为基本单位" title="以“节点”为基本单位">
+<p>其中除了输出层外、当前层的每个节点都会出来一个箭头指向下一层中的每个节点，这也正是当前层将信号传输给下一层的方式。容易想象当没有变换层时、人工神经网络就会“退化”成我们上个系列中讲过的感知机。事实上可以将第一张图所示的神经元看作是只有一个神经元的输出层并令<script type="math/tex">\phi</script>为恒同映射、亦即：</p>
+<script type="math/tex; mode=display">
+\phi(x) = x,\ \ \forall x\mathbb{\in R}</script><p>那么就有</p>
+<script type="math/tex; mode=display">
+y = \sum_{i = 1}^{n}{w_{i}x_{i}} + b = w \cdot x + b</script><p>其中</p>
+<script type="math/tex; mode=display">
+w = \left( w_{1},\ldots,w_{n} \right)^{T},\ \ x = \left( x_{1},\ldots,x_{n} \right)^{T}</script><p>可以看出上式即为感知机的决策公式。由此可见、这种主流人工神经网络结构其实可以称为多层感知机模型（Multi-Layer Perceptron，常简称为 MLP），本章所说的神经网络所代指的也正是 MLP 模型。它的工作原理是直观的：</p>
+<ul>
+<li>输入层和输出层即为整个模型的入口和出口</li>
+<li>变换层则会把上一层的输出当成输入、经过一番内部处理后把输出传给下一层</li>
+</ul>
+<p>所以问题的关键就在于层结构（Layer）的搭建上。不过在着手实现它之前、了解它具体需要做哪些工作是有必要的。如果往简单去说、神经网络算法其实只包含如下三个部分：</p>
+<ul>
+<li>通过将输入进行一层一层的变换来得到输出</li>
+<li>通过输出与真值的比较得到损失函数的梯度</li>
+<li>利用得到的这个梯度来更新模型的各个参数</li>
+</ul>
+<p>其中前两个部分相关的内容会在下两节进行简单的说明、第三个部分相关内容的简要叙述则会放在第四节。注意到第二个部分中提到了“损失函数”的概念；在我们将要实现的神经网络模型中、我们会将损失作为一个单独的层结构跟在输出层后面。换句话说、一个完整的神经网络模型将如下图所示：</p>
+<img src="/posts/3fa9a563/p5.png" alt="p5.png" title="">
+<p><strong><em>注意：今后章节中出现的各个数学算式中的元素如果不带下标的话、一般而言都代指向量或者矩阵而不是标量；为使文章结构连贯，我们不会一一说明哪些是标量、哪些是向量而哪些是矩阵，但是通过上下文和具体的算法、相关叙述应该是不会引起歧义的</em></strong></p>
+<p><strong><em>此外需要指出的是，由于损失层 CostLayer 只是为了实现的便利性而存在的结构、从数学的角度来讲它是不必抽出来作为一个独立个体的。因此我们有时会在叙述数学相关问题时会隐去 CostLayer</em></strong></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/综述/" rel="tag"># 综述</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/d94622d/" rel="prev" title="神经网络综述">
+                <i class="fa fa-chevron-left"></i> 神经网络综述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/2a8cdd6/" rel="next" title="前向传导算法">
+                前向传导算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

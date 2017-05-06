@@ -1,0 +1,1106 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数学,算法," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="时至今日，在各个编程语言的世界里、神经网络的成熟的库都可谓不在少数；这可能就导致有许多人虽然能够熟练应用神经网络、但对于其内部机制却不甚了解。事实上就笔者所展开的简单调查来看，有不少平时经常用到神经网络的程序员其实对神经网络的数学部分有一种“望而生畏”的感觉、其中各种梯度的计算更是让他们发出“眼花缭乱”的感叹 虽然很想说一些令人鼓舞的话，但是如果从繁复性来说、神经网络算法确实是我们目前为止介绍过的">
+<meta name="keywords" content="数学,算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前向传导算法">
+<meta property="og:url" content="http://www.carefree0910.com/posts/2a8cdd6/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="时至今日，在各个编程语言的世界里、神经网络的成熟的库都可谓不在少数；这可能就导致有许多人虽然能够熟练应用神经网络、但对于其内部机制却不甚了解。事实上就笔者所展开的简单调查来看，有不少平时经常用到神经网络的程序员其实对神经网络的数学部分有一种“望而生畏”的感觉、其中各种梯度的计算更是让他们发出“眼花缭乱”的感叹 虽然很想说一些令人鼓舞的话，但是如果从繁复性来说、神经网络算法确实是我们目前为止介绍过的">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2a8cdd6/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2a8cdd6/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2a8cdd6/p3.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2a8cdd6/p4.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2a8cdd6/p5.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/2a8cdd6/p6.png">
+<meta property="og:updated_time" content="2017-05-06T02:15:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="前向传导算法">
+<meta name="twitter:description" content="时至今日，在各个编程语言的世界里、神经网络的成熟的库都可谓不在少数；这可能就导致有许多人虽然能够熟练应用神经网络、但对于其内部机制却不甚了解。事实上就笔者所展开的简单调查来看，有不少平时经常用到神经网络的程序员其实对神经网络的数学部分有一种“望而生畏”的感觉、其中各种梯度的计算更是让他们发出“眼花缭乱”的感叹 虽然很想说一些令人鼓舞的话，但是如果从繁复性来说、神经网络算法确实是我们目前为止介绍过的">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/2a8cdd6/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/2a8cdd6/"/>
+
+
+
+
+
+  <title> 前向传导算法 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/2a8cdd6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                前向传导算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T20:51:11+08:00">
+                2017-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>时至今日，在各个编程语言的世界里、神经网络的成熟的库都可谓不在少数；这可能就导致有许多人虽然能够熟练应用神经网络、但对于其内部机制却不甚了解。事实上就笔者所展开的简单调查来看，有不少平时经常用到神经网络的程序员其实对神经网络的数学部分有一种“望而生畏”的感觉、其中各种梯度的计算更是让他们发出“眼花缭乱”的感叹</p>
+<p>虽然很想说一些令人鼓舞的话，但是如果从繁复性来说、神经网络算法确实是我们目前为止介绍过的算法中推导步骤最多的；不过可以保证的是，如果把算法的逻辑理清，那么静下心来好好演算一下的话、就会觉得它比想象中的简单</p>
+<a id="more"></a>
+<h1 id="算法概述"><a href="#算法概述" class="headerlink" title="算法概述"></a>算法概述</h1><p>如果把前文所说过的内容提炼、总结一下的话，就会发现我们其实已经把前向传导算法的过程都叙述了一遍。以一个简单的神经网络结构为例：</p>
+<img src="/posts/2a8cdd6/p1.png" alt="一个简单的三层（单隐层）神经网络" title="一个简单的三层（单隐层）神经网络">
+<p><strong><em>注意：虽然上图将一个个的“节点”画了出来，但是本篇文章及今后的所有讨论中、我们都应该时刻记住：神经网络的基本组成单元是层（Layer）而不是节点，之所以用节点来说明问题也仅仅是为了简化问题、在实现中是需要将节点上的算法“整合”成层的算法的</em></strong></p>
+<p>在展开叙述前、做一些符号约定是有必要的：</p>
+<ul>
+<li>记上图中的神经网络从左到右对应的 Layer 为<script type="math/tex">L_{1},L_{2},L_{3}</script>、记<script type="math/tex">L_{i}</script>中从上往下数的第 j 个神经元为<script type="math/tex">u_{ij}</script></li>
+<li>记<script type="math/tex">L_{i}</script>对应的：<ul>
+<li>神经元个数为<script type="math/tex">n_{i}</script>（从而<script type="math/tex">n_{1} = 3</script>、<script type="math/tex">n_{2} = 5</script>、<script type="math/tex">n_{3} = 2</script>）</li>
+<li>激活函数、偏置量分别为<script type="math/tex">\phi_{i}</script>、<script type="math/tex">b^{\left( i \right)}</script>（注意<script type="math/tex">b^{\left( 3 \right)}</script>其实不会被用到）</li>
+</ul>
+</li>
+<li>记<script type="math/tex">L_i,L_{i+1}</script>之间的权值矩阵为<script type="math/tex">w^{(i)}</script>、神经元<script type="math/tex">u_{ij},u_{i+1,k}</script>之间的权值为<script type="math/tex">w_{jk}^{(i)}</script>，可知：  <script type="math/tex; mode=display">
+w^{\left( i \right)} = \begin{bmatrix}
+w_{11}^{\left( i \right)} & \cdots & w_{1,n_{i + 1}}^{\left( i \right)} \\
+\vdots & \ddots & \vdots \\
+w_{n_{i}1}^{\left( i \right)} & \cdots & w_{n_{i},n_{i + 1}}^{\left( i \right)} \\
+\end{bmatrix}_{n_{i} \times n_{i + 1}},\ \ i = 1,2</script></li>
+<li>记<script type="math/tex">L_{i}</script>对应的输入、输出为<script type="math/tex">u^{\left( i \right)},v^{\left( i \right)}</script></li>
+<li>记模型的输入、输出集为<script type="math/tex">X</script>、<script type="math/tex">Y</script>，样本数为 N，损失函数为<script type="math/tex">L</script>；一般我们会要求<script type="math/tex">L</script>是一个二元对称函数，亦即对于<script type="math/tex">L</script>的输入空间中的任意两个向量（矩阵）<script type="math/tex">p</script>、<script type="math/tex">q</script>都有：  <script type="math/tex; mode=display">
+L\left( p,q \right) = L(q,p)</script></li>
+</ul>
+<p>那么上述神经网络的前向传导算法的所有步骤即为（运算符“<script type="math/tex">\times</script>”代表矩阵乘法、后同）：</p>
+<ul>
+<li><script type="math/tex">u^{\left( 1 \right)} = X</script>、<script type="math/tex">v^{\left( 1 \right)} = \phi_{1}(u^{\left( 1 \right)})</script>，注意<script type="math/tex">u^{\left( 1 \right)}</script>、<script type="math/tex">v^{\left( 1 \right)}</script>都是<script type="math/tex">N \times 3</script>维矩阵</li>
+<li><script type="math/tex">u^{\left( 2 \right)} = v^{\left( 1 \right)} \times w^{\left( 1 \right)} + b^{\left( 1 \right)}</script>、<script type="math/tex">v^{\left( 2 \right)} = \phi_{2}(u^{\left( 2 \right)})</script>，注意<script type="math/tex">w^{\left( 1 \right)}</script>是<script type="math/tex">3 \times 5</script>的矩阵、所以<script type="math/tex">u^{\left( 2 \right)}</script>、<script type="math/tex">v^{\left( 2 \right)}</script>都是<script type="math/tex">N \times 5</script>维矩阵</li>
+<li><script type="math/tex">u^{\left( 3 \right)} = v^{\left( 2 \right)} \times w^{\left( 2 \right)} + b^{\left( 2 \right)}</script>、<script type="math/tex">v^{\left( 3 \right)} = \phi_{3}(u^{\left( 3 \right)})</script>，注意<script type="math/tex">w^{\left( 2 \right)}</script>是<script type="math/tex">5 \times 2</script>的矩阵、所以<script type="math/tex">u^{\left( 3 \right)}</script>、<script type="math/tex">v^{\left( 3 \right)}</script>都是<script type="math/tex">N \times 2</script>维矩阵</li>
+</ul>
+<p>其中<script type="math/tex">v^{\left( 3 \right)}</script>即为模型的输出、<script type="math/tex">L\left( v^{\left( 3 \right)},Y \right) = L\left( Y,v^{\left( 3 \right)} \right)</script>即为模型在<script type="math/tex">(X,Y)</script>上的损失。可以看到这个过程确实相当平凡、但是里面蕴含的数学思想却是有趣而深刻的，接下来我们就分析一下其中的一些细节</p>
+<p><strong><em>注意：以上这个例子中的神经网络模型其实是一个二分类模型（<script type="math/tex">n_{3} = 2</script>），如果想用神经网络解决多分类问题（比如 K 分类问题）的话、只需自然地将输出层的神经元个数设为类别个数（<script type="math/tex">n_{3} \leftarrow K</script>）即可。此外，简便起见，如果我们没有特别指出的话、那么下文中所讨论的情况都是<script type="math/tex">N = 1</script>、亦即样本集里只有单样本的情形</em></strong></p>
+<h1 id="激活函数"><a href="#激活函数" class="headerlink" title="激活函数"></a>激活函数</h1><p>首先说说前文不断在提却又没有细说的激活函数<script type="math/tex">\phi</script>。直观来讲，所谓激活函数、正是整个结构中非线性扭曲力。这里介绍几个常见的激活函数：</p>
+<h2 id="逻辑函数（Sigmoid）"><a href="#逻辑函数（Sigmoid）" class="headerlink" title="逻辑函数（Sigmoid）"></a>逻辑函数（Sigmoid）</h2><script type="math/tex; mode=display">
+\phi\left( x \right) = \frac{1}{1 + e^{- x}}</script><p>其函数图像如下图所示：</p>
+<img src="/posts/2a8cdd6/p2.png" alt="p2.png" title="">
+<h2 id="正切函数（Tanh）"><a href="#正切函数（Tanh）" class="headerlink" title="正切函数（Tanh）"></a>正切函数（Tanh）</h2><script type="math/tex; mode=display">
+\phi\left( x \right) = \tanh\left( x \right) = \frac{1 - e^{- 2x}}{1 + e^{- 2x}}</script><p>其函数图像如下图所示：</p>
+<img src="/posts/2a8cdd6/p3.png" alt="p3.png" title="">
+<h2 id="线性整流函数（ReLU）"><a href="#线性整流函数（ReLU）" class="headerlink" title="线性整流函数（ReLU）"></a>线性整流函数（ReLU）</h2><p>ReLU 的全称是 Rectified Linear Unit，定义式很简洁：</p>
+<script type="math/tex; mode=display">
+\phi\left( x \right) = \max\left( 0,x \right)</script><p>其函数图像如下图所示（注意纵轴范围与上述两个激活函数不同）：</p>
+<img src="/posts/2a8cdd6/p4.png" alt="p4.png" title="">
+<h2 id="ELU-函数（Exponential-Linear-Unit）"><a href="#ELU-函数（Exponential-Linear-Unit）" class="headerlink" title="ELU 函数（Exponential Linear Unit）"></a>ELU 函数（Exponential Linear Unit）</h2><script type="math/tex; mode=display">
+\phi\left( \alpha,x \right) = \left\{ \begin{matrix}
+\alpha\left( e^{x} - 1 \right),\ \ & x < 0 \\
+x,\ \ & x \geq 0 \\
+\end{matrix} \right.\</script><p>我们在实现时会取<script type="math/tex">\alpha=1</script>、其函数图像如下图所示：</p>
+<img src="/posts/2a8cdd6/p5.png" alt="p5.png" title="">
+<h2 id="Softplus"><a href="#Softplus" class="headerlink" title="Softplus"></a>Softplus</h2><script type="math/tex; mode=display">
+\phi\left( x \right) = \ln{(1 + e^{x})}</script><p>其函数图像如下图所示：</p>
+<img src="/posts/2a8cdd6/p6.png" alt="p6.png" title="">
+<h2 id="恒同映射（Identify）"><a href="#恒同映射（Identify）" class="headerlink" title="恒同映射（Identify）"></a>恒同映射（Identify）</h2><script type="math/tex; mode=display">
+\phi\left( x \right) = x</script><p>其函数图像从略</p>
+<p>囿于篇幅、这些激活函数的由来及背后相关的错综复杂的数学理论研究就不展开叙述了；我们只需知道，神经网络之所以为非线性模型的关键、其实就在于激活函数</p>
+<p>然后来看看层与层之间的权值矩阵<script type="math/tex">w</script>以及偏置量<script type="math/tex">b</script>、它们的意义也都有比较好的解释：</p>
+<ul>
+<li><script type="math/tex">w</script>能把从激活函数得到的函数值线性映射到另一个维度的空间上</li>
+<li><script type="math/tex">b</script>能在此基础上再进行一步平移的操作</li>
+</ul>
+<p>其中<script type="math/tex">w</script>的重要性似乎无需过多说明也能让人明白，但<script type="math/tex">b</script>的重要性相对而言可能就没那么明显。为了直观体会偏置量<script type="math/tex">b</script>的重要性、可以设想这么一个场景（取之前的三层网络结构来说明问题）：</p>
+<ul>
+<li>激活函数全是中心对称的函数（比如常见的 tanh 函数）、亦即：  <script type="math/tex; mode=display">
+\phi_{i}\left( x \right) + \phi_{i}\left( - x \right) = 0,\ \ i = 1,2,3</script></li>
+<li>训练样本集为：  <script type="math/tex; mode=display">
+D = \{\left( x_{1},y_{1} \right),(x_{2},y_{2})\}</script></li>
+<li>权值矩阵<script type="math/tex">w^{\left( 1 \right)}</script>、<script type="math/tex">w^{\left( 2 \right)}</script>可变但偏置量恒为 0</li>
+</ul>
+<p>在此场景下不难想象，无论我们怎样进行训练、模型<script type="math/tex">G</script>在训练集<script type="math/tex">D</script>上的准确率都不可能达到 100%。这是因为我们有：</p>
+<script type="math/tex; mode=display">
+G(x) = \phi_{3}\left( \phi_{2}\left( \phi_{1}\left( x \right) \cdot w^{\left( 1 \right)} \right) \cdot w^{\left( 2 \right)} \right)</script><p>从而由激活函数为中心对称函数可知：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+G\left( - x \right) &= \phi_{3}\left( \phi_{2}\left( \phi_{1}\left( - x \right) \cdot w^{\left( 1 \right)} \right) \cdot w^{\left( 2 \right)} \right) \\
+&= \phi_{3}\left( \phi_{2}\left( - \phi_{1}\left( x \right) \cdot w^{\left( 1 \right)} \right) \cdot w^{\left( 2 \right)} \right) \\
+&= \phi_{3}\left( - \phi_{2}\left( \phi_{1}\left( x \right) \cdot w^{\left( 1 \right)} \right) \cdot w^{\left( 2 \right)} \right) \\
+&= - \phi_{3}\left( \phi_{2}\left( \phi_{1}\left( x \right) \cdot w^{\left( 1 \right)} \right) \cdot w^{\left( 2 \right)} \right) \\
+&= - G(x)
+\end{align}</script><p>亦即</p>
+<script type="math/tex; mode=display">
+G\left( x_{1} \right) = - G(x_{2})</script><p>但我们有<script type="math/tex">y_{1} = y_{2} = - 1</script>、所以模型<script type="math/tex">G</script>不可能同时预测对<script type="math/tex">(x_{1},y_{1})</script>和<script type="math/tex">(x_{2},y_{2})</script>。事实上由上述讨论可知、此时模型<script type="math/tex">G</script>所做的预测必定是关于输入空间“中心对称”的，这当然不是一个良好的结果。而如果我们引入偏置量的话、上述的对称性就会被打破，这就是偏置量重要性的其中一个比较浅显、直观的方面</p>
+<h1 id="损失函数（Cost-Function）"><a href="#损失函数（Cost-Function）" class="headerlink" title="损失函数（Cost Function）"></a>损失函数（Cost Function）</h1><p>注意到前向传导算法的最后一步是将模型的输出与真值相比较、并通过损失函数的作用来得到一个损失。损失函数有时也写作 Loss Function、我们之前已经提及它许多次。损失函数的直观意义是明确的：它是模型对数据拟合程度的反映；拟合得越差、损失函数的值就应该越大。如果同时考虑到梯度下降法的应用、我们自然还应该期望，当损失函数在函数值比较大（亦即模型的表现越差）时、它对应的梯度也要比较大（亦即更新参数的幅度也要比较大）</p>
+<p>由于我们此前没有对梯度下降法进行过深刻的应用（上个系列中的随机梯度下降只是一个相当粗浅的应用）、所以至今为止我们涉及到的损失函数基本只满足了“模型越差函数值越大”这一点，对于“函数值越大则梯度越大”这一点则没怎么考虑到。而对于神经网络而言、梯度下降可谓就是训练的全部，时至今日也没能出现能够与之抗衡的其余算法、最多也只是不断地研究出各式各样的梯度下降法的变体而已；所以对于神经网络来说，定义一个足够合适的损失函数是有必要的。接下来就介绍其中最常用的几个，为此需要先做符号约定：</p>
+<ul>
+<li>假设样本为<script type="math/tex">(x,y)</script></li>
+<li>假设共有 K 类：<script type="math/tex">\{ c_{1},\ldots,c_{K}\}</script></li>
+<li>假设讨论的模型为<script type="math/tex">G</script>、其输出（向量）为<script type="math/tex">G(x)</script></li>
+</ul>
+<p>其中<script type="math/tex">x \in \mathbb{R}^{n}</script>、<script type="math/tex">y \in \mathbb{R}^{K}</script>，且<script type="math/tex">y</script>是除了一位为 1、其余位都是 0 的向量。换句话说，若<script type="math/tex">y \in c_{k}</script>、那么<script type="math/tex">y</script>除了第 k 位为 1、其余位都是 0</p>
+<p><strong><em>注意：这种<script type="math/tex">y</script>的表示方法通常叫做 one-hot representation</em></strong></p>
+<p>在神经网络的训练算法中、损失函数通常需要结合输出层的激活函数来讨论；不过如果只考虑前向传导算法、只叙述损失函数的基本形式就可以：</p>
+<ul>
+<li>距离损失函数  <script type="math/tex; mode=display">
+L\left( y,G\left( x \right) \right) = \left\| y - G\left( x \right) \right\|^{2} = \left\lbrack y - G\left( x \right) \right\rbrack^{2}</script>该损失函数对应着最小平方误差准则（Minimum Squared Error，常简称为 MSE），它的直观意义是明确的：模型预测和真值的（欧氏）距离越大、损失就越大，反之就越小</li>
+<li>交叉熵损失函数（要求<script type="math/tex">G(x)</script>每一位的取值都在<script type="math/tex">(0,1)</script>中）  <script type="math/tex; mode=display">
+L\left( y,G\left( x \right) \right) = - \left\lbrack y\ln{G\left( x \right)} + \left( 1 - y \right)\ln\left( 1 - G\left( x \right) \right) \right\rbrack</script>其中交叉熵（Cross Entropy）是信息论中的一个概念、其本身是有一定内涵的，感兴趣的观众老爷可以参见<a href="https://en.wikipedia.org/wiki/Cross_entropy" target="_blank" rel="external">维基百科</a>来了解背后的那一套数学理论。囿于篇幅、我们无法展开叙述这一部分，但是从交叉熵的名字就可以看出、它和决策树里面提到过的熵有千丝万缕的关系；考虑到熵是定义在概率分布上的、所以进一步要求是一个概率向量（亦即进一步要求<script type="math/tex">\sum_{k=1}^Kv_k=1</script>）是一个非常合理的做法</li>
+<li>log-likelihood 损失函数（要求<script type="math/tex">G(x)</script>是一个概率向量、以及不妨假设<script type="math/tex">y\in c_k</script>）  <script type="math/tex; mode=display">
+L\left( y,G\left( x \right) \right) = - \ln v_{k}</script>换句话说，log-likelihood 即为模型预测的、真值 y 对应的类（<script type="math/tex">c_k</script>）的概率的负对数。需要指出的是、log-likelihood 这种原始的定义方式在神经网络里面不尽合理，我们会在下一节进行相关的讨论</li>
+</ul>
+<p>以上、我们就比较完整地叙述了一遍前向传导算法。可以看出在前向传导算法中、神经网络的各个 Layer 结构在很多地方的表现都一致、所以把 Layer 的共性抽象出来是有必要的。事实上再通过后面对神经网络的训练算法（反向传播算法）的说明我们就可以看出，每个变换层除了所对应的激活函数有所不同以外、其余部分的表现都几乎一样；而 CostLayer 虽然表现会有点不同（比如需要额外考虑损失函数、从而导致反向传播的形式会有些许改变）、其总体结构仍与变换层大致相同</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/3fa9a563/" rel="prev" title="从感知机到多层感知机">
+                <i class="fa fa-chevron-left"></i> 从感知机到多层感知机
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/437097cd/" rel="next" title="反向传播算法">
+                反向传播算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#算法概述"><span class="nav-number">1.</span> <span class="nav-text">算法概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#激活函数"><span class="nav-number">2.</span> <span class="nav-text">激活函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#逻辑函数（Sigmoid）"><span class="nav-number">2.1.</span> <span class="nav-text">逻辑函数（Sigmoid）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正切函数（Tanh）"><span class="nav-number">2.2.</span> <span class="nav-text">正切函数（Tanh）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线性整流函数（ReLU）"><span class="nav-number">2.3.</span> <span class="nav-text">线性整流函数（ReLU）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ELU-函数（Exponential-Linear-Unit）"><span class="nav-number">2.4.</span> <span class="nav-text">ELU 函数（Exponential Linear Unit）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Softplus"><span class="nav-number">2.5.</span> <span class="nav-text">Softplus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#恒同映射（Identify）"><span class="nav-number">2.6.</span> <span class="nav-text">恒同映射（Identify）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#损失函数（Cost-Function）"><span class="nav-number">3.</span> <span class="nav-text">损失函数（Cost Function）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

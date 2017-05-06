@@ -1,0 +1,1060 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文标题处的“大数据”打上了引号，是因为我们所要讨论的不是当今十分火热的、真正的大数据问题、而是讨论当问题规模“相当大”时应该如何处理。我们虽然在上篇文章中实现了一个切实可用的神经网络、但它确实显得过于朴实。本文会说明如何在这个朴实模型的基础上进行拓展，这些拓展的手法不单适用于神经网络、还适用于诸多旨在解决现实生活中规模相对较大的任务的模型">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="“大数据”下的网络结构">
+<meta property="og:url" content="http://www.carefree0910.com/posts/65c8a24f/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="本文标题处的“大数据”打上了引号，是因为我们所要讨论的不是当今十分火热的、真正的大数据问题、而是讨论当问题规模“相当大”时应该如何处理。我们虽然在上篇文章中实现了一个切实可用的神经网络、但它确实显得过于朴实。本文会说明如何在这个朴实模型的基础上进行拓展，这些拓展的手法不单适用于神经网络、还适用于诸多旨在解决现实生活中规模相对较大的任务的模型">
+<meta property="og:image" content="http://www.carefree0910.com/posts/65c8a24f/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/65c8a24f/p2.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/65c8a24f/p3.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/65c8a24f/p4.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/65c8a24f/p5.png">
+<meta property="og:updated_time" content="2017-05-06T02:36:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="“大数据”下的网络结构">
+<meta name="twitter:description" content="本文标题处的“大数据”打上了引号，是因为我们所要讨论的不是当今十分火热的、真正的大数据问题、而是讨论当问题规模“相当大”时应该如何处理。我们虽然在上篇文章中实现了一个切实可用的神经网络、但它确实显得过于朴实。本文会说明如何在这个朴实模型的基础上进行拓展，这些拓展的手法不单适用于神经网络、还适用于诸多旨在解决现实生活中规模相对较大的任务的模型">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/65c8a24f/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/65c8a24f/"/>
+
+
+
+
+
+  <title> “大数据”下的网络结构 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/65c8a24f/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                “大数据”下的网络结构
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-06T09:14:58+08:00">
+                2017-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文标题处的“大数据”打上了引号，是因为我们所要讨论的不是当今十分火热的、真正的大数据问题、而是讨论当问题规模“相当大”时应该如何处理。我们虽然在上篇文章中实现了一个切实可用的神经网络、但它确实显得过于朴实。本文会说明如何在这个朴实模型的基础上进行拓展，这些拓展的手法不单适用于神经网络、还适用于诸多旨在解决现实生活中规模相对较大的任务的模型</p>
+<a id="more"></a>
+<h1 id="分批（Batch）的思想"><a href="#分批（Batch）的思想" class="headerlink" title="分批（Batch）的思想"></a>分批（Batch）的思想</h1><p>回忆上一节实现的朴素神经网络中的<code>fit</code>方法、可以发现每次迭代时我们都只会用整个训练集进行一次参数的更新；以 Vanilla Update 为例的话、我们进行的就是 BGD 而非 MBGD。在数据量比较大时，姑且不论 MBGD 算法和 BGD 算法本身孰优孰劣，单从内存问题来看、BGD 就不是一个可以接受的做法。因此与 MBGD 算法的思想类似、我们需要将训练集“分批（Batch）”进行训练</p>
+<p>同样的道理，目前我们做预测时是将整个预测数据集扔给模型让它做前传算法的。当数据量比较大时、这样做显然也会引发内存不足的问题，为此我们需要分 Batch 进行前向传导并在最后做一个整合</p>
+<p>总之在数据量变大的情况下、我们要时刻有着分 Batch 的思想。先来看看如何在训练过程中引入 Batch（以下代码需定义在<code>fit</code>方法中的相关位置、仅写出关键部分）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 得到总样本数</span></div><div class="line">train_len = len(x)</div><div class="line"><span class="comment"># 得到单个Batch中的样本数，其中batch_size是传进来的参数</span></div><div class="line">batch_size = min(batch_size, train_len)</div><div class="line"><span class="comment"># 先判断是否有必要分Batch；若Batch中的样本数多于总样本数、自然没有必要分Batch</span></div><div class="line">do_random_batch = train_len &gt;= batch_size</div><div class="line"><span class="comment"># 算出需要分多少次Batch</span></div><div class="line">train_repeat = int(train_len / batch_size) + <span class="number">1</span></div><div class="line"><span class="comment"># 训练的主循环</span></div><div class="line"><span class="keyword">for</span> counter <span class="keyword">in</span> range(epoch):</div><div class="line">    <span class="comment"># 进行train_repeat次子迭代、每次子迭代中会利用一个Batch来训练模型</span></div><div class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(train_repeat):</div><div class="line">        <span class="keyword">if</span> do_random_batch:</div><div class="line">            <span class="comment"># np.random.choice(n, m)：随机从[0,1,...,n-1]中选出m个数</span></div><div class="line">            batch = np.random.choice(train_len, batch_size)</div><div class="line">            x_batch, y_batch = x_train[batch], y_train[batch]</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            x_batch, y_batch = x_train, y_train</div><div class="line">        self._w_optimizer.update()</div><div class="line">        self._b_optimizer.update()</div><div class="line">        _activations = self._get_activations(x_batch)</div><div class="line">        _deltas = [self._layers[<span class="number">-1</span>].bp_first(y_batch, _activations[<span class="number">-1</span>])]</div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">-1</span>, -len(_activations), <span class="number">-1</span>):</div><div class="line">            _deltas.append(</div><div class="line">                self._layers[i - <span class="number">1</span>].bp(_activations[i - <span class="number">1</span>], self._weights[i], _deltas[<span class="number">-1</span>])</div><div class="line">            )</div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(layer_width - <span class="number">1</span>, <span class="number">0</span>, <span class="number">-1</span>):</div><div class="line">            self._opt(i, _activations[i - <span class="number">1</span>], _deltas[layer_width - i - <span class="number">1</span>])</div><div class="line">        self._opt(<span class="number">0</span>, x_batch, _deltas[<span class="number">-1</span>])</div></pre></td></tr></table></figure>
+<p>然后是在预测过程中引入 Batch，实现的方法有两种：一种是比较常见的按个数分 Batch、一种是我们打算采用的按数据大小分 Batch。换句话说：</p>
+<ul>
+<li>常见的做法是在每个 Batch 中放 k 个数据</li>
+<li>我们的做法是在每个 Batch 中放 m 个数据、它们一共大概包含 N 个数字</li>
+</ul>
+<p>其中常见做法有一个显而易见的缺点：如果单个数据很庞大的话、这样做可能还是会引发内存不足的问题。接下来就看看我们的做法相对应的具体实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 参数batch_size即为N</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_prediction</span><span class="params">(self, x, batch_size=<span class="number">1e6</span>)</span>:</span></div><div class="line">    <span class="comment"># 计算Batch中的数据个数m、默认</span></div><div class="line">    single_batch = int(batch_size / np.prod(x.shape[<span class="number">1</span>:]))</div><div class="line">    <span class="comment"># 如果单个样本的数据量比N还大、那么将m设为1</span></div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> single_batch:</div><div class="line">        single_batch = <span class="number">1</span></div><div class="line">    <span class="comment"># 如果m大于样本总数、直接将所有样本输入前向传导算法即可</span></div><div class="line">    <span class="keyword">if</span> single_batch &gt;= len(x):</div><div class="line">        <span class="keyword">return</span> self._get_activations(x).pop()</div><div class="line">    <span class="comment"># 否则、计算需要重复调用前向传导算法的次数</span></div><div class="line">    epoch = int(len(x) / single_batch)</div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> len(x) % single_batch:</div><div class="line">        epoch += <span class="number">1</span></div><div class="line">    <span class="comment"># 反复调用前向传导并获得一系列结果</span></div><div class="line">    rs, count = [self._get_activations(x[:single_batch]).pop()], single_batch</div><div class="line">    <span class="keyword">while</span> count &lt; len(x):</div><div class="line">        count += single_batch</div><div class="line">        <span class="keyword">if</span> count &gt;= len(x):</div><div class="line">            rs.append(self._get_activations(x[count - single_batch:]).pop())</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            rs.append(self._get_activations(x[count - single_batch:count]).pop())</div><div class="line">    <span class="comment"># 利用np.vstack将这一系列结果进行合并</span></div><div class="line">    <span class="keyword">return</span> np.vstack(rs)</div></pre></td></tr></table></figure>
+<p>实现完毕后、我们就能得到如下图所示的结果（以在上一篇文章最后所用的螺旋线数据集上的训练过程为例）：</p>
+<img src="/posts/65c8a24f/p1.png" alt="p1.png" title="">
+<p>其中左图的准确率为 99.0%、右图的准确率为 100%。神经网络的结构仍都是两层含 24 个神经元的 ReLU 加 Softmax<script type="math/tex">+</script>Cross Entropy 组合的这个结构、迭代次数仍为 1000 次、平均训练时间则分别变为 2.36秒（左图）和 3.84秒（右图）</p>
+<h1 id="交叉验证"><a href="#交叉验证" class="headerlink" title="交叉验证"></a>交叉验证</h1><p>由于针对现实任务训练出来的神经网络通常来说是很难直接进行可视化的，所以如果想要评估它的表现的话、就必须要用交叉验证。这里我们提供一种简易交叉验证的实现方法（以下代码需定义在<code>fit</code>方法中的相关位置、仅写出关键部分）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># train_rate是传进来的参数、代表着训练集在整个数据集中占的比例</span></div><div class="line"><span class="keyword">if</span> train_rate <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">    train_rate = float(train_rate)</div><div class="line">    train_len = int(len(x) * train_rate)</div><div class="line">    shuffle_suffix = np.random.permutation(len(x))</div><div class="line">    x, y = x[shuffle_suffix], y[shuffle_suffix]</div><div class="line">    x_train, y_train = x[:train_len], y[:train_len]</div><div class="line">    x_test, y_test = x[train_len:], y[train_len:]</div><div class="line"><span class="keyword">else</span>:</div><div class="line">    x_train = x_test = x</div><div class="line">    y_train = y_test = y</div></pre></td></tr></table></figure>
+<p>仅仅简单地把数据集分开并没有意义，如果想要进行评估的话、就必须切实利用到那分出来的测试集。一种常见的做法是实时记录模型在测试集上的表现并在最后以图表的形式画出，这正是我们之前展示过的各种训练曲线的由来；要想实现这种实时记录的功能、我们需要额外地定义一些属性和方法。思路大致如下：</p>
+<ul>
+<li>定义一个属性<code>self._logs</code>以存储我们的记录。该属性是一个字典、结构大致为：  <script type="math/tex; mode=display">
+\text{self._logs} = "\text{\{"train": train_log, "test":test_log\}}</script>其中<script type="math/tex">\text{train_log}</script>和<script type="math/tex">\text{test_log}</script>为训练集和测试集的实时表现</li>
+<li>常见的对模型实时表现的评估有三种：损失（cost）、准确率（acc）和 F1-score，其中前两种是通用的评估、F1-score 则针对二类分类问题（F1-score 的相关数学定义可以参见<a href="https://en.wikipedia.org/wiki/F1_score" target="_blank" rel="external">这里</a>）</li>
+<li>定义三个方法，一个拿来实时记录这些评估、一个拿来输出最新的评估、一个拿来可视化评估</li>
+</ul>
+<p>实现的话不难但繁、需要综合考虑许多东西并微调已有的代码；由于如果把所有变动的地方都写出来会有大量的冗余、所以这里就不写出所有细节了。感兴趣的观众老爷们可以尝试自己进行实现，我个人实现的版本则可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/f_NN/Networks.py" target="_blank" rel="external">这里</a></p>
+<p>实现完毕后、我们就能得到如下图所示的结果（以之前二分类螺旋线数据集上的训练过程为例）：</p>
+<img src="/posts/65c8a24f/p2.png" alt="p2.png" title="">
+<p>从左到右依次为损失、准确率和 F1-score 的曲线，其中绿线为训练集上的表现、蓝线为测试集上的表现</p>
+<h1 id="进度条"><a href="#进度条" class="headerlink" title="进度条"></a>进度条</h1><p>当我们在解决现实生活中一个比较大型的问题时（比如网络爬虫或机器学习）、模型的耗时有时会达数十分钟甚至几个小时。在此期间如果程序什么都不输出的话、不免会感到些许不安：程序的运行到底到了哪个步骤？大概还需多久程序才能跑完呢？为了能在大型任务中获得即时的反馈、设计一个进度条是相当有必要的。本节拟介绍一种简单实用的进度条的实现方法，它支持记录并发程序的进度且损耗基本只来源于 Python 本身</p>
+<p>先来看看我们的进度条是怎样的：</p>
+<img src="/posts/65c8a24f/p3.png" alt="p3.png" title="">
+<p>其中每一行对应着一个单独任务的进度条、它有如下属性：</p>
+<ul>
+<li>任务名字（“Test”、“Test2”和“Test3”）</li>
+<li>一个形如“[- - - - - - ]”的进度显示器（紧跟在任务名字后面）</li>
+<li>已完成任务数和总任务数（紧跟在进度显示器后面、以 m /n 的形式出现，其中 m 为已完成任务数、n 为总任务数）</li>
+<li>总耗时和单个任务的平均耗时（紧跟在任务数后面，其中“Time Cost”后显示的是总耗时、“Average”后显示的是平均耗时，格式都是“时-分-秒”）</li>
+</ul>
+<p>可以看到功能还算完备。不过虽说看上去有些复杂、但其实核心的实现只用到了<code>time</code>这个 Python 标准库和<code>print</code>这个 Python 自带的函数。总代码量虽说不算太大（110 行左右）、但有许多地方都是些琐碎的细节；所以我们这里就只说一个思路、具体的代码则可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/ProgressBar.py" target="_blank" rel="external">这里</a></p>
+<p>实现的大纲大概如下：</p>
+<ul>
+<li>要记录任务开始时的已完成的任务数和未完成的任务数</li>
+<li>要定义一个计数器，记录着总共已完成的任务数</li>
+<li>要定义一个<code>start</code>函数和一个<code>update</code>函数作为初始化进度条和更新进度条的接口</li>
+<li>要定义一个<code>_flush</code>函数来控制输出流</li>
+</ul>
+<p>调用的方法也非常直观，这里举一个简单的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义一个返回函数的函数</span></div><div class="line"><span class="comment"># 参数cost为任务耗时（秒）、epoch为迭代次数、name为任务名、_sub_task为子任务</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">task</span><span class="params">(cost=<span class="number">0.5</span>, epoch=<span class="number">3</span>, name=<span class="string">""</span>, _sub_task=None)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_sub</span><span class="params">()</span>:</span></div><div class="line">        bar = ProgressBar(max_value=epoch, name=name)</div><div class="line">        <span class="comment"># 调用start方法进行进度条的初始化</span></div><div class="line">        bar.start()</div><div class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">            <span class="comment"># 利用time.sleep方法模拟任务耗时</span></div><div class="line">            time.sleep(cost)</div><div class="line">            <span class="comment"># 如果有子任务的话就执行子任务</span></div><div class="line">            <span class="keyword">if</span> _sub_task <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">                _sub_task()</div><div class="line">            <span class="comment"># 调用update方法更新进度条</span></div><div class="line">            bar.update()</div><div class="line">    <span class="keyword">return</span> _sub</div><div class="line"></div><div class="line"><span class="comment"># 定义三个任务Task1、Task2、Task3</span></div><div class="line"><span class="comment"># 其中Task2、Task3分别为Task1、Task2的子任务</span></div><div class="line">task(name=<span class="string">"Task1"</span>, _sub_task=task(</div><div class="line">    name=<span class="string">"Task2"</span>, _sub_task=task(</div><div class="line">        name=<span class="string">"Task3"</span>)))()</div></pre></td></tr></table></figure>
+<p>这段代码的运行效果正如上图所示</p>
+<h1 id="计时器"><a href="#计时器" class="headerlink" title="计时器"></a>计时器</h1><p>对于现实生活中的任务来说，我们往往需要让模型更可控、高效；这就使得我们需要知道程序运行的各个细节、或说各个部分的时间开销。Python 有一个自带的分析程序运行开销的工具 profile、它能满足我们大部分的要求。本节拟介绍 profile 的一种更灵活的轻量级替代品——Timing 的使用，其代码量仅 60 行左右、且可以比较简单地进行各种改进、拓展（Timing 的实现会放在今后介绍 Python 装饰器时进行简要的说明，观众老爷们也可以直接参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/Util/Timing.py" target="_blank" rel="external">这里</a>）</p>
+<p>先来看一下它的效果：</p>
+<img src="/posts/65c8a24f/p4.png" alt="p4.png" title="">
+<p>该图反映的正是之前二分类螺旋线数据集上的训练过程。可以看到它将神经网络中各个组成部分的各个函数的开销情况都记录了下来、总体上来说已足够我们进行性能分析。此外、这里我们采取的是按名字排序，如有必要、完全可以定义成按总开销排序或是按平均开销排序（另外虽然我们没有记录平均开销、但是添加上平均开销这一项是平凡的）</p>
+<p>应用 Timing 是比较简单的一件事，举一个小例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义一个测试类来进行简单的测试</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span>:</span></div><div class="line">    timing = Timing()</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, rate)</span>:</span></div><div class="line">        self.rate = rate</div><div class="line"></div><div class="line">    <span class="comment"># 以装饰器的形式、调用Timing中的timeit方法来计时</span></div><div class="line">    <span class="comment"># 默认迭代三次且单次迭代中调用self._test方法</span></div><div class="line"><span class="meta">    @timing.timeit()</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(self, cost=<span class="number">0.1</span>, epoch=<span class="number">3</span>)</span>:</span></div><div class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">            self._test(cost * self.rate)</div><div class="line"></div><div class="line">    <span class="comment"># 使用time.sleep模拟任务耗时</span></div><div class="line"><span class="meta">    @timing.timeit(prefix="[Core] ")</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_test</span><span class="params">(self, cost)</span>:</span></div><div class="line">        time.sleep(cost)</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test1</span><span class="params">(Test)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        Test.__init__(self, <span class="number">1</span>)</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test2</span><span class="params">(Test)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        Test.__init__(self, <span class="number">2</span>)</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test3</span><span class="params">(Test)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        Test.__init__(self, <span class="number">3</span>)</div><div class="line"></div><div class="line">test1 = Test1()</div><div class="line">test2 = Test2()</div><div class="line">test3 = Test3()</div><div class="line">test1.test()</div><div class="line">test2.test()</div><div class="line">test3.test()</div><div class="line">test1.timing.show_timing_log()</div></pre></td></tr></table></figure>
+<p>这段代码的运行效果如下图所示：</p>
+<img src="/posts/65c8a24f/p5.png" alt="p5.png" title="">
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/3bb962a6/" rel="prev" title="朴素的网络结构">
+                <i class="fa fa-chevron-left"></i> 朴素的网络结构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/613bbb2f/" rel="next" title="相关数学理论">
+                相关数学理论 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#分批（Batch）的思想"><span class="nav-number">1.</span> <span class="nav-text">分批（Batch）的思想</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交叉验证"><span class="nav-number">2.</span> <span class="nav-text">交叉验证</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#进度条"><span class="nav-number">3.</span> <span class="nav-text">进度条</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#计时器"><span class="nav-number">4.</span> <span class="nav-text">计时器</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

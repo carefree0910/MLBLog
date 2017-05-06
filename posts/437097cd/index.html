@@ -1,0 +1,1144 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python,数学,算法," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文要讲的就是可能最让我们头疼的反向传播（Backpropagation，常简称为 BP）算法了。事实上，如果不是要做理论研究而只是想快速应用神经网络来干活的话，了解如何使用 Tensorflow 等帮我们处理梯度的成熟的框架可能会比了解算法细节要更好一些（我们会把本章实现的模型的 Tensorflow 版本放在下一个系列中进行说明）。但即使如此，了解神经网络背后的原理总是有益的，在某种意义上它也">
+<meta name="keywords" content="Python,数学,算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="反向传播算法">
+<meta property="og:url" content="http://www.carefree0910.com/posts/437097cd/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="本文要讲的就是可能最让我们头疼的反向传播（Backpropagation，常简称为 BP）算法了。事实上，如果不是要做理论研究而只是想快速应用神经网络来干活的话，了解如何使用 Tensorflow 等帮我们处理梯度的成熟的框架可能会比了解算法细节要更好一些（我们会把本章实现的模型的 Tensorflow 版本放在下一个系列中进行说明）。但即使如此，了解神经网络背后的原理总是有益的，在某种意义上它也">
+<meta property="og:updated_time" content="2017-05-06T02:24:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="反向传播算法">
+<meta name="twitter:description" content="本文要讲的就是可能最让我们头疼的反向传播（Backpropagation，常简称为 BP）算法了。事实上，如果不是要做理论研究而只是想快速应用神经网络来干活的话，了解如何使用 Tensorflow 等帮我们处理梯度的成熟的框架可能会比了解算法细节要更好一些（我们会把本章实现的模型的 Tensorflow 版本放在下一个系列中进行说明）。但即使如此，了解神经网络背后的原理总是有益的，在某种意义上它也">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/437097cd/"/>
+
+
+
+
+
+  <title> 反向传播算法 | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/437097cd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                反向传播算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T21:27:21+08:00">
+                2017-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文要讲的就是可能最让我们头疼的反向传播（Backpropagation，常简称为 BP）算法了。事实上，如果不是要做理论研究而只是想快速应用神经网络来干活的话，了解如何使用 Tensorflow 等帮我们处理梯度的成熟的框架可能会比了解算法细节要更好一些（我们会把本章实现的模型的 Tensorflow 版本放在下一个系列中进行说明）。但即使如此，了解神经网络背后的原理总是有益的，在某种意义上它也能告诉我们应该选择怎样的神经网络结构来进行具体的训练</p>
+<a id="more"></a>
+<h1 id="算法概述"><a href="#算法概述" class="headerlink" title="算法概述"></a>算法概述</h1><p>顾名思义、BP 算法和前向传导算法的“方向”其实刚好相反：前向传导是由后往前（将激活值）一路传导，反向传播则是由前往后（将梯度）一路传播</p>
+<p><strong><em>注意：这里的“前”和“后”的定义是由 Layer 和输出层的相对位置给出的。具体而言，越靠近输出层的 Layer 我们称其越“前”、反之就称其越“后”</em></strong></p>
+<p>先从直观上理解一下 BP 算法的原理。总体上来说，BP 算法的目的是利用梯度来更新结构中的参数以使得损失函数最小化。这里面就涉及两个问题：</p>
+<ul>
+<li>如何获得（局部）梯度？</li>
+<li>如何使用梯度进行更新？</li>
+</ul>
+<p>本节会简要介绍第一个问题应该如何解决、并说一种第二个问题的解决方案，对第二个问题的详细讨论会放在第 5 节中；正如前面提到的，BP 是在前向传导之后进行的、从前往后传播的算法，所以我们需要时刻记住这么一个要求——对于每个 Layer（<script type="math/tex">L_{i}</script>）而言、其（局部）梯度的计算除了能利用它自身的数据外、仅会利用到（假设包括输入、输出层在内一共有 m 个 Layer、符号约定与上述符号约定一致）：</p>
+<ul>
+<li>上一层（<script type="math/tex">L_{i - 1}</script>）传过来的激活值<script type="math/tex">v^{\left( i - 1 \right)}</script>和下一层（<script type="math/tex">L_{i + 1}</script>）传回来的（局部）梯度<script type="math/tex">\delta^{\left( i + 1 \right)}</script></li>
+<li>该层与下一层之间的线性变换矩阵（亦即权值矩阵）<script type="math/tex">w^{\left( i \right)}</script></li>
+</ul>
+<p>其中出现的“局部梯度”的概念即为 BP 算法获得梯度的核心。其数学定义为：</p>
+<script type="math/tex; mode=display">
+\delta_{j}^{\left( i \right)} = \frac{\partial L\left( x \right)}{\partial u_{j}^{\left( i \right)}}</script><p>一般而言我们会用其向量形式：</p>
+<script type="math/tex; mode=display">
+\delta^{\left( i \right)} = \frac{\partial L\left( x \right)}{\partial u^{\left( i \right)}}</script><p>需要注意的是、此时数据样本数<script type="math/tex">N</script>不可忽视，亦即<script type="math/tex">u^{\left( i \right)}</script>、<script type="math/tex">\delta^{\left( i \right)}</script>其实都是<script type="math/tex">N \times n_{i}</script>的矩阵。</p>
+<p>由名字不难想象、局部梯度<script type="math/tex">\delta^{\left( i \right)}</script>仅在局部起作用且能在局部进行计算，事实上 BP 算法也正是通过将局部梯度进行传播来计算各个参数在全局的梯度、从而使参数的更新变得非常高效的。有关局部梯度的推导是相当繁复的工作、其中的细节我们会在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中进行说明，这里就只叙述最终结果：</p>
+<ul>
+<li>BP 算法的第一步为得到损失函数的梯度：  <script type="math/tex; mode=display">
+\delta^{\left( m \right)} = \frac{\partial L\left( y,v^{\left( m \right)} \right)}{\partial v^{\left( m \right)}}*\phi_{m}^{'}\left( u^{\left( m \right)} \right)</script>注意式中运算符“<em>”两边都是维的矩阵（其中即为输出层所含神经元的个数）、运算符“</em>”本身代表的则是 element wise 操作，亦即若  <script type="math/tex; mode=display">
+x = \left( x_{1},\ldots,x_{m} \right)^{T},\ \ y = \left( y_{1},\ldots,y_{m} \right)^{T}</script>则有  <script type="math/tex; mode=display">
+x*y = \left( x_{1}y_{1},\ldots,x_{m}y_{m} \right)^{T}</script>同理若  <script type="math/tex; mode=display">x = \begin{bmatrix}
+x_{11} & \cdots & x_{1q} \\
+\vdots & \ddots & \vdots \\
+x_{p1} & \cdots & x_{\text{pq}} \\
+\end{bmatrix},\ \ y = \begin{bmatrix}
+y_{11} & \cdots & y_{1q} \\
+\vdots & \ddots & \vdots \\
+y_{p1} & \cdots & y_{\text{pq}} \\
+\end{bmatrix}</script></li>
+<li>BP 算法剩下的步骤即为局部梯度的反向传播过程：  <script type="math/tex; mode=display">
+\delta^{\left( i \right)} = \delta^{\left( i + 1 \right)} \times w^{\left( i \right)T}*\phi_{i}^{'}\left( u^{\left( i \right)} \right)</script>这里列举出各个变量的维度以便理解：<ul>
+<li>局部梯度、激活函数的导数：<script type="math/tex">\delta^{\left( i \right)}</script>、<script type="math/tex">\phi_{i}^{'}\left( u^{\left( i \right)} \right)</script>的维度为<script type="math/tex">N \times n_{i}</script></li>
+<li>权值矩阵的转置：<script type="math/tex">w^{\left( i \right)T}</script>的维度为<script type="math/tex">n_{i + 1} \times n_{i}</script></li>
+<li>局部梯度：<script type="math/tex">\delta^{\left( i + 1 \right)}</script>的维度为<script type="math/tex">N \times n_{i + 1}</script></li>
+</ul>
+</li>
+</ul>
+<p>如果不管推导的话、求局部梯度的过程本身其实是相当清晰简洁的；如果所用的编程语言（比如 Python）能够直接支持矩阵操作的话、求解局部梯度的过程完全可以用一行实现</p>
+<h1 id="损失函数的选择"><a href="#损失函数的选择" class="headerlink" title="损失函数的选择"></a>损失函数的选择</h1><p>我们在上一篇文章中说过、损失函数通常需要结合输出层的激活函数来讨论，这是因为在 BP 算法的第一步所计算的局部梯度<script type="math/tex">\delta^{\left( m \right)}</script>正是由损失函数对模型输出<script type="math/tex">v^{\left( m \right)}</script>的梯度<script type="math/tex">\frac{\partial L\left( y,v^{\left( m \right)} \right)}{\partial v^{\left( m \right)}}</script>和激活函数的导数<script type="math/tex">\phi_{m}^{'}\left( u^{\left( m \right)} \right)</script>通过 element<br>wise 操作“*”得到的。不难想象对于固定的损失函数而言、会有相对“适合它”的激活函数，而事实上、结合激活函数来选择损失函数确实是一个常见的做法。用得比较多的组合有以下四个：</p>
+<ul>
+<li>Sigmoid 系以外的激活函数$+$距离损失函数（MSE）<br>MSE 可谓是一个万金油，它不会出太大问题、同时也基本不能很好地解决问题。这里特地指出不能使用 Sigmoid 系激活函数（目前我们提到过的 Sigmoid 系函数只有 Sigmoid 函数本身和 Tanh 函数），是因为 Sigmoid 系激活函数在图像两端都非常平缓（可以结合之前的图来理解）、从而会引起梯度消失的现象。MSE 这个损失函数无法处理这种梯度消失、所以一般来说不会用 Sigmoid 系激活函数<script type="math/tex">+</script>MSE 这个组合。具体而言，由于对 MSE 来说：  <script type="math/tex; mode=display">
+L\left( y,v^{\left( m \right)} \right) = \left\| y - v^{\left( m \right)} \right\|^{2}</script>所以  <script type="math/tex; mode=display">
+\frac{\partial L\left( y,v^{\left( m \right)} \right)}{\partial v^{\left( m \right)}} = - 2\left\lbrack y - v^{\left( m \right)} \right\rbrack</script>结合 Sigmoid 的函数图像不难得知：若模型的输出<script type="math/tex">v^{\left( m \right)} \rightarrow \mathbf{0} = \left( 0,\ldots,0 \right)^{T}</script>但真值<script type="math/tex">y = \mathbf{1} = \left( 1,\ldots,1 \right)^{T}</script>；此时虽然预测值和真值之间的误差几乎达到了极大值、不过由于  <script type="math/tex; mode=display">
+\frac{\partial L\left( y,v^{\left( m \right)} \right)}{\partial v^{\left( m \right)}} = - 2\left\lbrack y - v^{\left( m \right)} \right\rbrack \rightarrow - 2 \cdot \mathbf{1}</script><script type="math/tex; mode=display">
+\phi_{m}^{'}\left( u^{\left( m \right)} \right) \rightarrow \mathbf{0}</script>从而  <script type="math/tex; mode=display">
+\delta^{\left( m \right)} = \frac{\partial L\left( y,v^{\left( m \right)} \right)}{\partial v^{\left( m \right)}}*\phi_{m}^{'}\left( u^{\left( m \right)} \right) \rightarrow \mathbf{0}</script>亦即第一步算的局部梯度就趋近于 0 向量了；可以想象在此场景下模型参数的更新将会非常困难、收敛速度因为会变得很慢。前文提到若干次的梯度消失、正是这种由于激活函数在接近饱和时变化过于缓慢所引发的现象</li>
+<li>Sigmoid<script type="math/tex">+</script>Cross Entropy<br>Sigmoid 激活函数之所以有梯度消失的现象是因为它的导函数形式为  <script type="math/tex; mode=display">
+\phi^{'}\left( x \right) = \phi\left( x \right)\left\lbrack 1 - \phi\left( x \right) \right\rbrack</script>想要解决梯度消失的话，比较自然的想法是定义一个损失函数、使得它导函数的分母上有<script type="math/tex">\phi\left( x \right)\left\lbrack 1 - \phi\left( x \right) \right\rbrack</script>这一项。而前文说过的 Cross Entropy 这个损失函数恰恰满足该条件、因为其导函数形式为  <script type="math/tex; mode=display">
+\frac{\partial L\left( y,v^{\left( m \right)} \right)}{\partial v^{\left( m \right)}} = - \frac{y}{v^{\left( m \right)}} + \frac{1 - y}{1 - v^{\left( m \right)}} = - \frac{y - v^{\left( m \right)}}{v^{\left( m \right)}\left( 1 - v^{\left( m \right)} \right)}</script>且<script type="math/tex">v^{\left( m \right)} = \phi_{m}\left( u^{\left( m \right)} \right)</script>，从而有  <script type="math/tex; mode=display">
+\delta^{\left( m \right)} = \frac{\partial L\left( y,v^{\left( m \right)} \right)}{\partial v^{\left( m \right)}}*\phi_{m}^{'}\left( u^{\left( m \right)} \right)\phi_{m}\left( u^{\left( m \right)} \right) - y</script>这就相当完美地解决了梯度消失问题</li>
+<li>Softmax<script type="math/tex">+</script>Cross Entropy / log-likelihood<br>这两个组合的核心都在于前面额外用了一个 Softmax。Softmax 比起一个激活函数来说更像是一个（针对向量的）变换，它具有相当好的直观：能把模型的输出向量通过指数函数归一化成一个概率向量。比如若输出是<script type="math/tex">\left( 1,\ 1,\ 1,\ 1 \right)^{T}</script>，经过 Softmax 之后就是<script type="math/tex">\left( 0.25,\ 0.25,\ 0.25,\ 0.25 \right)^{T}</script>。它的严格定义式也比较简洁（以<script type="math/tex">\varphi</script>代指 Softmax）：  <script type="math/tex; mode=display">
+v^{\left( m \right)} = \varphi\left( u^{\left( m \right)} \right) = \left( \varphi_{1},\ldots,\varphi_{K} \right)^{T}</script>其中  <script type="math/tex; mode=display">
+u^{\left( m \right)} = \left( u_{1}^{\left( m \right)},\ldots,u_{K}^{\left( m \right)} \right)^{T}</script><script type="math/tex; mode=display">
+\varphi_{i} = \frac{e^{u_{i}^{\left( m \right)}}}{\sum_{j = 1}^{K}e^{u_{j}^{\left( m \right)}}}</script>从而  <script type="math/tex; mode=display">
+\varphi_{i}^{'}\left( u_{i}^{\left( m \right)} \right) = \frac{e^{u_{i}^{\left( m \right)}} \cdot \sum_{j = 1}^{K}e^{v_{j}^{\left( m \right)}} - \left( e^{u_{i}^{\left( m \right)}} \right)^{2}}{\left( \sum_{j = 1}^{K}e^{u_{j}^{\left( m \right)}} \right)^{2}} = \varphi_{i} - \varphi_{i}^{2} = \varphi_{i}\left( 1 - \varphi_{i} \right)</script>亦即  <script type="math/tex; mode=display">
+\varphi^{'}\left( u^{\left( m \right)} \right) = \varphi\left( u^{\left( m \right)} \right)\left\lbrack 1 - \varphi\left( u^{\left( m \right)} \right) \right\rbrack</script>这和 Sigmoid 函数的导函数形式一模一样<br>之所以要进行这一步变换，其实是因为 Cross Entropy 用概率向量来定义损失（要比用随便一个各位都在内的向量）更好、且 log-likelihood 更是只能使用概率向量来定义损失。由于 Sigmoid<script type="math/tex">+</script>Cross Entropy 的求导已经介绍过且 Softmax 导函数与 Sigmoid 导函数一致、这里就只需给出 Softmax<script type="math/tex">+</script>log-likelihood 的求导公式：  <script type="math/tex; mode=display">
+\frac{\partial L^{*}(x)}{\partial w_{\text{pq}}^{\left( m - 1 \right)}} = \left\{ \begin{matrix}
+\left( \varphi_{p} - 1 \right)v_{q}^{\left( m - 1 \right)},\ \ & p = k \\
+0,\ \ & p \neq k \\
+\end{matrix} \right.\</script>亦即  <script type="math/tex; mode=display">
+\delta_{p}^{\left( m \right)} = \left\{ \begin{matrix}
+\varphi_{p} - 1,\ \ & p = k \\
+0,\ \ & p \neq k \\
+\end{matrix} \right.\</script>其中  <script type="math/tex; mode=display">
+L^{*}(x) \triangleq L\left( y,v^{\left( m \right)} \right)</script>且  <script type="math/tex; mode=display">
+y\in c_k</script>将该式写成向量化的形式并不容易、但从实现的角度来说却也不算困难（以上公式的推导过程会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中）。不过需要注意的是，像这样算出来的局部梯度会是一个非常稀疏的矩阵（亦即大部分元素都是 0）、从而很容易导致训练根本无法收敛，这也正是为何前文说 log-likelihood 的原始形式不尽合理。改进的方法很简单、只需将损失函数变为：  <script type="math/tex; mode=display">
+L\left( y,G\left( x \right) \right) = \left\{ \begin{matrix}
+- \ln v_{p},\ \ & p = k \\
+- \ln{(1 - v_{p})},\ \ & p \neq k \\
+\end{matrix} \right.\</script>即可。不难发现这个改进后的损失函数和 Cross Entropy 从本质上来说是一样的、所以我们在后文不会实现 log-likelihood 对应的算法</li>
+</ul>
+<p>以上我们对如何获取局部梯度作了比较充分的介绍，对于如何利用局部梯度更新参数的详细讲解会放在第5节、这里仅介绍一种最简单的做法：直接应用上一章说过的随机梯度下降（SGD）。由于可以推出（推导过程同样可参见<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>）：</p>
+<script type="math/tex; mode=display">
+\frac{\partial L^{*}\left( x \right)}{\partial w_{\text{pq}}^{\left( i - 1 \right)}} = \delta_{q}^{\left( i \right)}v_{p}^{\left( i - 1 \right)}</script><p>从而只需</p>
+<script type="math/tex; mode=display">
+w_{\text{pq}}^{\left( i - 1 \right)} \leftarrow w_{\text{pq}}^{\left( i - 1 \right)} - \eta\delta_{q}^{\left( i \right)}v_{p}^{\left( i - 1 \right)}</script><p>即可完成一步训练</p>
+<h1 id="相关实现"><a href="#相关实现" class="headerlink" title="相关实现"></a>相关实现</h1><p>至此、神经网络中的 Layer 结构所需完成的所有工作就都已经介绍完毕，接下来就是归纳总结并着手实现的环节了。不难发现，每个 Layer 除了前向传导和反向传播算法核心以外，其余结构、功能等都完全一致；再加上这两大算法的核心只随激活函数的不同而不同、所以只需把激活函数留给具体的子类定义即可，其余的部分则都应该抽象成一个基类。由简入繁、我们可以先进行一个朴素的实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Layer</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.shape：记录着上个Layer和该Layer所含神经元的个数，具体而言：</div><div class="line">            self.shape[0] = 上个Layer所含神经元的个数</div><div class="line">            self.shape[1] = 该Layer所含神经元的个数</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, shape)</span>:</span></div><div class="line">        self.shape = shape</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> self.__class__.__name__</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> str(self)</div><div class="line"></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">name</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> str(self)</div></pre></td></tr></table></figure>
+<p>以上是对结构的抽象。由于我们实现的是一个比较朴素的版本、所以这个框架里也没有太多东西；如果要考虑上特殊的结构（比如后文会介绍的 Dropout、Normalize 等“附加层”）的话、就需要再往这个框架中添加若干属性</p>
+<p>接下来就是对两大算法（前向传导、反向传播）的抽象（不妨设当前 Layer 为<script type="math/tex">L_{i}</script>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div><div class="line"></div><div class="line"><span class="comment"># 将激活函数的导函数的定义留给子类定义</span></div><div class="line"><span class="comment"># 需要特别指出的是、这里的参数y其实是</span></div><div class="line"><span class="comment"># 这样设置参数y的原因会马上在后文叙述、这里暂时按下不表</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">derivative</span><span class="params">(self, y)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div><div class="line"></div><div class="line"><span class="comment"># 前向传导算法的封装</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias)</span>:</span></div><div class="line">    <span class="keyword">return</span> self._activate(x.dot(w) + bias)</div><div class="line"></div><div class="line"><span class="comment"># 反向传播算法的封装，主要是利用上面定义的导函数derivative来完成局部梯度的计算</span></div><div class="line"><span class="comment"># 其中：、、prev_delta；</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">bp</span><span class="params">(self, y, w, prev_delta)</span>:</span></div><div class="line">    <span class="keyword">return</span> prev_delta.dot(w.T) * self.derivative(y)</div></pre></td></tr></table></figure>
+<p>出于优化的考虑、我们在上述实现的<code>bp</code>方法中留了一些“余地”。具体而言，考虑到神经网络最后两层通常都是前文提到的 4 种组合之一、所以针对它们进行算法的优化是合理的；而为了具有针对性、CostLayer 的 BP 算法就无法包含在这个相对而言抽象程度比较高的方法里面。具体细节会在后文进行介绍、这里只说一下 CostLayer 自带的 BP 算法的大致思路：它会根据需要将相应的额外变换（比如 Softmax 变换）和损失函数整合在一起并算出一个整合后的梯度</p>
+<p>以上便完成了 Layer 结构基类的定义，接下来就说明一下为何在定义<code>derivative</code>这个计算激活函数导函数的方法时、传进去的参数是该 Layer 的输出值<script type="math/tex">v^{\left( i \right)} = \phi_{i}\left( u^{\left( i \right)} \right)</script>。其实理由相当平凡：很多常用的激活函数的导函数使用函数值来定义会比使用自变量来定义要更好（所谓更好是指形式上更简单、从而计算开销会更小）。接下来就罗列一下上文提到过的、6 种激活函数的导函数的形式：</p>
+<ul>
+<li>逻辑函数（Sigmoid）  <script type="math/tex; mode=display">
+\phi\left( x \right) = \frac{1}{1 + e^{- x}}</script><script type="math/tex; mode=display">
+\Rightarrow \phi^{'}\left( x \right) = \frac{e^{- x}}{\left( 1 + e^{- x} \right)^{2}} = \phi\left( x \right)\left\lbrack 1 - \phi\left( x \right) \right\rbrack</script></li>
+<li>正切函数（Tanh）  <script type="math/tex; mode=display">
+\phi\left( x \right) = \tanh(x) = \frac{1 - e^{- 2x}}{1 + e^{- 2x}}</script><script type="math/tex; mode=display">
+\Rightarrow \phi^{'}\left( x \right) = \frac{4e^{-2x}}{\left( 1 + e^{-2x} \right)^{2}} = 1 - \phi\left( x \right)^{2}</script></li>
+<li>线性整流函数（Rectified Linear Unit，常简称为 ReLU）  <script type="math/tex; mode=display">
+\phi\left( x \right) = \max\left( 0,x \right)</script><script type="math/tex; mode=display">
+\Rightarrow \phi^{'}\left( x \right) = \left\{ \begin{matrix}
+0,\ \ & x \leq 0 \\
+1,\ \ & x > 0 \\
+\end{matrix} \right.\  = \left\{ \begin{matrix}
+0,\ \ &\phi(x) = 0 \\
+1,\ \ &\phi(x) \neq 0 \\
+\end{matrix} \right.\</script></li>
+<li>ELU 函数（Exponential Linear Unit）  <script type="math/tex; mode=display">
+\phi\left( \alpha,x \right) = \left\{ \begin{matrix}
+\alpha\left( e^{x} - 1 \right),\ \ & x < 0 \\
+x,\ \ & x \geq 0 \\
+\end{matrix} \right.\</script><script type="math/tex; mode=display">
+\Rightarrow \phi^{'}\left( \alpha,x \right) = \left\{ \begin{matrix}
+\alpha\left( e^{x} - 1 \right),\ \ & x < 0 \\
+1,\ \ & x \geq 0 \\
+\end{matrix} \right.\  = \left\{ \begin{matrix}
+\phi\left( x \right) + \alpha,\ \ & x < 0 \\
+1,\ \ & x \geq 0 \\
+\end{matrix} \right.\</script></li>
+<li>Softplus 函数  <script type="math/tex; mode=display">
+\phi\left( x \right) = \ln{(1 + e^{x})}</script><script type="math/tex; mode=display">
+\Rightarrow \phi^{'}\left( x \right) = \frac{e^{x}}{1 + e^{x}} = 1 - \frac{1}{e^{\phi\left( x \right)}}</script></li>
+<li>恒同映射（Identity）  <script type="math/tex; mode=display">
+\phi\left( x \right) = x</script><script type="math/tex; mode=display">
+\Rightarrow \phi^{'}\left( x \right) = 1</script></li>
+</ul>
+<p>可以看出，用<script type="math/tex">\phi(x)</script>来表示<script type="math/tex">\phi'(x)</script>确实基本都比用<script type="math/tex">x</script>来表示<script type="math/tex">\phi'(x)</script>要简单、高效不少，所以在传参时将激活函数值传给计算导函数值的方法是合理的</p>
+<p>接下来就是实现具体要用在神经网络中的 Layer 了；由前文讨论可知、它们只需定义相应的激活函数及（用激活函数值表示的）导函数即可。以经典的 Sigmoid 激活函数所对应的 Layer 为例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sigmoid</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x)</span>:</span></div><div class="line">        <span class="keyword">return</span> <span class="number">1</span> / (<span class="number">1</span> + np.exp(-x))</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">derivative</span><span class="params">(self, y)</span>:</span></div><div class="line">        <span class="keyword">return</span> y * (<span class="number">1</span> - y)</div></pre></td></tr></table></figure>
+<p>其余 5 个激活函数对应 Layer 的实现是类似的、观众老爷们可以尝试对照着公式进行实现，我个人实现的版本则可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/f_NN/Layers.py" target="_blank" rel="external">这里</a></p>
+<p>最后我们要实现的就是那有些特殊的 CostLayer 了。总结一下前文所说的诸多内容、可知实现 CostLayer 时需要注意如下两点：</p>
+<ul>
+<li>没有激活函数、但可能会有特殊的变换函数（比如说 Softmax），同时还需要定义某个损失函数</li>
+<li>定义导函数时，需要考虑到自身特殊的变换函数并计算相应的、整合后的梯度</li>
+</ul>
+<p>具体的代码也是非常直观的，先来看看其基本架构：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CostLayer</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._available_cost_functions：记录所有损失函数的字典</div><div class="line">        self._available_transform_functions：记录所有特殊变换函数的字典</div><div class="line">        self._cost_function、self._cost_function_name：记录损失函数及其名字的两个属性</div><div class="line">        self._transform_function 、self._transform：记录特殊变换函数及其名字的两个属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, shape, cost_function=<span class="string">"MSE"</span>)</span>:</span></div><div class="line">        super(CostLayer, self).__init__(shape)</div><div class="line">        self._available_cost_functions = &#123;</div><div class="line">            <span class="string">"MSE"</span>: CostLayer._mse,</div><div class="line">            <span class="string">"SVM"</span>: CostLayer._svm,</div><div class="line">            <span class="string">"CrossEntropy"</span>: CostLayer._cross_entropy</div><div class="line">        &#125;</div><div class="line">        self._available_transform_functions = &#123;</div><div class="line">            <span class="string">"Softmax"</span>: CostLayer._softmax,</div><div class="line">            <span class="string">"Sigmoid"</span>: CostLayer._sigmoid</div><div class="line">        &#125;</div><div class="line">        self._cost_function_name = cost_function</div><div class="line">        self._cost_function = self._available_cost_functions[cost_function]</div><div class="line">        <span class="keyword">if</span> transform <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">and</span> cost_function == <span class="string">"CrossEntropy"</span>:</div><div class="line">            self._transform = <span class="string">"Softmax"</span></div><div class="line">            self._transform_function = CostLayer._softmax</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self._transform = transform</div><div class="line">            self._transform_function = self._available_transform_functions.get(</div><div class="line">                transform, <span class="keyword">None</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> self._cost_function_name</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="comment"># 如果不使用特殊的变换函数的话、直接返回输入值即可</span></div><div class="line">        <span class="keyword">if</span> self._transform_function <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            <span class="keyword">return</span> x</div><div class="line">        <span class="comment"># 否则、调用相应的变换函数以获得结果</span></div><div class="line">        <span class="keyword">return</span> self._transform_function(x)</div><div class="line"></div><div class="line">    <span class="comment"># 由于CostLayer有自己特殊的BP算法，所以这个方法不会被调用、自然也无需定义</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_derivative</span><span class="params">(self, y, delta=None)</span>:</span></div><div class="line">        <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<p>接下来就要定义相应的变换函数了。由前文对四种损失函数组合的讨论及上述代码都可以看出、我们需要定义 Softmax 和 Sigmoid 这两种变换函数及相应导函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">safe_exp</span><span class="params">(x)</span>:</span></div><div class="line">    <span class="keyword">return</span> np.exp(x - np.max(x, axis=<span class="number">1</span>, keepdims=<span class="keyword">True</span>))</div><div class="line"></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_softmax</span><span class="params">(y, diff=False)</span>:</span></div><div class="line">    <span class="keyword">if</span> diff:</div><div class="line">        <span class="keyword">return</span> y * (<span class="number">1</span> - y)</div><div class="line">    exp_y = CostLayer.safe_exp(y)</div><div class="line">    <span class="keyword">return</span> exp_y / np.sum(exp_y, axis=<span class="number">1</span>, keepdims=<span class="keyword">True</span>)</div><div class="line"></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_sigmoid</span><span class="params">(y, diff=False)</span>:</span></div><div class="line">    <span class="keyword">if</span> diff:</div><div class="line">        <span class="keyword">return</span> y * (<span class="number">1</span> - y)</div><div class="line">    <span class="keyword">return</span> <span class="number">1</span> / (<span class="number">1</span> + np.exp(-y))</div></pre></td></tr></table></figure>
+<p>其中前三行代码实现的<code>safe_exp</code>方法主要利用了如下恒等式：</p>
+<script type="math/tex; mode=display">
+\frac{e^{v_{i}^{\left( m \right)}}}{\sum_{j = 1}^{K}e^{v_{j}^{\left( m \right)}}} = \frac{e^{v_{i}^{\left( m \right)} - c}}{\sum_{j = 1}^{K}e^{v_{j}^{\left( m \right)} - c}}</script><p>其中<script type="math/tex">c</script>是任意一个常数；如果此时我们取</p>
+<script type="math/tex; mode=display">
+c = \max{\{ v_{1}^{\left( m \right)},\ldots,v_{K}^{\left( m \right)}\}}</script><p>这样的话分母、分子中所有幂次都不大于 0，从而不会出现由于某个<script type="math/tex">v_{i}^{\left( m \right)}</script>很大而导致对应的<script type="math/tex">e^{v_{i}^{\left( m \right)}}</script>很大、并因而导致数据溢出的情况，从而在一定程度上保证了数值稳定性</p>
+<p>接下来要实现的就是各种损失函数以及能够根据损失函数计算整合梯度的方法了；考虑到可拓展性，我们不仅要优化特定的组合对应的整合算法、同时也要考虑一般性的情况。因此在实现损失函数的同时、实现损失函数的导函数是有必要的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义计算整合梯度的方法，注意这里返回的是负梯度</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">bp_first</span><span class="params">(self, y, y_pred)</span>:</span></div><div class="line">    <span class="comment"># 如果是Sigmoid / Softmax和Cross Entropy的组合、就用进行优化</span></div><div class="line">    <span class="comment"># 注意返回时需要返回负梯度，下同</span></div><div class="line">    <span class="keyword">if</span> self._cost_function_name == <span class="string">"CrossEntropy"</span> <span class="keyword">and</span> (</div><div class="line">            self._transform == <span class="string">"Softmax"</span> <span class="keyword">or</span> self._transform == <span class="string">"Sigmoid"</span>):</div><div class="line">        <span class="keyword">return</span> y - y_pred</div><div class="line">    <span class="comment"># 否则、就只能用普适性公式进行计算：</span></div><div class="line">    <span class="comment">#            （没有特殊变换函数）</span></div><div class="line">    <span class="comment">#  （有特殊变换函数）</span></div><div class="line">    dy = -self._cost_function(y, y_pred)</div><div class="line">    <span class="keyword">if</span> self._transform_function <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">return</span> dy</div><div class="line">    <span class="keyword">return</span> dy * self._transform_function(y_pred, diff=<span class="keyword">True</span>)</div><div class="line"></div><div class="line"><span class="comment"># 定义计算损失的方法</span></div><div class="line"><span class="meta">@property</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">calculate</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">lambda</span> y, y_pred: self._cost_function(y, y_pred, <span class="keyword">False</span>)</div><div class="line"></div><div class="line"><span class="comment"># 定义距离损失函数及其导函数</span></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_mse</span><span class="params">(y, y_pred, diff=True)</span>:</span></div><div class="line">    <span class="keyword">if</span> diff:</div><div class="line">        <span class="keyword">return</span> -y + y_pred</div><div class="line">    <span class="keyword">return</span> <span class="number">0.5</span> * np.average((y - y_pred) ** <span class="number">2</span>)</div><div class="line"></div><div class="line"><span class="comment"># 定义Cross Entropy损失函数及其导函数</span></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_cross_entropy</span><span class="params">(y, y_pred, diff=True, eps=<span class="number">1e-8</span>)</span>:</span></div><div class="line">    <span class="keyword">if</span> diff:</div><div class="line">        <span class="keyword">return</span> -y / (y_pred + eps) + (<span class="number">1</span> - y) / (<span class="number">1</span> - y_pred + eps)</div><div class="line">    <span class="keyword">return</span> np.average(-y * np.log(y_pred + eps) - (<span class="number">1</span> - y) * np.log(<span class="number">1</span> - y_pred + eps))</div></pre></td></tr></table></figure>
+<p>至此、我们打算实现的朴素神经网络模型中的所有 Layer 结构就都实现完毕了。下一节我们会介绍一些特殊的 Layer 结构，它们不会整合在我们的朴素神经网络结构中；但是如果想在实际任务中应用神经网络的话、了解它们是有必要的</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/2a8cdd6/" rel="prev" title="前向传导算法">
+                <i class="fa fa-chevron-left"></i> 前向传导算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/a33ff165/" rel="next" title="特殊的层结构">
+                特殊的层结构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#算法概述"><span class="nav-number">1.</span> <span class="nav-text">算法概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#损失函数的选择"><span class="nav-number">2.</span> <span class="nav-text">损失函数的选择</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关实现"><span class="nav-number">3.</span> <span class="nav-text">相关实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
