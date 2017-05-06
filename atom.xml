@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.carefree0910.com/"/>
-  <updated>2017-05-06T02:00:52.000Z</updated>
+  <updated>2017-05-06T07:17:13.000Z</updated>
   <id>http://www.carefree0910.com/</id>
   
   <author>
@@ -14,6 +14,361 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>“卷积神经网络”小结</title>
+    <link href="http://www.carefree0910.com/posts/18671318/"/>
+    <id>http://www.carefree0910.com/posts/18671318/</id>
+    <published>2017-05-06T07:15:38.000Z</published>
+    <updated>2017-05-06T07:17:13.000Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>相比起 NN 的全连接来说、CNN 使用了局部视野和权值共享，这使得 CNN 更适合处理结构性的数据（比如图像）</li>
+<li>Tensorflow 框架能帮助我们处理梯度并更新参数，这可以给实现带来极大的便利</li>
+<li>CNN 大体上可分为“卷积块”与“NN 块”两部分，其中卷积块为特征提取器、NN 块为“附带”的分类器</li>
+<li>比起 NN 而言、CNN 的参数量会少很多，这也是许多近现代的 CNN 网络不采用全连接层而采用全局平均池化层（GAP）的原因之一</li>
+<li>CNN 的强大之处更多在于其提取特征的能力而非分类的能力，使用 CNN 进行特征提取后、再使用其它模型（比如 NN）进行相应的训练是一种常见的做法。事实上、这种做法有个学名叫做“迁移学习（Transfer Learning）”，感兴趣的观众老爷可以参见<a href="http://journalofbigdata.springeropen.com/articles/10.1186/s40537-016-0043-6" target="_blank" rel="external">这里</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;相比起 NN 的全连接来说、CNN 使用了局部视野和权值共享，这使得 CNN 更适合处理结构性的数据（比如图像）&lt;/li&gt;
+&lt;li&gt;Tensorflow 框架能帮助我们处理梯度并更新参数，这可以给实现带来极大的便利&lt;/li&gt;
+&lt;li&gt;CNN 大体上可分为“卷积块
+    
+    </summary>
+    
+      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>将 NN 扩展为 CNN</title>
+    <link href="http://www.carefree0910.com/posts/433ed5d6/"/>
+    <id>http://www.carefree0910.com/posts/433ed5d6/</id>
+    <published>2017-05-06T06:54:43.000Z</published>
+    <updated>2017-05-06T07:15:12.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>往简单里说、CNN 只是多了卷积层、池化层和 FC 的 NN 而已，虽然卷积、池化对应的前向传导算法和反向传播算法的高效实现都很不平凡，但得益于 Tensorflow 的强大、我们可以在仅仅知道它们思想的前提下进行相应的实现，因为 Tensorflow 能够帮我们处理所有数学与技术上的细节</p>
+<a id="more"></a>
+<h1 id="实现卷积层"><a href="#实现卷积层" class="headerlink" title="实现卷积层"></a>实现卷积层</h1><p>回忆我们说过的卷积层和普通层的性质、不难发现它们的表现极其相似，区别大体上来说只在于如下三点：</p>
+<ul>
+<li>普通层自身对数据的处理只有“激活”（<script type="math/tex">v^{\left( i \right)} = \phi_{i}\left( u^{\left( i \right)} \right)</script>）这一个步骤，层与层（<script type="math/tex">L_{i}</script>、<script type="math/tex">L_{i + 1}</script>）之间的数据传递则是通过权值矩阵、偏置量（<script type="math/tex">w^{\left( i \right)}</script>、<script type="math/tex">b^{\left( i \right)}</script>）和线性变换（<script type="math/tex">u^{\left( i + 1 \right)} = v^{\left( i \right)} \times w^{\left( i \right)} + b^{\left( i \right)}</script>）来完成的；卷积层自身对数据的处理则多了“卷积”这个步骤（通常来说是先卷积再激活：<script type="math/tex">v^{\left( i \right)} = \phi_{i}\left( \text{conv}\left( u^{\left( i \right)} \right) \right)</script>）、同时层与层之间的数据传递是直接传递的（<script type="math/tex">u^{\left( i + 1 \right)} = v^{\left( i \right)}</script>）</li>
+<li>卷积层自身多了 Kernel 这个属性并因此带来了诸如 Stride、Padding 等属性，不过与此同时、卷积层之间没有权值矩阵</li>
+<li>卷积层和普通层的<code>shape</code>属性记录的东西不同，具体而言：<ul>
+<li>普通层的<code>shape</code>记录着上个 Layer 和该 Layer 所含神经元的个数</li>
+<li>卷积层的<code>shape</code>记录着上个卷积层的输出和该卷积层的 Kernel 的信息（注意卷积层的上一层必定还是卷积层）</li>
+</ul>
+</li>
+</ul>
+<p>接下来就看看具体实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvLayer</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.shape：记录着上个卷积层的输出和该Layer的Kernel的信息，具体而言：</div><div class="line">            self.shape[0] = 上个卷积层的输出的形状（频道数×高×宽）</div><div class="line">                常简记为self.shape[0] =(c,h_old,w_old)</div><div class="line">            self.shape[1] = 该卷积层Kernel的信息（Kernel数×高×宽）</div><div class="line">                常简记为self.shape[1] =(f,h_new,w_new)</div><div class="line">        self.stride、self.padding：记录Stride、Padding的属性</div><div class="line">        self.parent：记录父层的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, shape, stride=<span class="number">1</span>, padding=<span class="string">"SAME"</span>, parent=None)</span>:</span></div><div class="line">        <span class="keyword">if</span> parent <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            _parent = parent.root <span class="keyword">if</span> parent.is_sub_layer <span class="keyword">else</span> parent</div><div class="line">            shape = _parent.shape</div><div class="line">        Layer.__init__(self, shape)</div><div class="line">        self.stride = stride</div><div class="line">        <span class="comment"># 利用Tensorflow里面对Padding功能的封装、定义self.padding属性</span></div><div class="line">        <span class="keyword">if</span> isinstance(padding, str):</div><div class="line">            <span class="comment"># "VALID"意味着输出的高、宽会受Kernel的高、宽影响，具体公式后面会说</span></div><div class="line">            <span class="keyword">if</span> padding.upper() == <span class="string">"VALID"</span>:</div><div class="line">                self.padding = <span class="number">0</span></div><div class="line">                self.pad_flag = <span class="string">"VALID"</span></div><div class="line">            <span class="comment"># "SAME"意味着输出的高、宽与Kernel的高、宽无关、只受Stride的影响</span></div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                self.padding = self.pad_flag = <span class="string">"SAME"</span></div><div class="line">        <span class="comment"># 如果输入了一个整数、那么就按照VALID情形设置Padding相关的属性</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self.padding = int(padding)</div><div class="line">            self.pad_flag = <span class="string">"VALID"</span></div><div class="line">        self.parent = parent</div><div class="line">        <span class="keyword">if</span> len(shape) == <span class="number">1</span>:</div><div class="line">            self.n_channels = self.n_filters = self.out_h = self.out_w = <span class="keyword">None</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self.feed_shape(shape)</div><div class="line"></div><div class="line">    <span class="comment"># 定义一个处理shape属性的方法</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">feed_shape</span><span class="params">(self, shape)</span>:</span></div><div class="line">        self.shape = shape</div><div class="line">        self.n_channels, height, width = shape[<span class="number">0</span>]</div><div class="line">        self.n_filters, filter_height, filter_width = shape[<span class="number">1</span>]</div><div class="line">        <span class="comment"># 根据Padding的相关信息、计算输出的高、宽</span></div><div class="line">        <span class="keyword">if</span> self.pad_flag == <span class="string">"VALID"</span>:</div><div class="line">            self.out_h = ceil((height - filter_height + <span class="number">1</span>) / self.stride)</div><div class="line">            self.out_w = ceil((width - filter_width + <span class="number">1</span>) / self.stride)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self.out_h = ceil(height / self.stride)</div><div class="line">            self.out_w = ceil(width / self.stride)</div></pre></td></tr></table></figure>
+<p>上述代码的最后几行对应着下述两个公式、这两个公式在 Tensorflow 里面有着直接对应的实现：</p>
+<ul>
+<li>当 Padding 设置为 VALID 时，输出的高、宽分别为：  <script type="math/tex; mode=display">
+h^{\text{out}} = \left\lceil \frac{h^{\text{old}} - h^{\text{new}} + 1}{\text{stride}} \right\rceil,\ \ w^{\text{out}} = \left\lceil \frac{w^{\text{old}} - w^{\text{new}} + 1}{\text{stride}} \right\rceil</script>其中，符号“<script type="math/tex">\lceil\ \rceil</script>”代表着“向上取整”，stride 代表着步长</li>
+<li>当 Padding 设置为 SAME 时，输出的高、宽分别为：  <script type="math/tex; mode=display">
+h^{\text{out}} = \left\lceil \frac{h^{\text{old}}}{\text{stride}} \right\rceil,\ \ w^{\text{out}} = \left\lceil \frac{w^{\text{old}}}{\text{stride}} \right\rceil</script></li>
+</ul>
+<p>同时不难看出、上述代码其实没有把 CNN 的前向传导算法囊括进去，这是因为考虑到卷积层会利用到普通层的激活函数、所以期望能够合理复用代码。所以期望能够把上述代码定义的 ConvLayer 和前文重写的 Layer 整合在一起以成为具体用在 CNN 中的卷积层，为此我们需要利用到 Python 中一项比较高级的技术——元类（元类的介绍可以参见<a href="https://zhuanlan.zhihu.com/p/24633374" target="_blank" rel="external">这里</a>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvLayerMeta</span><span class="params">(type)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(mcs, *args, **kwargs)</span>:</span></div><div class="line">        name, bases, attr = args[:<span class="number">3</span>]</div><div class="line">        <span class="comment"># 规定继承的顺序为ConvLayer→Layer</span></div><div class="line">        conv_layer, layer = bases</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, shape, stride=<span class="number">1</span>, padding=<span class="string">"SAME"</span>)</span>:</span></div><div class="line">            conv_layer.__init__(self, shape, stride, padding)</div><div class="line"></div><div class="line">        <span class="comment"># 利用Tensorflow的相应函数定义计算卷积的方法</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_conv</span><span class="params">(self, x, w)</span>:</span></div><div class="line">            <span class="keyword">return</span> tf.nn.conv2d(x, w, strides=[self.stride] * <span class="number">4</span>, padding=self.pad_flag)</div><div class="line"></div><div class="line">        <span class="comment"># 依次进行卷积、激活的步骤</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, w, bias, predict)</span>:</span></div><div class="line">            res = self._conv(x, w) + bias</div><div class="line">            <span class="keyword">return</span> layer._activate(self, res, predict)</div><div class="line"></div><div class="line">        <span class="comment"># 在正式进行前向传导算法之前、先要利用Tensorflow相应函数进行Padding</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias=None, predict=False)</span>:</span></div><div class="line">            <span class="keyword">if</span> self.pad_flag == <span class="string">"VALID"</span> <span class="keyword">and</span> self.padding &gt; <span class="number">0</span>:</div><div class="line">                _pad = [self.padding] * <span class="number">2</span></div><div class="line">                x = tf.pad(x, [[<span class="number">0</span>, <span class="number">0</span>], _pad, _pad, [<span class="number">0</span>, <span class="number">0</span>]], <span class="string">"CONSTANT"</span>)</div><div class="line">            <span class="keyword">return</span> _activate(self, x, w, bias, predict)</div><div class="line">        <span class="comment"># 将打包好的类返回</span></div><div class="line">        <span class="keyword">for</span> key, value <span class="keyword">in</span> locals().items():</div><div class="line">            <span class="keyword">if</span> str(value).find(<span class="string">"function"</span>) &gt;= <span class="number">0</span>:</div><div class="line">                attr[key] = value</div><div class="line">        <span class="keyword">return</span> type(name, bases, attr)</div></pre></td></tr></table></figure>
+<p>在定义好基类和元类后、定义实际应用在 CNN 中的卷积层就非常简洁了。以在深度学习中应用最广泛的 ReLU 卷积层为例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvReLU</span><span class="params">(ConvLayer, ReLU, metaclass=ConvLayerMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<h1 id="实现池化层"><a href="#实现池化层" class="headerlink" title="实现池化层"></a>实现池化层</h1><p>池化层比起卷积层而言要更简单一点：对于最常见的两种池化——极大池化和平均池化而言，它们所做的只是取输入的极大值和均值而已、本身并没有可以更新的参数。是故对池化层而言，我们无需维护其 Kernel、而只用定义相应的池化方法（极大、平均）即可，因此我们要求用户在调用池化层时、只提供“高”和“宽”而不提供“Kernel 个数”</p>
+<p><strong><em>注意：Kernel 个数从数值上来说与输出频道个数一致，所以对于池化层的实现而言、我们应该直接用输入频道数来赋值 Kernel 数，因为池化不会改变数据的频道数</em></strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvPoolLayer</span><span class="params">(ConvLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">feed_shape</span><span class="params">(self, shape)</span>:</span></div><div class="line">        shape = (shape[<span class="number">0</span>], (shape[<span class="number">0</span>][<span class="number">0</span>], *shape[<span class="number">1</span>]))</div><div class="line">        ConvLayer.feed_shape(self, shape)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias=None, predict=False)</span>:</span></div><div class="line">        pool_height, pool_width = self.shape[<span class="number">1</span>][<span class="number">1</span>:]</div><div class="line">        <span class="comment"># 处理Padding</span></div><div class="line">        <span class="keyword">if</span> self.pad_flag == <span class="string">"VALID"</span> <span class="keyword">and</span> self.padding &gt; <span class="number">0</span>:</div><div class="line">            _pad = [self.padding] * <span class="number">2</span></div><div class="line">            x = tf.pad(x, [[<span class="number">0</span>, <span class="number">0</span>], _pad, _pad, [<span class="number">0</span>, <span class="number">0</span>]], <span class="string">"CONSTANT"</span>)</div><div class="line">        <span class="comment"># 利用self._activate方法进行池化</span></div><div class="line">        <span class="keyword">return</span> self._activate(<span class="keyword">None</span>)(</div><div class="line">            x, ksize=[<span class="number">1</span>, pool_height, pool_width, <span class="number">1</span>],</div><div class="line">            strides=[<span class="number">1</span>, self.stride, self.stride, <span class="number">1</span>], padding=self.pad_flag)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, *args)</span>:</span></div><div class="line">        <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<p>同样的，由于 Tensorflow 已经帮助我们做好了封装、我们可以直接调用相应的函数来完成极大池化和平均池化的实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 实现极大池化</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MaxPool</span><span class="params">(ConvPoolLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, *args)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.nn.max_pool</div><div class="line"></div><div class="line"><span class="comment"># 实现平均池化</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">AvgPool</span><span class="params">(ConvPoolLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, *args)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.nn.avg_pool</div></pre></td></tr></table></figure>
+<h1 id="实现-CNN-中的特殊层结构"><a href="#实现-CNN-中的特殊层结构" class="headerlink" title="实现 CNN 中的特殊层结构"></a>实现 CNN 中的特殊层结构</h1><p>在 CNN 中同样有着 Dropout 和 Normalize 这两种特殊层结构。它们的表现和 NN 中相应特殊层结构的表现是完全一致的，区别只在于作用的对象不同</p>
+<p>我们知道，CNN 每一层数据的维度要比 NN 中每一层数据的维度多一维：一个典型的 NN 中每一层的数据通常是<script type="math/tex">N \times p \times q</script>的，而 CNN 则通常是<script type="math/tex">N \times p \times q \times r</script>的、其中<script type="math/tex">r</script>是当前数据的频道数。为了让适用于 NN 的特殊层结构适配于 CNN，一个自然而合理的做法就是将<script type="math/tex">r</script>个频道的数据当做一个整体来处理、或说将 CNN 中<script type="math/tex">r</script>个频道的数据放在一起并视为 NN 中的一个神经元，这样做的话就能通过简易的封装来直接利用上我们对 NN 定义的特殊层结构。封装的过程则仍要用到元类：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义作为封装的元类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvSubLayerMeta</span><span class="params">(type)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(mcs, *args, **kwargs)</span>:</span></div><div class="line">        name, bases, attr = args[:<span class="number">3</span>]</div><div class="line">        conv_layer, sub_layer = bases</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent, shape, *_args, **_kwargs)</span>:</span></div><div class="line">            conv_layer.__init__(self, <span class="keyword">None</span>, parent=parent)</div><div class="line">            <span class="comment"># 与池化层类似、特殊层输出数据的形状应保持与输入数据的形状一致</span></div><div class="line">            self.out_h, self.out_w = parent.out_h, parent.out_w</div><div class="line">            sub_layer.__init__(self, parent, shape, *_args, **_kwargs)</div><div class="line">            self.shape = ((shape[<span class="number">0</span>][<span class="number">0</span>], self.out_h, self.out_w), shape[<span class="number">0</span>])</div><div class="line">            <span class="comment"># 如果是CNN中的Normalize、则要提前初始化好γ、β</span></div><div class="line">            <span class="keyword">if</span> name == <span class="string">"ConvNorm"</span>:</div><div class="line">                self.tf_gamma = tf.Variable(tf.ones(self.n_filters), name=<span class="string">"norm_scale"</span>)</div><div class="line">                self.tf_beta = tf.Variable(tf.zeros(self.n_filters), name=<span class="string">"norm_beta"</span>)</div><div class="line"></div><div class="line">        <span class="comment"># 利用NN中的特殊层结构的相应方法获得结果</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">            <span class="keyword">return</span> sub_layer._activate(self, x, predict)</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias=None, predict=False)</span>:</span></div><div class="line">            <span class="keyword">return</span> _activate(self, x, predict)</div><div class="line">        <span class="comment"># 将打包好的类返回</span></div><div class="line">        <span class="keyword">for</span> key, value <span class="keyword">in</span> locals().items():</div><div class="line">            <span class="keyword">if</span> str(value).find(<span class="string">"function"</span>) &gt;= <span class="number">0</span> <span class="keyword">or</span> str(value).find(<span class="string">"property"</span>):</div><div class="line">                attr[key] = value</div><div class="line">        <span class="keyword">return</span> type(name, bases, attr)</div><div class="line"></div><div class="line"><span class="comment"># 定义CNN中的Dropout，注意继承顺序</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvDrop</span><span class="params">(ConvLayer, Dropout, metaclass=ConvSubLayerMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div><div class="line"></div><div class="line"><span class="comment"># 定义CNN中的Normalize，注意继承顺序</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvNorm</span><span class="params">(ConvLayer, Normalize, metaclass=ConvSubLayerMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<h1 id="实现-LayerFactory"><a href="#实现-LayerFactory" class="headerlink" title="实现 LayerFactory"></a>实现 LayerFactory</h1><p>我们在前三节讲述了 CNN 中卷积层、池化层和特殊层的实现，这一节我们将介绍如何定义一个简单的工厂来“生产”NN 中的层和前文介绍的这些层以方便进行应用（与上个系列中生产优化器的工厂差不多）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LayerFactory</span>:</span></div><div class="line">    <span class="comment"># 使用一个字典记录下所有的Root Layer</span></div><div class="line">    available_root_layers = &#123;</div><div class="line">        <span class="string">"Tanh"</span>: Tanh, <span class="string">"Sigmoid"</span>: Sigmoid,</div><div class="line">        <span class="string">"ELU"</span>: ELU, <span class="string">"ReLU"</span>: ReLU, <span class="string">"Softplus"</span>: Softplus,</div><div class="line">        <span class="string">"Identical"</span>: Identical,</div><div class="line">        <span class="string">"CrossEntropy"</span>: CrossEntropy, <span class="string">"MSE"</span>: MSE,</div><div class="line">        <span class="string">"ConvTanh"</span>: ConvTanh, <span class="string">"ConvSigmoid"</span>: ConvSigmoid,</div><div class="line">        <span class="string">"ConvELU"</span>: ConvELU, <span class="string">"ConvReLU"</span>: ConvReLU, <span class="string">"ConvSoftplus"</span>: ConvSoftplus,</div><div class="line">        <span class="string">"ConvIdentical"</span>: ConvIdentical,</div><div class="line">        <span class="string">"MaxPool"</span>: MaxPool, <span class="string">"AvgPool"</span>: AvgPool</div><div class="line">    &#125;</div><div class="line">    <span class="comment"># 使用一个字典记录下所有特殊层</span></div><div class="line">    available_special_layers = &#123;</div><div class="line">        <span class="string">"Dropout"</span>: Dropout,</div><div class="line">        <span class="string">"Normalize"</span>: Normalize,</div><div class="line">        <span class="string">"ConvDrop"</span>: ConvDrop,</div><div class="line">        <span class="string">"ConvNorm"</span>: ConvNorm</div><div class="line">    &#125;</div><div class="line">    <span class="comment"># 使用一个字典记录下所有特殊层的默认参数</span></div><div class="line">    special_layer_default_params = &#123;</div><div class="line">        <span class="string">"Dropout"</span>: (<span class="number">0.5</span>,),</div><div class="line">        <span class="string">"Normalize"</span>: (<span class="string">"Identical"</span>, <span class="number">1e-8</span>, <span class="number">0.9</span>),</div><div class="line">        <span class="string">"ConvDrop"</span>: (<span class="number">0.5</span>,),</div><div class="line">        <span class="string">"ConvNorm"</span>: (<span class="string">"Identical"</span>, <span class="number">1e-8</span>, <span class="number">0.9</span>)</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>以上是一些准备工作，如果由于特殊需求（比如想实验某种激活函数是否好用）实现了新的 Layer 的话、就需要更新上面对应的字典。<br>接下来看看核心的方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义根据“名字”获取（Root）Layer的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_root_layer_by_name</span><span class="params">(self, name, *args, **kwargs)</span>:</span></div><div class="line">    <span class="comment"># 根据字典判断输入的名字是否是Root Layer的名字</span></div><div class="line">    <span class="keyword">if</span> name <span class="keyword">in</span> self.available_root_layers:</div><div class="line">        <span class="comment"># 若是、则返回相应的Root Layer</span></div><div class="line">        layer = self.available_root_layers[name]</div><div class="line">        <span class="keyword">return</span> layer(*args, **kwargs)</div><div class="line">    <span class="comment"># 否则返回None</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line"></div><div class="line"><span class="comment"># 定义根据“名字”获取（任何）Layer的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_layer_by_name</span><span class="params">(self, name, parent, current_dimension, *args, **kwargs)</span>:</span></div><div class="line">    <span class="comment"># 先看输入的是否是Root Layer</span></div><div class="line">    _layer = self.get_root_layer_by_name(name, *args, **kwargs)</div><div class="line">    <span class="comment"># 若是、直接返回相应的Root Layer</span></div><div class="line">    <span class="keyword">if</span> _layer:</div><div class="line">        <span class="keyword">return</span> _layer, <span class="keyword">None</span></div><div class="line">    <span class="comment"># 否则就根据父层和相应字典进行初始化后、返回相应的特殊层</span></div><div class="line">    _current, _next = parent.shape[<span class="number">1</span>], current_dimension</div><div class="line">    layer_param = self.special_layer_default_params[name]</div><div class="line">    _layer = self.available_special_layers[name]</div><div class="line">    <span class="keyword">if</span> args <span class="keyword">or</span> kwargs:</div><div class="line">        _layer = _layer(parent, (_current, _next), *args, **kwargs)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        _layer = _layer(parent, (_current, _next), *layer_param)</div><div class="line">    <span class="keyword">return</span> _layer, (_current, _next)</div></pre></td></tr></table></figure>
+<p>至此，所有 CNN 会用到的、和层结构相关的东西就已经全部实现完毕了，接下来只需在网络结构上做一些简单的更新后、CNN 的实现便能大功告成</p>
+<h1 id="扩展网络结构"><a href="#扩展网络结构" class="headerlink" title="扩展网络结构"></a>扩展网络结构</h1><p>将网络结构迁移到 Tensorflow 框架中并扩展出 CNN 的功能这个过程、虽然不算困难却也相当繁琐。本节将会节选出其中比较重要的部分进行说明，对于其余和上个系列实现的网络结构几乎一致的地方则不再进行注释或叙述</p>
+<p>首先是初始化，由于我们使用的是 Tensorflow 框架、所以相应变量名的前面会一概加上“tf”两个字母：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NN</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(NN, self).__init__()</div><div class="line">        self._layers = []</div><div class="line">        self._optimizer = <span class="keyword">None</span></div><div class="line">        self._current_dimension = <span class="number">0</span></div><div class="line">        self._available_metrics = &#123;</div><div class="line">            key: value <span class="keyword">for</span> key, value <span class="keyword">in</span> zip([<span class="string">"acc"</span>, <span class="string">"f1-score"</span>], [NN.acc, NN.f1_score])</div><div class="line">        &#125;</div><div class="line">        self.verbose = <span class="number">0</span></div><div class="line">        self._metrics, self._metric_names, self._logs = [], [], &#123;&#125;</div><div class="line">        self._layer_factory = LayerFactory()</div><div class="line">        <span class="comment"># 定义Tensorflow中的相应变量</span></div><div class="line">        self._tfx = self._tfy = <span class="keyword">None</span>  <span class="comment"># 记录每个Batch的样本、标签的属性</span></div><div class="line">        self._tf_weights, self._tf_bias = [], []  <span class="comment"># 记录w、b的属性</span></div><div class="line">        self._cost = self._y_pred = <span class="keyword">None</span>  <span class="comment"># 记录损失值、输出值的属性</span></div><div class="line">        self._train_step = <span class="keyword">None</span>  <span class="comment"># 记录“参数更新步骤”的属性</span></div><div class="line">        self._sess = tf.Session()  <span class="comment"># 记录Tensorflow Session的属性</span></div></pre></td></tr></table></figure>
+<p>然后我们要解决的就是上篇文章最后遗留下来的、在初始化各个权值矩阵时要把从初始化为 Numpy 数组改为初始化为 Tensorflow 数组、同时要注意兼容 CNN 的问题：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 利用Tensorflow相应函数初始化参数</span></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_w</span><span class="params">(shape)</span>:</span></div><div class="line">    initial = tf.truncated_normal(shape, stddev=<span class="number">0.1</span>)</div><div class="line">    <span class="keyword">return</span> tf.Variable(initial, name=<span class="string">"w"</span>)</div><div class="line"></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_b</span><span class="params">(shape)</span>:</span></div><div class="line">    <span class="keyword">return</span> tf.Variable(np.zeros(shape, dtype=np.float32) + <span class="number">0.1</span>, name=<span class="string">"b"</span>)</div><div class="line"></div><div class="line"><span class="comment"># 做一个初始化参数的封装，要注意兼容CNN</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_add_params</span><span class="params">(self, shape, conv_channel=None, fc_shape=None, apply_bias=True)</span>:</span></div><div class="line">    <span class="comment"># 如果是FC的话、就要根据铺平后数据的形状来初始化数据</span></div><div class="line">    <span class="keyword">if</span> fc_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        w_shape = (fc_shape, shape[<span class="number">1</span>])</div><div class="line">        b_shape = shape[<span class="number">1</span>],</div><div class="line">    <span class="comment"># 如果是卷积层的话、就要定义Kernel而非权值矩阵</span></div><div class="line">    <span class="keyword">elif</span> conv_channel <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">if</span> len(shape[<span class="number">1</span>]) &lt;= <span class="number">2</span>:</div><div class="line">            w_shape = shape[<span class="number">1</span>][<span class="number">0</span>], shape[<span class="number">1</span>][<span class="number">1</span>], conv_channel, conv_channel</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            w_shape = (shape[<span class="number">1</span>][<span class="number">1</span>], shape[<span class="number">1</span>][<span class="number">2</span>], conv_channel, shape[<span class="number">1</span>][<span class="number">0</span>])</div><div class="line">        b_shape = shape[<span class="number">1</span>][<span class="number">0</span>],</div><div class="line">    <span class="comment"># 其余情况和普通NN无异</span></div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        w_shape = shape</div><div class="line">        b_shape = shape[<span class="number">1</span>],</div><div class="line">    self._tf_weights.append(self._get_w(w_shape))</div><div class="line">    <span class="keyword">if</span> apply_bias:</div><div class="line">        self._tf_bias.append(self._get_b(b_shape))</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        self._tf_bias.append(<span class="keyword">None</span>)</div><div class="line"></div><div class="line"><span class="comment"># 由于特殊层不会用到w和b、所以要定义一个生成占位符的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_add_param_placeholder</span><span class="params">(self)</span>:</span></div><div class="line">    self._tf_weights.append(tf.constant([<span class="number">.0</span>]))</div><div class="line">    self._tf_bias.append(tf.constant([<span class="number">.0</span>]))</div></pre></td></tr></table></figure>
+<p>以上就是和 NN 中网络结构相比有比较大改动的地方、其余的部分则都是一些琐碎的细节。完整的代码可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/g_CNN/Networks.py" target="_blank" rel="external">这里</a>，功能更为齐全、在许多细节上都进行了优化的版本则可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/NN/TF/Networks.py" target="_blank" rel="external">这里</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;往简单里说、CNN 只是多了卷积层、池化层和 FC 的 NN 而已，虽然卷积、池化对应的前向传导算法和反向传播算法的高效实现都很不平凡，但得益于 Tensorflow 的强大、我们可以在仅仅知道它们思想的前提下进行相应的实现，因为 Tensorflow 能够帮我们处理所有数学与技术上的细节&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>利用 Tensorflow 重写 NN</title>
+    <link href="http://www.carefree0910.com/posts/24ed2586/"/>
+    <id>http://www.carefree0910.com/posts/24ed2586/</id>
+    <published>2017-05-06T06:24:58.000Z</published>
+    <updated>2017-05-06T07:15:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文将会使用 Tensorflow 框架来重写我们上个系列中实现过的 NN、观众老爷们可能会需要知道 Tensorflow 的基本知识之后才能比较顺畅地阅读接下来的内容；如果对 Tensorflow 基本不了解的话、可以先参见我写的一篇 <a href="https://zhuanlan.zhihu.com/p/26645181" target="_blank" rel="external">Tensorflow 的应用式入门教程</a></p>
+<a id="more"></a>
+<h1 id="重写-Layer-结构"><a href="#重写-Layer-结构" class="headerlink" title="重写 Layer 结构"></a>重写 Layer 结构</h1><p>使用 Tensorflow 来重写 NN 的流程和上个系列中我们介绍过的实现流程是差不多的，不过由于 Tensorflow 帮助我们处理了更新参数这一部分的细节，所以我们能增添许多功能、同时也能把接口写得更漂亮一些。</p>
+<p>首先还是要来实现 NN 的基本单元——Layer 结构。鉴于 Tensorflow 能够自动获取梯度、同时考虑到要扩展出 CNN 的功能，我们需要做出如下微调：</p>
+<ul>
+<li>对于激活函数，只用定义其原始形式、不必定义其导函数形式</li>
+<li>解决上一章遗留下来的、特殊层结构的实现问题</li>
+<li>要考虑当前层为 FC（全连接层）时的表现</li>
+<li>让用户可以选择是否给 Layer 加偏置量</li>
+</ul>
+<p>其中的第四点可能有些让人不明所以：上个系列不是刚说过、偏置量对破坏对称性是很重要的吗？为什么要让用户选择是否使用偏置量呢？这主要是因为特殊层结构中 Normalize 的特殊性会使偏置量显得冗余。具体细节会在后文讨论特殊层结构处进行说明，这里就暂时按下不表</p>
+<p>以下是 Layer 结构基类的具体代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</div><div class="line"><span class="keyword">from</span> math <span class="keyword">import</span> ceil</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Layer</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.shape：记录该Layer和上个Layer所含神经元的个数，具体而言：</div><div class="line">            self.shape[0] = 上个Layer所含神经元的个数</div><div class="line">            self.shape[1] = 该Layer所含神经元的个数</div><div class="line">        self.is_fc、self.is_sub_layer：记录该Layer是否为FC、特殊层结构的属性</div><div class="line">        self.apply_bias：记录是否对该Layer加偏置量的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, shape, **kwargs)</span>:</span></div><div class="line">        self.shape = shape</div><div class="line">        self.is_fc = self.is_sub_layer = <span class="keyword">False</span></div><div class="line">        self.apply_bias = kwargs.get(<span class="string">"apply_bias"</span>, <span class="keyword">True</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> self.__class__.__name__</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> str(self)</div><div class="line"></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">name</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> str(self)</div><div class="line"></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">root</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> self</div><div class="line"></div><div class="line">    <span class="comment"># 定义兼容特殊层结构和CNN的、前向传导算法的封装</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias=None, predict=False)</span>:</span></div><div class="line">        <span class="comment"># 如果当前层是FC、就需要先将输入“铺平”</span></div><div class="line">        <span class="keyword">if</span> self.is_fc:</div><div class="line">            x = tf.reshape(x, [<span class="number">-1</span>, int(np.prod(x.get_shape()[<span class="number">1</span>:]))])</div><div class="line">        <span class="comment"># 如果是特殊的层结构、就调用相应的方法获得结果</span></div><div class="line">        <span class="keyword">if</span> self.is_sub_layer:</div><div class="line">            <span class="keyword">return</span> self._activate(x, predict)</div><div class="line">        <span class="comment"># 如果不加偏置量的话、就只进行矩阵相乘和激活函数的作用</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.apply_bias:</div><div class="line">            <span class="keyword">return</span> self._activate(tf.matmul(x, w), predict)</div><div class="line">        <span class="comment"># 否则就进行“最正常的”前向传导算法</span></div><div class="line">        <span class="keyword">return</span> self._activate(tf.matmul(x, w) + bias, predict)</div><div class="line"></div><div class="line">    <span class="comment"># 前向传导算法的核心、留待子类定义</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<p>注意到我们前向传导算法中有一项“predict”参数，这主要是因为特殊层结构的训练过程和预测过程表现通常都会不一样、所以要加一个标注。该标注的具体意义会在后文进行特殊层结构 SubLayer 的相关说明时体现出来、这里暂时按下不表</p>
+<p>在实现好基类后、就可以实现具体要用在神经网络中的 Layer 了。以 Sigmoid 激活函数对应的 Layer 为例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sigmoid</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.nn.sigmoid(x)</div></pre></td></tr></table></figure>
+<p>得益于 Tensorflow 框架的强大（你除了这句话就没别的话说了吗……）、我们甚至连激活函数的形式都无需手写，因为它已经帮我们封装好了（事实上、绝大多数常用的激活函数在 Tensorflow 里面都有封装）</p>
+<h1 id="实现特殊层"><a href="#实现特殊层" class="headerlink" title="实现特殊层"></a>实现特殊层</h1><p>这一节我们将介绍如何利用 Tensorflow 框架实现上个系列没有实现的特殊层结构——SubLayer，同时也会对十分常用的两种 SubLayer（Dropout、Normalize）做比上个系列深入一些的介绍</p>
+<p>先来看看应该如何定义 SubLayer 的基类：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 让SubLayer继承Layer以合理复用代码</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SubLayer</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.shape：和Layer相应属性意义一致</div><div class="line">        self.parent：记录该Layer的父层的属性</div><div class="line">        self.description：用于可视化的属性，记录着对该SubLayer的“描述”</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent, shape)</span>:</span></div><div class="line">        Layer.__init__(self, shape)</div><div class="line">        self.parent = parent</div><div class="line">        self.description = <span class="string">""</span></div><div class="line"></div><div class="line">    <span class="comment"># 辅助获取Root Layer的property</span></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">root</span><span class="params">(self)</span>:</span></div><div class="line">        _root = self.parent</div><div class="line">        <span class="keyword">while</span> _root.parent:</div><div class="line">            _root = _root.parent</div><div class="line">        <span class="keyword">return</span> _root</div></pre></td></tr></table></figure>
+<p>可以看到，得益于 Tensorflow 框架（Tensorflow 就是很厉害嘛……），本来难以处理的SubLayer 的实现变得非常简洁清晰。在实现好基类后、就可以实现具体要用在神经网络中的 SubLayer 了，先来看 Dropout：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dropout</span><span class="params">(SubLayer)</span>:</span></div><div class="line">    <span class="comment"># self._prob：训练过程中每个神经元被“留下”的概率</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent, shape, drop_prob=<span class="number">0.5</span>)</span>:</span></div><div class="line">        <span class="comment"># 神经元被Drop的概率必须大于等于0和小于1</span></div><div class="line">        <span class="keyword">if</span> drop_prob &lt; <span class="number">0</span> <span class="keyword">or</span> drop_prob &gt;= <span class="number">1</span>:</div><div class="line">            <span class="keyword">raise</span> ValueError(</div><div class="line">                <span class="string">"(Dropout) Probability of Dropout should be a positive float smaller than 1"</span>)</div><div class="line">        SubLayer.__init__(self, parent, shape)</div><div class="line">        <span class="comment"># 被“留下”的概率自然是1-被Drop的概率</span></div><div class="line">        self._prob = tf.constant(<span class="number">1</span> - drop_prob, dtype=tf.float32)</div><div class="line">        self.description = <span class="string">"(Drop prob: &#123;&#125;)"</span>.format(drop_prob)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="comment"># 如果是在训练过程，那么就按照设定的、被“留下”的概率进行Dropout</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> predict:</div><div class="line">            <span class="keyword">return</span> tf.nn.dropout(x, self._prob)</div><div class="line">        <span class="comment"># 如果是在预测过程，那么直接返回输入值即可</span></div><div class="line">        <span class="keyword">return</span> x</div></pre></td></tr></table></figure>
+<p>Dropout 的详细说明自然是看<a href="https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf" target="_blank" rel="external">原 paper </a>最好，这里我就大概翻译、总结一下主要内容。Dropout 的核心思想在于提高模型的泛化能力：它会在每次迭代中依概率去掉对应 Layer 的某些神经元，从而每次迭代中训练的都是一个小的神经网络。这个过程可以通过下图进行说明：</p>
+<img src="/posts/24ed2586/p1.png" alt="p1.png" title="">
+<p>上图所示的即为当<code>drop_prob</code>为 50%（我们所设的默认值）时、Dropout 的一种可能的表现。左图所示为原网络、右图所示的为 Dropout 后的网络，可以看到神经元 a、b、e、g、j 都被 Drop 了</p>
+<p>Dropout 过程的合理性需要概率论上一些理论的支撑，不过鉴于 Tensorflow 框架有封装好的相应函数、我们就不深入介绍其具体的数学原理而仅仅说明其直观（以<code>drop_prob</code>为 50%为例，其余<code>drop_prob</code>的情况是同理的）：</p>
+<ul>
+<li>在训练过程中，由于 Dropout 后留下来的神经元可以理解为“在 50%死亡概率下幸存”的神经元，所以给将它们对应的输出进行“增幅”是合理的。具体而言，假设一个神经元<script type="math/tex">n_{i}</script>的输出本来是<script type="math/tex">o_{i}</script>，那么如果 Dropout 后它被留下来了的话、其输出就应该变成<script type="math/tex">o_{i} \times \frac{1}{50\%} = 2o_{i}</script>（换句话说、应该让带 Dropout 的期望输出和原输出一致：对于任一个神经元<script type="math/tex">n_{i}</script>，设<code>drop_prob</code>为<script type="math/tex">p</script>而其原输出为<script type="math/tex">o_{i}</script>，那么当带 Dropout 的输出为<script type="math/tex">o_{i} \times \frac{1}{p}</script>时、<script type="math/tex">n_{i}</script>的期望输出即为<script type="math/tex">p \times o_{i} \times \frac{1}{p} = o_{i}</script>）</li>
+<li>由于在训练时我们保证了神经网络的期望输出不变、所以在预测过程中我们还是应该让整个网络一起进行预测而不进行 Dropout（关于这一点，原论文似乎也表示这是一种“经试验证明行之有效”的办法而没有给出具体的、原理层面的说明）</li>
+</ul>
+<p>接下来介绍一下 Normalize。Normalize 这个特殊层结构的学名叫 Batch Normalization、常简称为 BN，顾名思义，它用于对每个 Batch 对应的数据进行规范化处理。这样做的意义是直观的：对于 NN、CNN 乃至任何机器学习分类器来说，其目的可以说都是从训练样本集中学出样本在样本空间中的分布、从而可以用这个分布来预测未知数据所属的类别。如果不对每个 Batch 的数据进行任何操作的话，不难想象它们彼此对应的“极大似然分布（极大似然估计意义下的分布）”是各不相同的（因为训练集只是样本空间中的一个小抽样、而 Batch 又只是训练集的一个小抽样）；这样的话，分类器在接受每个 Batch 时都要学习一个新的分布、然后最后还要尝试从这些分布中总结出样本空间的总分布，这无疑是相当困难的。如果存在一种规范化处理方法能够使每个 Batch 的分布都贴近真实分布的话、对分类器的训练来说无疑是至关重要的</p>
+<p>传统的做法是对输入<script type="math/tex">X</script>进行很久以前提到过的归一化处理、亦即：</p>
+<script type="math/tex; mode=display">
+X = \frac{X - \overset{\overline{}}{X}}{std(X)}</script><p>其中<script type="math/tex">\overset{\overline{}}{X}</script>表示<script type="math/tex">X</script>的均值、<script type="math/tex">std(X)</script>表示<script type="math/tex">X</script>的标准差（Standard Deviation）。这种做法虽然能保证输入数据的质量、但是却无法保证NN里面中间层输出数据的质量。试想NN中的第一个隐藏层<script type="math/tex">L_{2}</script>，它接收的输入<script type="math/tex">u^{\left( 2 \right)}</script>是输入层<script type="math/tex">L_{1}</script>的输出<script type="math/tex">v^{\left( 1 \right)} = \phi_{1}(u^{\left( 1 \right)})</script>和权值矩阵<script type="math/tex">w^{\left( 1 \right)}</script>相乘后、加上偏置量<script type="math/tex">b^{\left( 1 \right)}</script>后的结果；在训练过程中，虽然<script type="math/tex">v^{\left( 1 \right)}</script>的质量有保证，但由于<script type="math/tex">w^{\left( 1 \right)}</script>和<script type="math/tex">b^{\left( 1 \right)}</script>在训练过程中会不断地被更新、所以<script type="math/tex">u^{\left( 2 \right)} = v^{\left( 1 \right)} \times w^{\left( 1 \right)} + b^{\left( 1 \right)}</script>的分布其实仍然不断在变。换句话说、<script type="math/tex">u^{\left( 2 \right)}</script>的质量其实就已经没有保证了</p>
+<p>BN 打算解决的正是随着前向传导算法的推进、得到的数据的质量会不断变差的问题，它能通过对中间层数据进行某种规范化处理以达到类似对输入归一化处理的效果。事实上回忆上一章的内容、我们已经提到过 Normalize 的核心思想在于把父层的输出进行“归一化”了，下面我们就简单看看它具体是怎么做到这一点的</p>
+<p>首先需要指出的是，简单地将每层得到的数据进行上述归一化操作显然是不可行的、因为这样会破坏掉每层自身学到的数据特征。设想如果某一层<script type="math/tex">L_{i}</script>学到了“数据基本都分布在样本空间的边缘”这一特征，这时如果强行做归一化处理并把数据都中心化的话、无疑就摈弃了<script type="math/tex">L_{i}</script>所学到的、可能是非常有价值的知识</p>
+<p>为了使得中心化之后不破坏 Layer 本身学到的特征、BN 采取了一个简单却十分有效的方法：引入两个可以学习的“重构参数”以期望能够从中心化的数据重构出 Layer 本身学到的特征。具体而言：</p>
+<ol>
+<li><strong>输入</strong>：某一层<script type="math/tex">L_{i}</script>在当前 Batch 上的输出<script type="math/tex">v^{\left( i \right)}</script>、增强数值稳定性所用的小值<script type="math/tex">\epsilon</script></li>
+<li><strong>过程</strong>：<ol>
+<li>计算当前 Batch 的均值、方差：  <script type="math/tex; mode=display">
+\mu_{i} = \overset{\overline{}}{v^{\left( i \right)}}</script><script type="math/tex; mode=display">
+\sigma_{i}^{2} = \left\lbrack \text{std}\left( v^{\left( i \right)} \right) \right\rbrack^{2}</script></li>
+<li>归一化：  <script type="math/tex; mode=display">
+\hat{v^{\left( i \right)}} = \frac{v^{\left( i \right)} - \mu_{i}}{\sqrt{\sigma_{i}^{2} + \epsilon}}</script></li>
+<li>线性变换：  <script type="math/tex; mode=display">
+y^{\left( i \right)} = \gamma\hat{v^{\left( i \right)}} + \beta</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：规范化处理后的输出<script type="math/tex">y^{\left( i \right)}</script></li>
+</ol>
+<p>BN 的核心即在于<script type="math/tex">\gamma</script>、<script type="math/tex">\beta</script>这两个参数的应用上。关于如何利用反向传播算法来更新这两个参数的数学推导会稍显繁复、我们就不展开叙述了，取而代之、我们会直接利用 Tensorflow 来进行相关的实现</p>
+<p>需要指出的是、对于算法中均值和方差的计算其实还有一个被广泛使用的小技巧，该小技巧某种意义上可以说是用到了“动量”的思想：我们会分别维护两个储存“运行均值（Running<br>Mean）”和“运行方差（Running Variance）”的变量。具体而言：</p>
+<ol>
+<li><strong>输入</strong>：某一层<script type="math/tex">L_{i}</script>在当前 Batch 上的输出<script type="math/tex">v^{\left( i \right)}</script>、增强数值稳定性所用的小值<script type="math/tex">\epsilon</script>；动量值<script type="math/tex">m</script>（一般取<script type="math/tex">m = 0.9</script>）</li>
+<li><strong>过程</strong>：<br>首先要初始化 Running Mean、Running Variance 为 0 向量：  <script type="math/tex; mode=display">
+\mu_{run} = \sigma_{run}^{2} = 0</script>并初始化<script type="math/tex">\gamma</script>、<script type="math/tex">\beta</script>为 1、0 向量：  <script type="math/tex; mode=display">
+\gamma = 1,\ \ \beta = 0</script>然后进行如下操作：<ol>
+<li>计算当前 Batch  的均值、方差：  <script type="math/tex; mode=display">
+\mu_{i} = \overset{\overline{}}{v^{\left( i \right)}}</script><script type="math/tex; mode=display">
+\sigma_{i}^{2} = \left\lbrack \text{std}\left( v^{\left( i \right)} \right) \right\rbrack^{2}</script></li>
+<li>利用<script type="math/tex">\mu_{i}</script>、<script type="math/tex">\sigma_{i}^{2}</script>和动量值<script type="math/tex">m</script>更新<script type="math/tex">\mu_{run}</script>、<script type="math/tex">\sigma_{run}^{2}</script>：  <script type="math/tex; mode=display">
+\mu_{run} \leftarrow m \cdot \mu_{run} + \left( 1 - m \right) \cdot \mu_{i}</script><script type="math/tex; mode=display">
+\sigma_{run}^{2} \leftarrow m \cdot \sigma_{run}^{2} + \left( 1 - m \right) \cdot \sigma_{i}^{2}</script></li>
+<li>利用<script type="math/tex">\mu_{run}</script>、<script type="math/tex">\sigma_{run}^{2}</script>规范化处理输出：  <script type="math/tex; mode=display">
+\hat{v^{\left( i \right)}} = \frac{v^{\left( i \right)} - \mu_{run}}{\sqrt{\sigma_{run}^{2} + \epsilon}}</script></li>
+<li>线性变换：  <script type="math/tex; mode=display">
+y^{\left( i \right)} = \gamma\hat{v^{\left( i \right)}} + \beta</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：规范化处理后的输出<script type="math/tex">y^{\left( i \right)}</script></li>
+</ol>
+<p>最后提三点使用 Normalize 时需要注意的事项：</p>
+<ul>
+<li>无论是上述的哪种算法、BN 的训练过程和预测过程的表现都是不同的。具体而言，训练过程和算法中所叙述的一致、均值和方差都是根据当前 Batch 来计算的；但测试过程中的均值和方差不能根据当前 Batch 来计算、而应该根据训练样本集的某些特征来进行计算。对于第二个算法来说，<script type="math/tex">\mu_{\text{run}}</script>和<script type="math/tex">\sigma_{\text{run}}^{2}</script>天然就是很好的、可以用来当测试过程中的均值和方差的变量，对于第一个算法而言就需要额外的计算</li>
+<li>对于 Normalize 这个特殊层结构来说、偏置量是一个冗余的变量；这是因为规范化操作（去均值）本身会将偏置量的影响抹去、同时 BN 本身的<script type="math/tex">\beta</script>参数可以说正是破坏对称性的参数，它能比较好地完成原本偏置量所做的工作</li>
+<li>Normalize 这个层结构是可以加在许多不同地方的（如下图所示的 A、B 和 C 处），原论文将它加在了 A 处、但其实现在很多主流的深层 CNN 结构都将它加在了 C 处；相对而言、加在 B 处的做法则会少一些</li>
+</ul>
+<img src="/posts/24ed2586/p2.png" alt="p2.png" title="">
+<p>在基本了解了 Normalize 对应的 BN 算法之后、我们就可以着手进行实现了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Normalize</span><span class="params">(SubLayer)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._eps：记录增强数值稳定性所用的小值的属性</div><div class="line">        self._activation：记录自身的激活函数的属性，主要是为了兼容图7.17 A的情况</div><div class="line">        self.tf_rm、self.tf_rv：记录μ_run、σ_run^2的属性</div><div class="line">        self.tf_gamma、self.tf_beta：记录γ、β的属性</div><div class="line">        self._momentum：记录动量值m的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent, shape, activation=<span class="string">"Identical"</span>, eps=<span class="number">1e-8</span>, momentum=<span class="number">0.9</span>)</span>:</span></div><div class="line">        SubLayer.__init__(self, parent, shape)</div><div class="line">        self._eps, self._activation = eps, activation</div><div class="line">        self.tf_rm = self.tf_rv = <span class="keyword">None</span></div><div class="line">        self.tf_gamma = tf.Variable(tf.ones(self.shape[<span class="number">1</span>]), name=<span class="string">"norm_scale"</span>)</div><div class="line">        self.tf_beta = tf.Variable(tf.zeros(self.shape[<span class="number">1</span>]), name=<span class="string">"norm_beta"</span>)</div><div class="line">        self._momentum = momentum</div><div class="line">        self.description = <span class="string">"(eps: &#123;&#125;, momentum: &#123;&#125;)"</span>.format(eps, momentum)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="comment"># 若μ_run、σ_run^2还未初始化，则根据输入x进行相应的初始化</span></div><div class="line">        <span class="keyword">if</span> self.tf_rm <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">or</span> self.tf_rv <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            shape = x.get_shape()[<span class="number">-1</span>]</div><div class="line">            self.tf_rm = tf.Variable(tf.zeros(shape), trainable=<span class="keyword">False</span>, name=<span class="string">"norm_mean"</span>)</div><div class="line">            self.tf_rv = tf.Variable(tf.ones(shape), trainable=<span class="keyword">False</span>, name=<span class="string">"norm_var"</span>)</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> predict:</div><div class="line">            <span class="comment"># 利用Tensorflow相应函数计算当前Batch的举止、方差</span></div><div class="line">            _sm, _sv = tf.nn.moments(x, list(range(len(x.get_shape()) - <span class="number">1</span>)))</div><div class="line">            _rm = tf.assign(</div><div class="line">                self.tf_rm, self._momentum * self.tf_rm + (<span class="number">1</span> - self._momentum) * _sm)</div><div class="line">            _rv = tf.assign(</div><div class="line">                self.tf_rv, self._momentum * self.tf_rv + (<span class="number">1</span> - self._momentum) * _sv)</div><div class="line">            <span class="comment"># 利用Tensorflow相应函数直接得到Batch Normalization的结果</span></div><div class="line">            <span class="keyword">with</span> tf.control_dependencies([_rm, _rv]):</div><div class="line">                _norm = tf.nn.batch_normalization(</div><div class="line">                    x, _sm, _sv, self.tf_beta, self.tf_gamma, self._eps)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _norm = tf.nn.batch_normalization(</div><div class="line">                x, self.tf_rm, self.tf_rv, self.tf_beta, self.tf_gamma, self._eps)</div><div class="line">        <span class="comment"># 如果指定了激活函数、就再用相应激活函数作用在BN结果上以得到最终结果</span></div><div class="line">        <span class="comment"># 这里只定义了ReLU和Sigmoid两种，如有需要可以很方便地进行拓展</span></div><div class="line">        <span class="keyword">if</span> self._activation == <span class="string">"ReLU"</span>:</div><div class="line">            <span class="keyword">return</span> tf.nn.relu(_norm)</div><div class="line">        <span class="keyword">if</span> self._activation == <span class="string">"Sigmoid"</span>:</div><div class="line">            <span class="keyword">return</span> tf.nn.sigmoid(_norm)</div><div class="line">        <span class="keyword">return</span> _norm</div></pre></td></tr></table></figure>
+<h1 id="重写-CostLayer-结构"><a href="#重写-CostLayer-结构" class="headerlink" title="重写 CostLayer 结构"></a>重写 CostLayer 结构</h1><p>在上个系列中，为了整合特殊变换函数和损失函数以更高效地计算梯度、我们花了不少代码来做繁琐的封装；不过由于 Tensorflow 中已经有了这些封装好的、数值性质更优的函数、所以 CostLayer 的实现将会变得非常简单：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义一个简单的基类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CostLayer</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="comment"># 定义一个方法以获取损失值</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">calculate</span><span class="params">(self, y, y_pred)</span>:</span></div><div class="line">        <span class="keyword">return</span> self._activate(y_pred, y)</div><div class="line"></div><div class="line"><span class="comment"># 定义Cross Entropy对应的CostLayer（整合了Softmax变换）</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CrossEntropy</span><span class="params">(CostLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, y)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=x, labels=y))</div><div class="line"></div><div class="line"><span class="comment"># 定义MSE准则对应的CostLayer</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MSE</span><span class="params">(CostLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, y)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.reduce_mean(tf.square(x - y))</div></pre></td></tr></table></figure>
+<p>短短 15 行代码就实现了上个系列中用 113 行代码才实现的所有功能，由此可窥见 Tensorflow 框架的强大</p>
+<p>（话说我这么卖力地安利 Tensorflow，Google 是不是应该给我些广告费什么的）（喂</p>
+<h1 id="重写网络结构"><a href="#重写网络结构" class="headerlink" title="重写网络结构"></a>重写网络结构</h1><p>由于 Tensorflow 重写的是算法核心部分，作为封装的网络结构其实并不用进行太大的变动；具体而言、整个网络结构需要做比较大的改动的地方只有如下两个：</p>
+<ul>
+<li>初始化各个权值矩阵时，从初始化为 Numpy 数组改为初始化为 Tensorflow 数组、同时要注意兼容 CNN 的问题</li>
+<li>不用记录所有 Layer 的激活值而只用关心输出 Layer 的输出值和 CostLayer 的损失值（在上个系列中、我们是要记录所有中间结果以进行反向传播算法的）</li>
+</ul>
+<p>关于第一点我们会在后面介绍 CNN 的实现时进行说明，这里就仅看看第二点怎么做到：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义一个只获取输出Layer的输出值的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_rs</span><span class="params">(self, x, predict=True)</span>:</span></div><div class="line">    <span class="comment"># 先获取第一层的激活值并用一个 _cache变量进行存储</span></div><div class="line">    _cache = self._layers[<span class="number">0</span>].activate(x, self._tf_weights[<span class="number">0</span>], self._tf_bias[<span class="number">0</span>], predict)</div><div class="line">    <span class="comment"># 遍历剩余的Layer</span></div><div class="line">    <span class="keyword">for</span> i, layer <span class="keyword">in</span> enumerate(self._layers[<span class="number">1</span>:]):</div><div class="line">        <span class="comment"># 如果到了倒数第二层（输出层）、就进行相应的处理并输出结果</span></div><div class="line">        <span class="keyword">if</span> i == len(self._layers) - <span class="number">2</span>:</div><div class="line">            <span class="comment"># 如果输出层是卷积层、就要把结果铺平</span></div><div class="line">            <span class="keyword">if</span> isinstance(self._layers[<span class="number">-2</span>], ConvLayer):</div><div class="line">                _cache = tf.reshape(_cache, [<span class="number">-1</span>, int(np.prod(_cache.get_shape()[<span class="number">1</span>:]))])</div><div class="line">            <span class="keyword">if</span> self._tf_bias[<span class="number">-1</span>] <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">                <span class="keyword">return</span> tf.matmul(_cache, self._tf_weights[<span class="number">-1</span>]) + self._tf_bias[<span class="number">-1</span>]</div><div class="line">            <span class="keyword">return</span> tf.matmul(_cache, self._tf_weights[<span class="number">-1</span>])</div><div class="line">        <span class="comment"># 否则、进行相应的前向传导算法</span></div><div class="line">        _cache = layer.activate(_cache, self._tf_weights[i + <span class="number">1</span>], self._tf_bias[i + <span class="number">1</span>], predict)</div></pre></td></tr></table></figure>
+<p><strong><em>注意：不难看出、<code>get_rs</code>是兼容 CNN 的</em></strong></p>
+<p>有了<code>get_rs</code>这个方法后、Tensorflow 下的网络结构的核心训练步骤就非常简洁了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 获取输出值</span></div><div class="line">self._y_pred = self._get_rs(self._tfx, predict=<span class="keyword">False</span>)</div><div class="line"><span class="comment"># 利用输出值和CostLayer的calculate方法、计算出损失值</span></div><div class="line">self._cost = self._layers[<span class="number">-1</span>].calculate(self._tfy, self._y_pred)</div><div class="line"><span class="comment"># 利用Tensorflow帮我们封装的优化器、直接定义出参数的更新步骤</span></div><div class="line">self._train_step = self._optimizer.minimize(self._cost)</div></pre></td></tr></table></figure>
+<p>完整的、Tensorflow 版本的网络结构的代码可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/g_CNN/Networks.py" target="_blank" rel="external">这里</a>，对其深入一些的介绍则在下篇文章的最后一节中进行。此外、我对 Tensorflow 提供的诸多优化器做了一个简单的封装以兼容上个系列实现的优化器的一些接口，具体的代码可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/g_CNN/Optimizers.py" target="_blank" rel="external">这里</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文将会使用 Tensorflow 框架来重写我们上个系列中实现过的 NN、观众老爷们可能会需要知道 Tensorflow 的基本知识之后才能比较顺畅地阅读接下来的内容；如果对 Tensorflow 基本不了解的话、可以先参见我写的一篇 &lt;a href=&quot;https://zhuanlan.zhihu.com/p/26645181&quot;&gt;Tensorflow 的应用式入门教程&lt;/a&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从 NN 到 CNN</title>
+    <link href="http://www.carefree0910.com/posts/7990dadf/"/>
+    <id>http://www.carefree0910.com/posts/7990dadf/</id>
+    <published>2017-05-06T05:59:36.000Z</published>
+    <updated>2017-05-06T07:15:08.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>从名字也可以看出、卷积神经网络（CNN）其实是神经网络（NN）的一种拓展，而事实上从结构上来说，朴素的 CNN 和朴素的 NN 没有任何区别（当然，引入了特殊结构的、复杂的 CNN 会和 NN 有着比较大的区别）。本文主要会说一下 CNN 的思想以及它到底在 NN 的基础上做了哪些改进，同时也会说一下 CNN 能够解决的任务类型</p>
+<a id="more"></a>
+<h1 id="“视野”的共享"><a href="#“视野”的共享" class="headerlink" title="“视野”的共享"></a>“视野”的共享</h1><p>CNN 的主要思想可以概括为如下两点：</p>
+<ul>
+<li>局部连接（Sparse Connectivity）</li>
+<li>权值共享（Shared Weights）</li>
+</ul>
+<p>它们具有很好的直观。举一个从学术上可能不太严谨的例子：我们平时看风景时，由于视野有限、我们通常并不能将整个风景收入眼中；取而代之、我们每次只能接受视野中的、整个风景的一块“局部风景”（所谓的【局部感受野】）。如果想要欣赏整个风景的话、我们就会不断地“四处张望”。在这个过程中，我们的思想在看的过程中通常是不怎么变的；而在看完后可能整合该过程中所有视野所看到的“局部风景”并发出“这风景真美”的感慨、然后可能会根据这个感慨来调整我们的思想。在这个例子中，我们的视野就可以看作所谓的“局部连接”，我们的思想则可以看作是“共享的权值”（注：这个栗子是我开脑洞开出来的、完全不能保证其学术严谨性、还请各位观众老爷们带着批判的眼光去看待它……如果有这方面专长的观众老爷发现我完全就在瞎扯淡、还望不吝指出 ( σ’ω’)σ）</p>
+<p>光用文字叙述可能还是有些懵懂，我来画张图（参考了一张被引用烂了的图；但由于原图有一定的误导性、所以还是打算自己画一个）（虽然很丑）：</p>
+<img src="/posts/7990dadf/p1.png" alt="p1.png" title="">
+<p>这张图比较了 NN 和 CNN 的思想差别。左图为 NN，可以看到它在处理输入时是全连接的、亦即它采用的是全局感受野；同时由于各个神经元又是相对独立的、这直接导致它难以将原数据样本翻译成一个“视野”。而正如上面所说、CNN 采用的是局部感受野和共享权值，这在右图中的表现为它的神经元可以看成是“一整块”的“视野”，这块视野的每一个组成部分都是共享的权值（右图中的绿线；换句话说、右图中的四条绿线其实是同一个东西）在原数据样本的某一个局部上“看到”的东西</p>
+<p>用上文中看风景的例子来说的话，CNN 的行为比较像一个正常人的表现、而 NN 的行为就更像是很多个能把整个风景都看在眼底的人同时看了同一个风景、然后分别感慨了一下并把这个感慨传递下去这种表现（？？？）</p>
+<h1 id="前向传导算法"><a href="#前向传导算法" class="headerlink" title="前向传导算法"></a>前向传导算法</h1><p>CNN 的前向传导算法和上一章说明过的 NN 的前向传导算法有许多相似之处，至少从实现的层面来说它们的结构几乎一模一样。它们之间的不同之处则主要体现在如下两点：</p>
+<ul>
+<li>接收的输入的形式不同</li>
+<li>层与层之间的连接方式不同</li>
+</ul>
+<p>先看第一点：对于 NN 而言、输入是一个<script type="math/tex">N \times n</script>的矩阵</p>
+<script type="math/tex; mode=display">
+X = \left( x_{1},\ldots,x_{N} \right)^{T}</script><p>其中<script type="math/tex">x_{1},\ldots,x_{N}</script>都是<script type="math/tex">n \times 1</script>的列向量；当输入是图像时，NN 的处理方式是将图像拉直成一个列向量。以<script type="math/tex">3 \times 3 \times 3</script>的图像为例（第一个 3 代指 RGB 通道，后两个 3 分别是高和宽），NN 会先把各个图像变成<script type="math/tex">27 \times 1</script>的列向量（亦即<script type="math/tex">n = 3 \times 3 \times 3</script>），然后再把它们合并、转置成一个<script type="math/tex">N \times 27</script>的大矩阵以当作输入</p>
+<p>CNN 则不会这么大费周章——它会直接以原始的数据作为输入。换句话说、CNN 接收的输入是<script type="math/tex">N \times 3 \times 3 \times 3</script>的矩阵</p>
+<p>可以用下图来直观认知一下该区别：</p>
+<img src="/posts/7990dadf/p2.png" alt="p2.png" title="">
+<p>所以两者的前向传导算法就可以用以下两张图来进行直观说明了：</p>
+<img src="/posts/7990dadf/p3.png" alt="NN 的前向传导算法" title="NN 的前向传导算法">
+<img src="/posts/7990dadf/p4.png" alt="CNN 的前向传导算法" title="CNN 的前向传导算法">
+<p>（我已经尽我全力来画得好看一点了……）</p>
+<p>下面进行进一步的说明：</p>
+<ul>
+<li>对于一个<script type="math/tex">3 \times 3 \times 3</script>的输入，我们可以把它拆分成 3 个<script type="math/tex">3 \times 3</script>的输入的堆叠（如果把<script type="math/tex">3 \times 3 \times 3</script>的输入看成是一个“图像”的话，我们可以把拆分后的 3 个输入看成是该图像的 3 个“频道”；对于原始输入来讲，这 3 个频道通常就是 RGB 通道）</li>
+<li>由于 NN 是全连接的，所以输入的所有信息都会直接输入给下一层的某个神经元</li>
+<li>由于 CNN 是局部连接、共享权值的，一个合理的做法就是给拆分后的每个“频道”分配一个共享的“局部视野”（注意上图中三个“频道”中间都有 4 个相同颜色的正方形、且三个频道中正方形的颜色彼此不同，这就是局部共享视野的意义）（谁注意得到啊喂）。我们通常会把这三个局部视野视为一个整体并把它称作一个 Kernel 或一个 Filter</li>
+<li>上面 CNN 那张图中我们用的是<script type="math/tex">2 \times 2</script>的局部视野，该局部视野从相应频道左上看到右上、然后看左下、最后看右下，这个过程中一共看了四次、每看一次就会生成一个输出。所以三个局部视野会分别在对应的频道上生成四个输出、亦即一个 Kernel（或说一个 Filter）会生成 3 个<script type="math/tex">2 \times 2</script>的输出，将它们直接相加就得到了该 Kernel 的最终输出——一个<script type="math/tex">2 \times 2</script>的频道</li>
+</ul>
+<p>上面最后提到的“左上<script type="math/tex">\rightarrow</script>右上<script type="math/tex">\rightarrow</script>左下<script type="math/tex">\rightarrow</script>右下”这个“看”的过程其实就是所谓的“卷积”，这也正是卷积神经网络名字的由来。卷积本身的数学定义要比上面这个简单的描述要繁复得多，但幸运的是、实现和应用 CNN 本身并不需要具备这方面的数学理论知识（当然如果想开发更好的 CNN 结构与算法的话、是需要进行相关研究的，不过这些都已超出我们的讨论范围了）</p>
+<p><strong><em>注意：上面 CNN 的那张图中的情形为只有一个 Kernel 的情形，通常来说在实际应用中、我们会使用几十甚至几百个 Kernel 以期望网络能够学习出更好的特征——这是因为一个 Kernel 会生成一个频道，几十、几百个 Kernel 就意味着会生成几十、几百个频道，由此可以期待这大量不同的频道能够对数据进行足够强的描述（要知道原始数据可只有 3 个频道）</em></strong></p>
+<p>不难根据上文和上个系列的内容总结出 NN 和 CNN 目前为止的异同：</p>
+<ul>
+<li>NN 和 CNN 的主要结构都是层，但是 NN 的层结构是一维的（<script type="math/tex">1 \times n_{i}</script>）、CNN 的层结构是高维的</li>
+<li>NN 处理的一般是“线性”的数据，CNN 则从直观上更适合处理“结构性的”数据</li>
+<li>NN 层结构间会有权值矩阵作为连接的桥梁，CNN 则没有层结构之间的权值矩阵、取而代之的是层结构本身的局部视野。该局部视野会在前向传导算法中与层结构进行卷积运算来得到结果、并会直接将这个结果（或将被激活函数作用后的结果）传给下一层。因此我们常称 NN 中的层结构为“普通层”、称 CNN 中拥有局部视野的层结构为“卷积层”</li>
+</ul>
+<p>可以看出、CNN 与 NN 区别之关键正在于“卷积”二字。虽然卷积的直观形式比较简单、但是它的实现却并不平凡。常用的解决方案有如下两种：</p>
+<ul>
+<li>将卷积步骤变换成比较大规模的矩阵相乘（cs231n 里面的 stride trick 把我看哭了……）</li>
+<li>利用快速傅里叶变换（Fast Fourier Transform，简称FFT）求解（只听说过，没实践过）</li>
+</ul>
+<p>展开叙述它们需要用到比较深的知识、所以从略</p>
+<p>最后介绍一下 Stride 和 Padding 的概念。Stride 可以翻译成“步长”，它描述了局部视野在频道上的“浏览速度”。设想现在有一个<script type="math/tex">5 \times 5</script>的频道而我们的局部视野是<script type="math/tex">2 \times 2</script>的，那么不同 Stride 下的表现将如下面两张图所示（只以第一排为例）：</p>
+<img src="/posts/7990dadf/p5.png" alt="p5.png" title="">
+<img src="/posts/7990dadf/p6.png" alt="p6.png" title="">
+<p>（……）</p>
+<p>可以看到上图中局部视野每次前进“一步”而下图中每次会前进“三步”</p>
+<p>Padding 可以翻译成“填充”、其存在意义有许多种解释，一种最好理解的就是——它能保持输入和输出的频道形状一致。注意目前为止展示过的栗子中，输入频道在被卷积之后、输出的频道都会“缩小”一点。这样在经过相当有限的卷积操作后、输入就会变得过小而不适合再进行卷积，从而就会大大限制了整个网络结构的深度。Padding 正是这个问题的一种解决方案：它会在输入频道进行卷积之前、先在频道的周围“填充”上若干圈的“0”。设想现在有一个<script type="math/tex">3\times3</script>的频道而我们的局部视野也是<script type="math/tex">3\times3</script>的，如果按照之前所说的卷积来做的话、不难想象输出将会是<script type="math/tex">1\times1</script>的频道；不过如果我们将 Padding 设置为 1、亦即在输入的频道周围填充一圈 0 的话，那么卷积的表现将如下图所示：</p>
+<img src="/posts/7990dadf/p7.png" alt="p7.png" title="">
+<p>可以看到当我们在输入频道外面 Pad 上一圈 0 之后、输出就变成<script type="math/tex">3 \times 3</script>的了，这为超深层 CNN 的搭建创造了可能性（比如有名的 ResNet）</p>
+<p>在 cs231n 的<a href="http://cs231n.github.io/convolutional-networks/" target="_blank" rel="external">这篇文章</a>里面有一张很好很好很好的动图（大概位于页面中央），请允许我偷个懒不自己动手画了…… ( σ’ω’)σ</p>
+<h1 id="全连接层"><a href="#全连接层" class="headerlink" title="全连接层"></a>全连接层</h1><p>全连接层是 Fully Connected Layer 的直译，常简称为 FC，它是可能会出现在 CNN 中的、一个比较特殊的结构；从名字就可以大概猜想到、FC 应该和普通层息息相关，事实上也正是如此。直观地说、FC 是连接卷积层和普通层的普通层，它将从父层（卷积层）那里得到的高维数据铺平以作为输入、进行一些非线性变换（用激活函数作用）、然后将结果输进跟在它后面的各个普通层构成的系统中：</p>
+
+<p>上图中的 FC 一共有<script type="math/tex">n_{1} = 3 \times 2 \times 2 = 12</script>个神经元，自 FC 之后的系统其实就是上一章所介绍的 NN。换句话说、我们可以把 CNN 拆分成如下两块结构：</p>
+<ul>
+<li>自输入开始、至 FC 终止的“卷积块”，组成卷积块的都是卷积层</li>
+<li>自 FC 开始、至输出终止的“NN 块”，组成 NN 块的都是普通层</li>
+</ul>
+<p><strong><em>注意：值得一提的是，在许多常见的网络结构中、NN 块里都只含有 FC 这个普通层</em></strong></p>
+<p>那么为什么 CNN 会有 FC 这个结构呢？或者问得更具体一点、为什么要将总体分成卷积块和NN块两部分呢？这其实从直观上来说非常好解释：卷积块中的卷积的基本单元是局部视野，用它类比我们的眼睛的话、就是将外界信息翻译成神经信号的工具，它能将接收的输入中的各个特征提取出来；至于 NN（神经网络）块、则可以类比我们的神经网络（甚至说、类比我们的大脑），它能够利用卷积块得到的信号（特征）来做出相应的决策。概括地说、CNN 视卷积块为“眼”而视 NN 块为“脑”，眼脑结合则决策自成（？？？）。用机器学习的术语来说、则卷积块为“特征提取器”而 NN 块为“决策分类器”</p>
+<p>而事实上，CNN 的强大之处其实正在于其卷积块强大的特征提取能力上、NN 块甚至可以说只是用于分类的一个附属品而已。我们完全可以利用 CNN 将特征提取出来后、用前面几章介绍过的决策树、支持向量机等等来进行分类这一步而无须使用 NN 块</p>
+<h1 id="池化（Pooling）"><a href="#池化（Pooling）" class="headerlink" title="池化（Pooling）"></a>池化（Pooling）</h1><p>池化是 NN 中完全没有的、只属于 CNN 的特殊演算。虽然名字听上去可能有些高大上的感觉，但它的本质其实就是“对局部信息的总结”。常见的池化有如下两种：</p>
+<ul>
+<li>极大池化（Max Pooling），它会输出接收到的所有输入中的最大值</li>
+<li>平均池化（Average Pooling），它会输出接收到的所有输入的均值</li>
+</ul>
+<p>池化过程其实与卷积过程类似、可以看成是局部视野对输入信息的转换，只不过卷积过程做的是卷积运算、池化过程做的是极大或平均运算而已</p>
+<p>不过池化与卷积有一点通常是差异较大的——池化的 Stride 通常会比卷积的 Stride 要大。比如对于一个<script type="math/tex">3 \times 3</script>的输入频道和一个<script type="math/tex">3 \times 3</script>的局部视野而言：</p>
+<ul>
+<li>卷积常常选取 Stride 和 Padding 都为 1，从而输出频道是<script type="math/tex">3 \times 3</script>的</li>
+<li>池化常常选取 Stride 为 2、Padding 为1，从而输出频道是<script type="math/tex">2 \times 2</script>的</li>
+</ul>
+<p>将 Stride 选大是符合池化的内涵的：池化是对局部信息的总结、所以自然希望池化能够将得到的信息进行某种“压缩处理”。如果将 Stride 选得比较小的话、总结出来的信息就很可能会产生“冗余”，这就违背了池化的本意</p>
+<p>不过为什么最常见的两种池化——极大池化和平均池化确实能够压缩信息呢？这主要是因为 CNN 一般处理的都是图像数据。由经验可知、图像在像素级间隔上的差异是很小的，这就为上述两种池化提供了一定的合理性</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;从名字也可以看出、卷积神经网络（CNN）其实是神经网络（NN）的一种拓展，而事实上从结构上来说，朴素的 CNN 和朴素的 NN 没有任何区别（当然，引入了特殊结构的、复杂的 CNN 会和 NN 有着比较大的区别）。本文主要会说一下 CNN 的思想以及它到底在 NN 的基础上做了哪些改进，同时也会说一下 CNN 能够解决的任务类型&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>卷积神经网络综述</title>
+    <link href="http://www.carefree0910.com/posts/78be0d7d/"/>
+    <id>http://www.carefree0910.com/posts/78be0d7d/</id>
+    <published>2017-05-06T02:41:50.000Z</published>
+    <updated>2017-05-06T07:15:05.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>卷积神经网络是 Convolutional Neural Network 的直译、常简称为 CNN，它是当今非常火热的话题——深度学习中的一种具有代表性的结构。如果提起卷积神经网络的话、许多人可能都会觉得是一个非常深奥的魔法，但如果不考虑其背后的数学理论而只想理解并应用的话、学习 CNN 其实也并不是特别困难（而且事实上相比起比较传统的机器学习算法而言、CNN 经常会由于其缺乏理论支撑而受到批评）</p>
+<p>以下是目录：</p>
+<ul>
+<li><a href="/posts/7990dadf/" title="从 NN 到 CNN">从 NN 到 CNN</a></li>
+<li><a href="/posts/24ed2586/" title="利用 Tensorflow 重写 NN">利用 Tensorflow 重写 NN</a></li>
+<li><a href="/posts/433ed5d6/" title="将 NN 扩展为 CNN">将 NN 扩展为 CNN</a></li>
+<li><a href="/posts/18671318/" title="“卷积神经网络”小结">“卷积神经网络”小结</a>
+</li>
+</ul>
+<p>需要特别指出的是，本系列的文章基本不会涉及任何卷积神经网络数学上的细节；一方面是因为它们相当繁复、另一方面则是因为它们也并不完全 Make Sense。卷积神经网络在因其效果拔群而大红大紫的同时、其“黑箱”程度也是非常著名的，因此我们会较多地从实现和应用层面来介绍卷积神经网络、理论方面的叙述则大多采取直观说明的方式来进行</p>
+<p>此外，CNN 的性能分析会放在<a href="https://github.com/carefree0910/MachineLearning/tree/master/_Dist" target="_blank" rel="external">具体的应用实例（Applications）</a>中进行，故本系列将略去这部分的内容</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;卷积神经网络是 Convolutional Neural Network 的直译、常简称为 CNN，它是当今非常火热的话题——深度学习中的一种具有代表性的结构。如果提起卷积神经网络的话、许多人可能都会觉得是一个非常深奥的魔法，但如果不考虑其背后的数学理论而只想理解并应用的话
+    
+    </summary>
+    
+      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+    
+      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
+    
+  </entry>
   
   <entry>
     <title>“神经网络”小结</title>
@@ -440,11 +795,11 @@ v_{t} &= \rho v_{t - 1} - \eta\Delta{\hat{w}}_{t} \\
       <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
       <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
       <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
     
   </entry>
   
@@ -670,11 +1025,11 @@ c = \max{\{ v_{1}^{\left( m \right)},\ldots,v_{K}^{\left( m \right)}\}}</script>
       <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
       <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
       <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
     
   </entry>
   
@@ -1039,11 +1394,11 @@ y_{i}\left( w^{*} \cdot x_{i} + b^{*} \right) - 1 + \xi^{*} \geq 0</script><scri
       <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
     
     
+      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+    
       <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
       <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
-    
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
     
   </entry>
   
@@ -1093,9 +1448,9 @@ l_{\epsilon}(w,b,x_{i},y_{i}) = \left\{ \begin{matrix}
       <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
     
     
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
-    
       <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+    
+      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
@@ -1346,517 +1701,11 @@ b = y_{k} - \sum_{i = 1}^{N}{y_{i}\alpha_{i}K_{ik}}</script><p>这里的下标 k
       <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
       <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
       <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>从感知机到支持向量机</title>
-    <link href="http://www.carefree0910.com/posts/d455305a/"/>
-    <id>http://www.carefree0910.com/posts/d455305a/</id>
-    <published>2017-04-28T02:42:17.000Z</published>
-    <updated>2017-04-28T12:11:15.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：</p>
-<img src="/posts/d455305a/p1.png" alt="p1.png" title="">
-<p>可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容</p>
-<a id="more"></a>
-<h1 id="间隔最大化与线性-SVM"><a href="#间隔最大化与线性-SVM" class="headerlink" title="间隔最大化与线性 SVM"></a>间隔最大化与线性 SVM</h1><p>上图的结果之所以显得不合理、主要是因为分离超平面离正负样本点集都显得“太近”了。因此一个自然的想法就是：在训练过程中考虑上超平面到点集的距离、并努力让这个距离最大化</p>
-<p>然而直接从集合出发定义集合到平面的距离是相对困难的、所以通常会将它转化为点到平面的距离。前文已经说过，对于样本点<script type="math/tex">(x_{i},y_{i})</script>而言、它到超平面<script type="math/tex">\Pi:w \cdot x + b = 0</script>的相对距离即为：</p>
-<script type="math/tex; mode=display">
-d^{*}\left( x_{i},\Pi \right) = |w \cdot x_{i} + b|</script><p>这里的相对距离<script type="math/tex">d^{*}</script>有一个更学术一点称谓——函数间隔（Functional Margin）。函数间隔有一个比较明显的缺陷就是、当<script type="math/tex">w</script>和<script type="math/tex">b</script>等比例变大或变小时，虽然超平面不会改变、但是<script type="math/tex">d^{*}</script>却会随之等比例变大或变小。为解决这个问题、我们可以比较自然地定义出所谓的几何间隔（Geometric Distance）：</p>
-<script type="math/tex; mode=display">
-d\left( x_{i},\Pi \right) = \frac{1}{\left\| w \right\|} \cdot d^{*}\left( x_{i},\Pi \right) = \frac{1}{\left\| w \right\|} \cdot |w \cdot x_{i} + b|</script><p>这里的<script type="math/tex">\left\| w \right\|</script>是<script type="math/tex">w</script>的欧式范数。顾名思义、几何间隔描述的就是向量<script type="math/tex">x_{i}</script>到超平面<script type="math/tex">\Pi</script>的几何距离（欧氏距离），它不会随<script type="math/tex">w</script>和<script type="math/tex">b</script>的等比例变化而变化、是相对稳定且直观意义优良的距离的定义方法。SVM 在训练过程中所引入的也正是各个样本点到当前分离超平面的几何距离，结合前文所说的“努力让超平面到点集的距离最大化”、SVM 算法就可以比较自然地叙述为：最大化（几何间隔）<script type="math/tex">d</script>、使得：</p>
-<script type="math/tex; mode=display">
-\frac{1}{\left\| w \right\|} \cdot \left\lbrack y_{i}\left( w \cdot x_{i} + b \right) \right\rbrack \geq d\ (i = 1,\ldots,N)</script><p>考虑到几何间隔和函数间隔之间的转换关系、该问题可以等价为：最大化<script type="math/tex">\frac{d^{*}}{\left\| w \right\|}</script>、使得：</p>
-<script type="math/tex; mode=display">
-y_{i}\left( w \cdot x_{i} + b \right) \geq d^{*}\ (i = 1,\ldots,N)</script><p>可以发现函数间隔<script type="math/tex">d^{*}</script>的取值其实对该优化问题的解没有影响。这是因为当<script type="math/tex">d^{*}</script>变成<script type="math/tex">\lambda d^{*}</script>时、<script type="math/tex">w</script>和<script type="math/tex">b</script>也会相应地变成<script type="math/tex">\lambda w</script>和<script type="math/tex">\lambda b</script>（在超平面不变的情况下），此时<script type="math/tex">\frac{d^{*}}{\left\| w \right\|}</script>和不等式约束都没有变、所以对优化问题确实没有影响。这样的话我们就能不妨设<script type="math/tex">d^{*} = 1</script>、从而优化问题就可以转换为：最大化<script type="math/tex">\frac{1}{\left\| w \right\|}</script>、使得：</p>
-<script type="math/tex; mode=display">
-y_{i}\left( w \cdot x_{i} + b \right) \geq 1\ (i = 1,\ldots,N)</script><p>易知该优化问题又能转化为：最小化<script type="math/tex">\frac{1}{2}\left\| w \right\|^{2}</script>、使得：</p>
-<script type="math/tex; mode=display">
-y_{i}\left( w \cdot x_{i} + b \right) - 1 \geq 0\ (i = 1,\ldots,N)</script><p>这就是 SVM 算法的最原始的形式。可以证明，只要训练集<script type="math/tex">D</script>线性可分、那么 SVM 算法对应的这个优化问题的解就存在且唯一；其中存在性的证明相对直观、唯一性的证明需要用到反证法和一些数学上的技巧，细节从略</p>
-<p>假设该优化问题的解为<script type="math/tex">w^{*}</script>和<script type="math/tex">b^{*}</script>，我们通常称超平面：</p>
-<script type="math/tex; mode=display">
-\Pi^{*}:w^{*} \cdot x + b^{*} = 0</script><p>为<script type="math/tex">D</script>的最大硬间隔分离超平面。之所以称它为“硬间隔”的理由会在后文叙述，这里暂时按下不表。需要指出的是，考虑到优化问题中的不等式约束、易知在超平面</p>
-<script type="math/tex; mode=display">
-\Pi_{1}^{*}:w^{*} \cdot x + b = - 1</script><p>和超平面</p>
-<script type="math/tex; mode=display">
-\Pi_{2}^{*}:w^{*} \cdot x + b = + 1</script><p>之间、是没有任何<script type="math/tex">D</script>中的样本点的。不过在<script type="math/tex">\Pi_{1}^{*}</script>和<script type="math/tex">\Pi_{2}^{*}</script>上、确实有可能有样本点。我们通常称<script type="math/tex">\Pi_{1}^{*}</script>和<script type="math/tex">\Pi_{2}^{*}</script>为间隔边界、称其上的某些点为支持向量</p>
-<p><strong><em>注意：也有间隔边界上的样本点全是支持向量的说法，本书采用的支持向量的定义将更“苛刻”一些，具体细节会在 SVM 算法的对偶形式的叙述中讲到</em></strong></p>
-<p>以上的叙述比较完整地说明了 SVM 如何应用于线性可分的数据集，接下来我们就看看如何将这种思想拓展到线性不可分数据集的分类之上。事实上，由于单用超平面的话、甚至连对线性不可分数据集正确分类都做不到，更不用提在此之上的将（硬）间隔最大化的问题了；但是考虑到间隔最大化的思想、我们可以做一定的“妥协”：将“硬”间隔转化为更加普适的“软”间隔。从数学的角度来说，这等价于将不等式约束放宽：</p>
-<script type="math/tex; mode=display">
-y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \rightarrow y_{i}\left( w \cdot x_{i} + b \right) \geq 1 - \xi_{i}</script><p>其中的<script type="math/tex">\xi_{i}</script>通常被称为“松弛变量”，它需要满足<script type="math/tex">\xi_{i} \geq 0</script>。当然、这个约束的放宽并不是没有代价的，我们要在需要最小化的<script type="math/tex">{\frac{1}{2}\left\| w \right\|}^{2}</script>上加进一个“惩罚项”来“惩罚”<script type="math/tex">\xi_{i}</script>。换句话说，我们需要最小化的项将变为：</p>
-<script type="math/tex; mode=display">
-L\left( w,b,x,y \right) = \frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}\xi_{i}</script><p>式中<script type="math/tex">L(w,b,x,y)</script>即为损失函数、损失函数中的<script type="math/tex">C</script>（<script type="math/tex">> 0</script>）通常被称为“惩罚因子”，它描述了对松弛变量<script type="math/tex">\xi_{i}</script>的“惩罚力度”：<script type="math/tex">C</script>越大意味着最终的 SVM 模型越不能容忍误分类的点，越小则反之</p>
-<p>综上所述、SVM 算法对应的优化问题可以拓展为：最小化<script type="math/tex">L(w,b,x,y)</script>、使得：</p>
-<script type="math/tex; mode=display">
-y_{i}\left( w \cdot x_{i} + b \right) \geq 1 - \xi_{i}\ (i = 1,\ldots,N)</script><p>其中</p>
-<script type="math/tex; mode=display">
-\xi_{i} \geq 0\ (i = 1,\ldots,N)</script><p>可以证明该优化问题的解存在、且<script type="math/tex">w</script>的解唯一但<script type="math/tex">b</script>的解不唯一，证明细节从略。同时参照感知机算法、自然希望能够写出使用随机梯度下降来训练软间隔最大化 SVM 的算法；但是注意到<script type="math/tex">L</script>表达式中的<script type="math/tex">\xi_{i}</script>是有约束的（需要不小于 0）、所以直接对其进行随机梯度下降存在一定的困难。为了将问题近似转化为无约束最优化问题、我们可以引入 Hinge 损失，其定义很简单：</p>
-<script type="math/tex; mode=display">
-l\left( w,b,x,y \right) = \max(0,1 - y\left( w \cdot x + b \right))</script><p>其中<script type="math/tex">y \in \left\{ - 1, + 1 \right\}</script>。换句话说，只有在模型作出足够肯定的正确的预测时、Hinge 损失才为 0；否则即使模型作出了正确的预测、Hinge 损失还是有可能给予模型一个惩罚</p>
-<p>利用 Hinge 损失、我们可以把损失函数<script type="math/tex">L</script>写成：</p>
-<script type="math/tex; mode=display">
-\hat{L}\left( w,b,x,y \right) = \frac{1}{2}\left\| w \right\|^{2} + C\sum_{i = 1}^{N}{l(w,b,x_{i},y_{i})}</script><p>并通过最小化<script type="math/tex">\hat{L}</script>来求解上述 SVM 算法对应的最优化问题</p>
-<p><strong><em>注意：最小化<script type="math/tex">\hat{L}</script>和上文最优化问题的等价性可能并不太显然，但是通过对比损失函数及逐条比对约束条件、完成等价性证明不算太困难（比如直接令<script type="math/tex">\xi_{i} = l(w,b,x_{i},y_{i})</script>）</em></strong></p>
-<p>由于我们想要写出随机梯度下降的算法、所以求出<script type="math/tex">\hat{L}</script>在单一样本<script type="math/tex">(x_{i},y_{i})</script>上对<script type="math/tex">w</script>和<script type="math/tex">b</script>的偏导数是有必要的：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-\frac{\partial\hat{L}(w,b,x_{i},y_{i})}{\partial w} &= w + \left\{ \begin{matrix}
-0,\ \ & y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \\
- - Cy_{i}x_{i},\ \ & y_{i}\left( w \cdot x_{i} + b \right) < 1 \\
-\end{matrix} \right.\ \\
-
-\frac{\partial\hat{L}(w,b,x_{i},y_{i})}{\partial b} &= \left\{ \begin{matrix}
-0,\ \ & y_{i}\left( w \cdot x_{i} + b \right) \geq 1 \\
- - Cy_{i},\ \ & y_{i}\left( w \cdot x_{i} + b \right) < 1 \\
-\end{matrix} \right.\
-\end{align}</script><p>有了这两个偏导数之后，模仿感知机算法、我们就可以比较轻松地写出软间隔最大化 SVM 的随机梯度下降训练算法：</p>
-<ol>
-<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、惩罚因子<script type="math/tex">C</script>、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
-x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
-<li><strong>过程</strong>：<ol>
-<li>初始化参数：  <script type="math/tex; mode=display">
-w = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{n},b = 0</script></li>
-<li>对<script type="math/tex">j = 1,\ldots,M</script>：<ol>
-<li>算出误差向量<script type="math/tex">e = \left( e_{1},\ldots,e_{N} \right)^{T}</script>、其中：  <script type="math/tex; mode=display">
-e_{i} = 1 - y_{i}(w \cdot x_{i} + b)</script></li>
-<li>取出误差最大的一项：  <script type="math/tex; mode=display">
-i = \arg{\min_{i}e_{i}}</script></li>
-<li>若<script type="math/tex">e_{i} \leq 0</script>则直接退出循环体、否则取对应的样本来进行随机梯度下降  <script type="math/tex; mode=display">
-\begin{align}
-w &\leftarrow (1 - \eta)w + \eta Cy_{i}x_{i} \\
-b &\leftarrow b + \eta Cy_{i}
-\end{align}</script></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><strong>输出</strong>：线性 SVM 模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( w \cdot x + b \right)</script></li>
-</ol>
-<p>需要指出的是，虽然算法看上去差不多、内核也都是随机梯度下降，但其实在感知机模型对学习速率不敏感的同时、线性 SVM 对学习速率是相当敏感的。由前文提到过的 Novikoff 定理和凸优化相关理论可以从理论上解释这个现象，囿于篇幅、这里就不展开叙述了</p>
-<p>由于上述线性 SVM 算法的实现和感知机算法的实现几乎一致、所以我们就略去对线性 SVM 实现的详细说明；观众老爷们可以参照感知机的代码来尝试进行实现、我个人实现的版本则可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/e_SVM/LinearSVM.py" target="_blank" rel="external">这里</a></p>
-<p>可以通过二维线性可分数据集来简单直观地感受一下感知机和线性 SVM 的区别、结果如下图所示：</p>
-<img src="/posts/d455305a/p2.png" alt="p2.png" title="">
-<p>其中左、右图分别为感知机和线性 SVM 的表现，可以看出线性 SVM 要更合理</p>
-<h1 id="SVM-算法的对偶形式"><a href="#SVM-算法的对偶形式" class="headerlink" title="SVM 算法的对偶形式"></a>SVM 算法的对偶形式</h1><p>与感知机类似、SVM 算法也是存在着对偶形式，不过这个转化的过程会比感知机那里的转化过程复杂不少。具体的推导步骤会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中、这里我们就直接看结果：</p>
-<ul>
-<li>硬间隔最大化的对偶形式  <script type="math/tex; mode=display">
-\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：  <script type="math/tex; mode=display">
-\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
-\alpha_{i} \geq 0</script></li>
-<li>软间隔最大化的对偶形式  <script type="math/tex; mode=display">
-\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：  <script type="math/tex; mode=display">
-\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
-0 \leq \alpha_{i} \leq C</script></li>
-</ul>
-<p>可以看到它们彼此之间相似度非常高、且转化的过程和感知机的转化过程也多少有些相似。同样的，由于对偶形式中样本点仅以内积的形式出现、我们通常会先把 Gram 矩阵算出来。现我们假设对偶形式的解为<script type="math/tex">\alpha^{*} = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T}</script>、那么就有：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-w^{*} &= \sum_{i = 1}^{N}{\alpha_{i}^{*}y_{i} \cdot x_{i}} \\
-b^{*} &= y_{j} - \sum_{i = 1}^{N}{y_{i}\alpha_{i}^{*}\left( x_{i} \cdot x_{j} \right)}
-\end{align}</script><p>其中<script type="math/tex">w^{*}</script>的表达式和感知机中<script type="math/tex">w^{*}</script>的表达式一致、<script type="math/tex">b^{*}</script>表达式中出现的 j 是满足<script type="math/tex">0 < \alpha_{j} < C</script>的下标（用反证法可以证明这种 j 必然存在，细节从略）</p>
-<p>在有了对偶形式之后、我们就可以叙述支持向量的一个比较“苛刻”的定义了：假设支持向量的集合为<script type="math/tex">SV</script>、那么</p>
-<ul>
-<li>在硬间隔最大化 SVM 中：  <script type="math/tex; mode=display">
-x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script></li>
-<li>在软间隔最大化 SVM 中：  <script type="math/tex; mode=display">
-x_{i} \in SV \Leftrightarrow 0 < \alpha_{i}^{*} \leq C</script></li>
-</ul>
-<p>其中在软间隔最大化 SVM 里，由于<script type="math/tex">\alpha_{i}^{*} \leq C</script>本身其实是由约束条件规定的、所以可以把上述两式统一写成：</p>
-<script type="math/tex; mode=display">
-x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下图来直观认知何谓支持向量：</p>
-<img src="/posts/d455305a/p3.png" alt="p3.png" title="">
-<p>图中的线段即为决策边界、被一个黑色圆圈给圈住的样本点即为支持向量，左图为线性可分数据集上的情况、右图为线性不可分数据集上的情况</p>
-<p>此外，说明<script type="math/tex">\alpha_{i}^{*}</script>和<script type="math/tex">\xi_{i}^{*}</script>是如何定出各个样本点和间隔边界、分离超平面之间的位置关系是有必要的，它能加深我们对对偶形式求解过程中涉及到的 KKT 条件的理解与记忆（KKT 条件的相关定义会在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中讲到）。具体而言：</p>
-<ul>
-<li>若<script type="math/tex">\alpha_{i}^{*} = 0</script>，那么<script type="math/tex">x_{i}</script>被正确分类且不在间隔边界上、又或被正确分类且在间隔边界上但不是支持向量</li>
-<li>若<script type="math/tex">0 < \alpha_{i}^{*} < C</script>，那么就有<script type="math/tex">\xi_{i} = 0</script>、亦即<script type="math/tex">x_{i}</script>落在间隔边界上且为支持向量</li>
-<li>若<script type="math/tex">\alpha_{i}^{*} = C</script>，那么：<ul>
-<li>若<script type="math/tex">\xi_{i} = 0</script>、则<script type="math/tex">x_{i}</script>落在间隔边界上且为支持向量</li>
-<li>若<script type="math/tex">0 < \xi_{i} < 1</script>、则<script type="math/tex">x_{i}</script>被正确分类且落在间隔边界和分离超平面之间</li>
-<li>若<script type="math/tex">\xi_{i} = 1</script>、则<script type="math/tex">x_{i}</script>落在分离超平面上</li>
-<li>若<script type="math/tex">\xi_{i} > 1</script>、则<script type="math/tex">x_{i}</script>被错误分类<br>由此可知、<script type="math/tex">\xi_{i}</script>其实刻画了<script type="math/tex">x_{i}</script>到相应间隔边界的函数间隔。换句话说、<script type="math/tex">\frac{\xi_{i}}{\left\| w \right\|}</script>即是<script type="math/tex">x_{i}</script>到间隔边间的距离（几何间隔）</li>
-</ul>
-</li>
-</ul>
-<h1 id="SVM-的训练"><a href="#SVM-的训练" class="headerlink" title="SVM 的训练"></a>SVM 的训练</h1><p>前文曾经提过、原始算法的对偶形式通常能将问题简化；虽然这点在感知机算法上没有太多体现，但是对于 SVM 来说，由于它的应用场景更为广泛、在许多问题的提法下转化成对偶形式的意义将非常重大。目前已经有许多针对 SVM 的成熟算法，本书拟介绍的是其中由 Platt 在 1998 年提出的、针对对偶问题求解的序列最小最优化算法（SMO）。本篇文章主要介绍 SMO 的思路和大概步骤，详细的叙述会在下一篇文章介绍完核技巧后进行</p>
-<p>SMO 是一种启发式算法，其主要手段是在每次迭代中专注于只有两个变量的优问题以期望在可以接受的时间内得到一个较优解。具体而言、SMO 要解决的是软间隔最大化 SVM 的对偶问题：</p>
-<script type="math/tex; mode=display">
-\max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script><p>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：</p>
-<script type="math/tex; mode=display">
-\sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
-0 \leq \alpha_{i} \leq C</script><p>解决方案是在循环体中不断针对两个变量构造二次规划、并通过求出其解析解来优化原始的对偶问题。大致步骤如下：</p>
-<ul>
-<li>考察所有变量（<script type="math/tex">\alpha_{1},\ldots,\alpha_{N}</script>）及对应的样本点（<script type="math/tex">\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})</script>）满足 KKT 条件的情况</li>
-<li>若所有变量及对应样本在容许误差内都满足 KKT 条件，则退出循环体、完成训练</li>
-<li>否则、通过如下步骤选出两个变量来构造新的规划问题：<ul>
-<li>选出违反 KKT 条件最严重的样本点、以其对应的变量作为第一个变量</li>
-<li>第二个变量的选取有一种比较繁复且高效的方法，但对于一个朴素的实现而言、第二个变量即使随机选取也无不可</li>
-</ul>
-</li>
-<li>将上述步骤选出的变量以外的变量固定、仅针对这两个变量进行最优化。易知此时问题转化为了求二次函数的极大值、从而能简单地得到解析解</li>
-</ul>
-<p>这里仅简要说明一下 SVM 对偶算法中的 KKT 条件，详细的陈列则会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中。具体而言、<script type="math/tex">\alpha_{i}</script>及其对应样本<script type="math/tex">(x_{i},y_{i})</script>的 KKT 条件为：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-\alpha_{i} = 0 &\Leftrightarrow y_{i}g\left( x_{i} \right) \geq 1 \\
-0 < \alpha_{i} < C &\Leftrightarrow y_{i}g\left( x_{i} \right) = 1 \\
-\alpha_{i} = C &\Leftrightarrow y_{i}g\left( x_{i} \right) \leq 1
-\end{align}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
-<script type="math/tex; mode=display">
-c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
-<ul>
-<li>计算“损失向量”<script type="math/tex">c = \left( c_{1},\ldots,c_{N} \right)^{T}</script>、其中：  <script type="math/tex; mode=display">
-c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script></li>
-<li>将损失向量<script type="math/tex">c</script>复制三份（<script type="math/tex">c^{\left( 1 \right)}</script>、<script type="math/tex">c^{\left( 2 \right)}</script>、<script type="math/tex">c^{\left( 3 \right)}</script>）并分情况将相应位置的损失置为 0。具体而言：<ul>
-<li>将<script type="math/tex">\alpha_{i} > 0</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) \geq 1</script>对应的<script type="math/tex">c_{i}^{\left( 1 \right)}</script>置为 0</li>
-<li>将<script type="math/tex">\alpha_{i} = 0</script>或<script type="math/tex">\alpha_{i} = C</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) = 1</script>对应的<script type="math/tex">c_{i}^{\left( 2 \right)}</script>置为 0</li>
-<li>将<script type="math/tex">\alpha_{i} < C</script>或<script type="math/tex">y_{i}g\left( x_{i} \right) \leq 1</script>对应的<script type="math/tex">c_{i}^{\left( 3 \right)}</script>置为 0</li>
-</ul>
-</li>
-<li>将三份损失向量相加并取损失最大的样本对应<script type="math/tex">\alpha_i</script>的作为SMO的第一个变量、亦即：  <script type="math/tex; mode=display">
-i = \arg{\max_{i}{\left\{ c_{i}^{\left( 1 \right)} + c_{i}^{\left( 2 \right)} + c_{i}^{\left( 3 \right)}|i = 1,\ldots,N\right\}}}</script></li>
-</ul>
-<p>在后面 SVM 的朴素实现中、我们打算采用的正是这种定义</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：&lt;/p&gt;
-&lt;img src=&quot;/posts/d455305a/p1.png&quot; alt=&quot;p1.png&quot; title=&quot;&quot;&gt;
-&lt;p&gt;可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
-    
-    
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
-    
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>感知机模型</title>
-    <link href="http://www.carefree0910.com/posts/93db8ec2/"/>
-    <id>http://www.carefree0910.com/posts/93db8ec2/</id>
-    <published>2017-04-28T01:31:37.000Z</published>
-    <updated>2017-04-28T12:04:47.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>本篇文章所叙述的感知机模型是我们第一次应用到梯度下降法的模型，它的算法相当简单、但其框架却相当具有代表性。虽然说感知机模型只能处理非常特殊的问题（线性可分的数据集的分类问题）、但它的思想却是值得琢磨的</p>
-<a id="more"></a>
-<h1 id="线性可分性与感知机策略"><a href="#线性可分性与感知机策略" class="headerlink" title="线性可分性与感知机策略"></a>线性可分性与感知机策略</h1><p>在详细叙述感知机模型的原始算法之前，了解感知机适用范围和基本思想是必要的。正如前文所说，感知机只能用于给线性可分的数据集分类。其中，所谓的“线性可分性”的定义其实相当直观：对于一个数据集</p>
-<script type="math/tex; mode=display">
-D = \{\left( x_{1},y_{1} \right),\ldots,(x_{N},y_{N})\}</script><p>其中</p>
-<script type="math/tex; mode=display">
-x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script><p>如果存在一个超平面<script type="math/tex">\Pi</script>能够将<script type="math/tex">D</script>中的正负样本点精确地划分到<script type="math/tex">S</script>的两侧、亦即：</p>
-<script type="math/tex; mode=display">
-\exists\Pi:\ w \cdot x + b = 0</script><p>使得</p>
-<script type="math/tex; mode=display">
-\begin{align}
-w \cdot x_{i} + b &< 0\ \left( \forall y_{i} = - 1 \right) \\
-w \cdot x_{i} + b &> 0\ \left( \forall y_{i} = + 1 \right)
-\end{align}</script><p>那么就称数据集<script type="math/tex">D</script>是线性可分的（Linearly Separable）；否则、就称<script type="math/tex">D</script>线性不可分</p>
-<p>当维数<script type="math/tex">n = 2</script>时、数据集线性可分等价于正负样本点能在二维平面上被一条直线精确划分；当<script type="math/tex">n = 3</script>时则等价于能在三维空间中被一个平面精确划分。下给出一组线性可分和一组线性不可分的例子：</p>
-<img src="/posts/93db8ec2/p1.png" alt="线性可分的数据集" title="线性可分的数据集">
-<img src="/posts/93db8ec2/p2.png" alt="线性不可分的数据集" title="线性不可分的数据集">
-<p>从数学的角度来说，线性可分性还有一个比较直观的等价定义：正负样本点集的凸包彼此不交。所谓凸包的定义如下：若集合<script type="math/tex">S \subset \mathbb{R}^{n}</script>由<script type="math/tex">N</script>个点组成：</p>
-<script type="math/tex; mode=display">
-S = \left\{ x_{1},\ldots,x_{N} \right\}\ (x_{i} \in \mathbb{R}^{n},\forall i = 1,\ldots,N)</script><p>那么<script type="math/tex">S</script>的凸包<script type="math/tex">\text{conv}(S)</script>即为：</p>
-<script type="math/tex; mode=display">
-\text{conv}\left( S \right) = \left\{ x = \sum_{i = 1}^{N}{\lambda_{i}x_{i}}|\sum_{i = 1}^{N}\lambda_{i} = 1,\lambda_{i} \geq 0(i = 1,\ldots,N)\right\}</script><p>比如，上述两个二维数据集的凸包将如下面两张图所示：</p>
-<img src="/posts/93db8ec2/p3.png" alt="p3.png" title="">
-<img src="/posts/93db8ec2/p4.png" alt="p4.png" title="">
-<p>第一张图中，正负样本点集的凸包不交、所以数据集线性可分；第二张图中的橙色区域即为正负样本点集凸包的相交处、所以数据集线性不可分</p>
-<p>该等价性的证明可以用反证法得出；由于过程不算困难且结论相当直观、所以具体的推导步骤从略</p>
-<p>知道了线性可分性的定义之后、感知机模型的目的也就容易想到了——无非就是为了找到上文提到过的、能将线性可分数据集中的正负样本点精确划分到两侧的超平面<script type="math/tex">\Pi</script>。考虑到机器学习的共性，我们希望能将找超平面的过程转化为最小化一个损失函数的过程；感知机策略的具体表现、就在于如何定义这个损失函数上。考虑到<script type="math/tex">\Pi</script>的性质，损失函数的定义其实是很自然的：</p>
-<script type="math/tex; mode=display">
-L\left( w,b,x,y \right) = - \sum_{x_{i} \in E}^{}{y_{i}(w \cdot x_{i} + b)}</script><p>其中<script type="math/tex">E</script>是被当前感知机误分类的点集，亦即对<script type="math/tex">\forall x_{i} \in E</script>、有：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-w \cdot x_{i} + b &\geq 0\ \left( if\ y_{i} = - 1 \right) \\
-w \cdot x_{i} + b &\leq 0\ \left( if\ y_{i} = + 1 \right)
-\end{align}</script><p>换句话说、损失函数还可以表示为：</p>
-<script type="math/tex; mode=display">
-L\left( w,b,x,y \right) = \sum_{x_{i} \in E}^{}\left| w \cdot x_{i} + b \right|</script><p>注意到对于样本点<script type="math/tex">(x_{i},y_{i})</script>而言、<script type="math/tex">\left| w \cdot x_{i} + b \right|</script>能够相对地表示向量<script type="math/tex">x_{i}</script>到分离超平面<script type="math/tex">w \cdot x + b = 0</script>的距离，所以损失函数的几何解释即为：损失函数值<script type="math/tex">=</script>所有被误分类的样本点到当前分离超平面的相对距离的总和。如果感知机能将所有样本点正确分类的话、<script type="math/tex">E</script>就是空集、此时损失函数<script type="math/tex">L\left( w,b \right) = 0</script>；同时，若误分类的样本点越少或误分类的样本点离当前分离超平面越近、损失函数<script type="math/tex">L\left( w,b \right)</script>的值就越小。是故寻找最终正确的分离超平面<script type="math/tex">\Pi</script>的过程、确实可以转化为最小化损失函数<script type="math/tex">L\left( w,b \right)</script>的过程，而这也正是感知机所采用的训练策略</p>
-<p><strong><em>注意：需要强调的是，<script type="math/tex">\left| w \cdot x_{i} + b \right|</script>所描述的“相对距离”和我们直观上的“欧氏距离”或说“几何距离”是不一样的（事实上它们之间相差了一个<script type="math/tex">\left\| w \right\|</script>）；相对严谨的叙述会放在<a href="/posts/d455305a/" title="从感知机到支持向量机">从感知机到支持向量机</a>中、这里就先按下不表</em></strong></p>
-<h1 id="感知机算法"><a href="#感知机算法" class="headerlink" title="感知机算法"></a>感知机算法</h1><p>最小化损失函数这个过程在决策树的训练中也出现过，彼时我们采用的是一种启发式的算法——选取当前能使损失（信息的不确定性）减少最多的特征作为划分标准来划分数据。感知机算法采用的则是一种应用场景更广的方法——梯度下降法。梯度下降法的一般性定义和相关说明会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中、这里我们只说一个直观：在许多情况下，损失函数是足够好的函数、从而它在每个点都能进行“求导”。求导之后我们就能得到一个损失函数增长最快的“方向”，此时我们沿反方向前进的话、就能期望损失函数以“最快的速度”减少（这也正是为何梯度下降法又叫最速下降法）</p>
-<p>注意到在求得“方向”后、沿方向“走多远”也是需要考虑的参数。一般我们称该参数为“学习速率”或“步长”，通过调整和优化该参数的表现、常常能导出原理一致但表现迥异的算法。不过即使如此，梯度下降法的关键还是在于损失函数的“求导”。需要指出的是，梯度下降法本身还可以大致分为三种具体的算法——随机梯度下降法（Stochastic Gradient Descent，常简称为 SGD）、小批量梯度下降法（Mini-batch Gradient Descent，常简称为 MBGD）和批量梯度下降法（Batch Gradient Descent，常简称为 BGD）。这三种梯度下降法的说明、对比同样会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中进行，这里只需要知道它们行为上的差别：随机梯度下降法在每个迭代中只使用一个样本来进行参数的更新、小批量梯度下降法则会同时选用多个样本来更新参数、批量梯度下降法则更是会同时选用所有样本来更新参数</p>
-<p><strong><em>注意：也有认为 SGD 即为 MBGD 的说法、所以具体的含义需要结合具体情况分析</em></strong></p>
-<p>简单起见、我们采用随机梯度下降来进行训练，此时我们需要求出损失函数在单一样本上对<script type="math/tex">w</script>和<script type="math/tex">b</script>的偏导数：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-\frac{\partial L(w,b,x_{i},y_{i})}{\partial w} &= \left\{ \begin{matrix}
-0,\ \ &(x_{i},y_{i}) \notin E \\
- - y_{i}x_{i},\ \ &{(x}_{i},y_{i}) \in E \\
-\end{matrix} \right.\ \\
-
-\frac{\partial L(w,b,x_{i},y_{i})}{\partial b} &= \left\{ \begin{matrix}
-0,\ \ &(x_{i},y_{i}) \notin E \\
- - y_{i},\ \ &{(x}_{i},y_{i}) \in E \\
-\end{matrix} \right.\
-\end{align}</script><p>利用它们可以自然地写出感知机模型的随机梯度下降训练算法：</p>
-<ol>
-<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
-x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
-<li><strong>过程</strong>：<ol>
-<li>初始化参数：  <script type="math/tex; mode=display">
-w = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{n},b = 0</script></li>
-<li>对<script type="math/tex">j = 1,\ldots,M</script>：  <script type="math/tex; mode=display">
-E = \left\{ \left( x_{i},y_{i} \right) \middle| y_{i}\left( w \cdot x_{i} + b \right) \leq 0 \right\}</script><ol>
-<li>若<script type="math/tex">E = \varnothing</script>（亦即没有误分类的样本点）则退出循环体</li>
-<li>否则，任取<script type="math/tex">E</script>中的一个样本点<script type="math/tex">(x_{i},y_{i})</script>并利用它更新参数：  <script type="math/tex; mode=display">
-\begin{align}
-w &\leftarrow w + \eta y_{i}x_{i} \\
-b &\leftarrow b + \eta y_{i}
-\end{align}</script></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><strong>输出</strong>：感知机模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = \text{sign}\left( w \cdot x + b \right)</script></li>
-</ol>
-<p>其中最后一步用到的 sign 是符号函数。由于感知机算法中更新一次参数的时间开销非常小、所以通常会把迭代次数 M 设置成一个比较大的数（比如<script type="math/tex">10^{4}</script>）</p>
-<p>此外需要指出的是，虽说感知机只适用于线性可分数据集的分类、但它有个优点就是：无论学习速率<script type="math/tex">\eta</script>是多少，只要数据集线性可分，那么上述感知机算法在 M 足够大的情况下、必然能够训练出一个使得<script type="math/tex">E = \varnothing</script>的分离超平面（这其实就是著名的 Novikoff 定理，证明会用到比较纯粹的数学技巧、所以从略）</p>
-<p>虽说所蕴含的梯度下降的思想并不平凡，但感知机算法单就复杂度而言、可以说是目前为止遇到过的最简单的算法了，其实现相对的也非常简单直观：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">from</span> Util.Bases <span class="keyword">import</span> ClassifierBase</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Perceptron</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(Perceptron, self).__init__()</div><div class="line">        self._w = self._b = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self, x, y, sample_weight=None, lr=<span class="number">0.01</span>, epoch=<span class="number">10</span> ** <span class="number">6</span>)</span>:</span></div><div class="line">        x, y = np.atleast_2d(x), np.array(y)</div><div class="line">        <span class="keyword">if</span> sample_weight <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            sample_weight = np.ones(len(y))</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            sample_weight = np.array(sample_weight) * len(y)</div><div class="line">        <span class="comment"># 初始化参数</span></div><div class="line">        self._w = np.zeros(x.shape[<span class="number">1</span>])</div><div class="line">        self._b = <span class="number">0</span></div><div class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(epoch):</div><div class="line">            y_pred = self.predict(x)</div><div class="line">            <span class="comment"># 获取加权误差向量</span></div><div class="line">            _err = (y_pred != y) * sample_weight</div><div class="line">            <span class="comment"># 引入随机性以进行随机梯度下降</span></div><div class="line">            _indices = np.random.permutation(len(y))</div><div class="line">            _idx = _indices[np.argmax(_err[_indices])]</div><div class="line">            <span class="comment"># 若没有被误分类的样本点则完成了训练</span></div><div class="line">            <span class="keyword">if</span> y_pred[_idx] == y[_idx]:</div><div class="line">                <span class="keyword">return</span></div><div class="line">            <span class="comment"># 否则，根据选出的样本点更新参数</span></div><div class="line">            _delta = lr * y[_idx] * sample_weight[_idx]</div><div class="line">            self._w += _delta * x[_idx]</div><div class="line">            self._b += _delta</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, x, get_raw_results=False)</span>:</span></div><div class="line">        rs = np.sum(self._w * x, axis=<span class="number">1</span>) + self._b</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> get_raw_results:</div><div class="line">            <span class="keyword">return</span> np.sign(rs)</div><div class="line">        <span class="keyword">return</span> rs</div></pre></td></tr></table></figure>
-<p>可以用之前提到过的两个二维数据集来简单评估一下我们实现的感知机模型，结果如下图所示：</p>
-<img src="/posts/93db8ec2/p5.png" alt="p5.png" title="">
-<p>其中在线性可分的数据集上、感知机只用了一次迭代便得到了上面左图中的效果；在线性不可分的数据集上、感知机在迭代 1000 次后可以得到右图中的效果，此时正确率为 97.5%</p>
-<h1 id="感知机算法的对偶形式"><a href="#感知机算法的对偶形式" class="headerlink" title="感知机算法的对偶形式"></a>感知机算法的对偶形式</h1><p>本节将会简要介绍一个非常重要的概念：拉格朗日对偶性（Lagrange Duality）；在有约束的最优化问题中，为了便于求解、我们常常会利用它来将比较原始问题转化为更好解决的对偶问题。对于特定的问题，原始算法的对偶形式也常常会有一些共性存在。比如对于感知机和后文会介绍的支持向量机来说，它们的对偶算法都会将模型的参数表示为样本点的某种线性组合、并把问题转化为求解线性组合中的各个系数</p>
-<p>虽说感知机算法的原始形式已经非常简单，但是通过将它转化为对偶形式、我们可以比较清晰地感受到转化的过程，这有助于理解和记忆后文介绍的、较为复杂的支持向量机的对偶形式</p>
-<p>考虑到原始算法的核心步骤为：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-w &\leftarrow w + \eta y_{i}x_{i} \\
-b &\leftarrow b + \eta y_{i}
-\end{align}</script><p>其中<script type="math/tex">\left( x_{i},y_{i} \right) \in E</script>、<script type="math/tex">E</script>是当前被误分类的样本点的集合；可以看见、参数的更新是完全基于样本点的。考虑到我们要将参数<script type="math/tex">w</script>和<script type="math/tex">b</script>表示为样本点的线性组合，一个自然的想法就是记录下在核心步骤中、各个样本点分别被利用了多少次、然后利用这个次数来将<script type="math/tex">w</script>和<script type="math/tex">b</script>表示出来。比如说，若设样本点<script type="math/tex">\left( x_{i},y_{i} \right)</script>一共在上述核心步骤中被利用了<script type="math/tex">n_{i}</script>次、那么就有（假设初始化参数时<script type="math/tex">w = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{n},b = 0</script>）：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-w &= \eta\sum_{i = 1}^{N}{n_{i}y_{i}x_{i}} \\
-b &= \eta\sum_{i = 1}^{N}{n_{i}y_{i}}
-\end{align}</script><p>如果进一步设<script type="math/tex">\alpha_{i} = \eta n_{i}</script>、则有：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-w &= \sum_{i = 1}^{N}{\alpha_{i}y_{i}x_{i}} \\
-b &= \sum_{i = 1}^{N}{\alpha_{i}y_{i}}
-\end{align}</script><p>在此基础上，感知机算法的对偶形式就能很自然地写出来了：</p>
-<ol>
-<li><strong>输入</strong>：训练数据集<script type="math/tex">D = \{\left( x_{1},y_{1} \right),\ldots,\left( x_{N},y_{N} \right)\}</script>、迭代次数 M、学习速率<script type="math/tex">\eta</script>，其中：  <script type="math/tex; mode=display">
-x_{i} \in X \subseteq \mathbb{R}^{n}\ ;y_{i} \in Y = \{ - 1,\  + 1\}</script></li>
-<li><strong>过程</strong>：<ol>
-<li>初始化参数：  <script type="math/tex; mode=display">
-\alpha = \left( \alpha_{1},\ldots,\alpha_{N} \right)^{T} = \left( 0,\ldots,0 \right)^{T} \in \mathbb{R}^{N}</script></li>
-<li>对<script type="math/tex">j = 1,\ldots,M</script>：  <script type="math/tex; mode=display">
-E = \left\{ \left( x_{i},y_{i} \right) \middle| y_{i}\left( \sum_{k = 1}^{N}{\alpha_{k}y_{k}\left( x_{k} \cdot x_{i} + 1 \right)} \right) \leq 0 \right\}</script><ol>
-<li>若<script type="math/tex">E = \varnothing</script>（亦即没有误分类的样本点）则退出循环体</li>
-<li>否则，任取<script type="math/tex">E</script>中的一个样本点<script type="math/tex">(x_{i},y_{i})</script>并利用其下标更新参数：  <script type="math/tex; mode=display">
-\alpha_{i} \leftarrow \alpha_{i} + \eta</script></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><strong>输出</strong>：感知机模型<script type="math/tex">g\left( x \right) = \text{sign}\left( f\left( x \right) \right) = sign\left( \sum_{k = 1}^{N}{\alpha_{k}y_{k}\left( x_{k} \cdot x_{i} + 1 \right)} \right)</script></li>
-</ol>
-<p>需要指出的是，在对偶形式中、样本点里面的<script type="math/tex">x</script>仅以内积的形式（<script type="math/tex">x_{k} \cdot x_{i}</script>）出现；这是一个非常重要且深刻的性质，利用它和后文将进行介绍核技巧、能够将许多算法从线性算法“升级”成为非线性算法</p>
-<p>注意到对偶形式的训练过程常常会重复用到大量的、样本点之间的内积，我们通常会提前将样本点两两之间的内积计算出来并存储在一个矩阵中；这个矩阵就是著名的 Gram 矩阵、其数学定义即为：</p>
-<script type="math/tex; mode=display">
-G = \left( x_{i} \cdot x_{j} \right)_{N \times N}</script><p>这样的话，在训练过程中如果要用到相应的内积、只需从 Gram 矩阵中提取即可，这样在大多数情况下都能大大提高效率</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本篇文章所叙述的感知机模型是我们第一次应用到梯度下降法的模型，它的算法相当简单、但其框架却相当具有代表性。虽然说感知机模型只能处理非常特殊的问题（线性可分的数据集的分类问题）、但它的思想却是值得琢磨的&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
-    
     
       <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
-    
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
-    
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>支持向量机综述</title>
-    <link href="http://www.carefree0910.com/posts/487ba3a6/"/>
-    <id>http://www.carefree0910.com/posts/487ba3a6/</id>
-    <published>2017-04-28T01:21:08.000Z</published>
-    <updated>2017-04-28T12:24:52.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>目前为止讲过的模型中，朴素贝叶斯模型属于生成模型：它的训练过程其实很难称之为“训练”——毕竟它只是对输入的训练数据集进行了若干“计数”的操作；决策树模型的训练过程虽然确实有一些训练的意思在里面，但其本质——各种信息不确定性的度量仍然脱不出“计数”的范畴。换句话说，朴素贝叶斯和决策树的核心步骤似乎都只是“计数”而已。随机森林和 AdaBoost 自不用提，它们都只是将已有的模型进行集成、其本身的训练过程可谓不是主体</p>
-<p>然而我们都知道、机器学习当然不只是“计数”那么简单的一回事。因此我们拟在本系列及以后的系列中介绍另一大类训练方法——梯度下降法（Gradient Decent；有时我们也称之为最速下降法（Steepest Descent））。就本系列而言，我们会先介绍一个比较简易的、应用到了梯度下降法的模型——感知机（Perceptron），然后我们会介绍一个思想和感知机类似、但是应用场景更加广泛的模型——支持向量机（Support Vector Machine，常简称为SVM）</p>
-<p>以下是目录：</p>
-<ul>
-<li><a href="/posts/93db8ec2/" title="感知机模型">感知机模型</a></li>
-<li><a href="/posts/d455305a/" title="从感知机到支持向量机">从感知机到支持向量机</a></li>
-<li><a href="/posts/924abfe1/" title="从线性到非线性">从线性到非线性</a></li>
-<li><a href="/posts/917ccef9/" title="核模型的实现与评估">核模型的实现与评估</a></li>
-<li><a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a></li>
-<li><a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></li>
-<li><a href="/posts/5b3e9c59/" title="“支持向量机”小结">“支持向量机”小结</a>
-</li>
-</ul>
-<p>需要指出的是、本系列的前三篇文章讨论的都是二类分类问题，回归问题和把二类算法拓展成多类算法的手段会放在<a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a>中进行简要介绍（注意虽然我们上一个系列叙述 AdaBoost 算法时同样也只针对二类分类问题进行了说明、但是应用<a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a>中的内容是可以将上一个系列涉及到的的诸多 AdaBoost 二分类模型推广成多分类模型的）</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;目前为止讲过的模型中，朴素贝叶斯模型属于生成模型：它的训练过程其实很难称之为“训练”——毕竟它只是对输入的训练数据集进行了若干“计数”的操作；决策树模型的训练过程虽然确实有一些训练的意思在里面，但其本质——各种信息不确定性的度量仍然脱不出“计数”的范畴。换句话说，朴素贝叶斯
-    
-    </summary>
-    
-      <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
-    
-    
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
-    
-      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>“集成学习”小结</title>
-    <link href="http://www.carefree0910.com/posts/48a0211a/"/>
-    <id>http://www.carefree0910.com/posts/48a0211a/</id>
-    <published>2017-04-25T16:41:26.000Z</published>
-    <updated>2017-04-25T16:42:32.000Z</updated>
-    
-    <content type="html"><![CDATA[<ul>
-<li>集成学习是将个体模型进行集成的方法，大致可分为 Bagging 和 Boosting 两类</li>
-<li>随机森林是 Bagging 算法的一种常见拓展、性能优异；它不仅对样本的选取引入随机性、还对个体模型（决策树）的特征选取步骤引入随机性</li>
-<li>AdaBoost 是 Boosting 族算法的代表，通过以下三步进行提升：<ul>
-<li>根据样本权重训练弱分类器</li>
-<li>根据该弱分类器的加权错误率为其分配“话语权”</li>
-<li>根据该弱分类器的表现更新样本权重</li>
-</ul>
-</li>
-<li>集成模型具有相当不错的正则化能力、但该正则化能力并不是必然存在的</li>
-<li>AdaBoost 可以用前向分步算法和加法模型来解释</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;ul&gt;
-&lt;li&gt;集成学习是将个体模型进行集成的方法，大致可分为 Bagging 和 Boosting 两类&lt;/li&gt;
-&lt;li&gt;随机森林是 Bagging 算法的一种常见拓展、性能优异；它不仅对样本的选取引入随机性、还对个体模型（决策树）的特征选取步骤引入随机性&lt;/li&gt;
-&lt;li
-    
-    </summary>
-    
-      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
-    
-    
-      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>相关数学理论</title>
-    <link href="http://www.carefree0910.com/posts/613bbb2f/"/>
-    <id>http://www.carefree0910.com/posts/613bbb2f/</id>
-    <published>2017-04-25T16:19:04.000Z</published>
-    <updated>2017-04-28T10:51:56.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>这篇文章会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度</p>
-<a id="more"></a>
-<h1 id="经验分布函数"><a href="#经验分布函数" class="headerlink" title="经验分布函数"></a>经验分布函数</h1><p>正如前文所说，经验分布函数的数学表达式为：</p>
-<script type="math/tex; mode=display">
-F_{N}\left( x \right) = \frac{1}{N}\sum_{i = 1}^{N}{I_{\left( - \infty,x \right\rbrack}(x_{i})}</script><p>如果将<script type="math/tex">x_{1},\ldots,x_{N}</script>按从小到大的顺序排成<script type="math/tex">x_{(1)},\ldots,x_{\left( N \right)}</script>，我们通常称其中的<script type="math/tex">x_{\left( i \right)}</script>为第 i 个次序统计量。易知可以利用次序统计量将<script type="math/tex">F_{N}(x)</script>表示成更直观的形式：</p>
-<script type="math/tex; mode=display">
-F_{N}\left( x \right) = \left\{ \begin{matrix}
-0,\ \ &x < x_{\left( 1 \right)} \\
-\frac{i}{N},\ \ &x \in \left\lbrack x_{\left( i \right)},x_{\left( i + 1 \right)} \right)\ (i = 1,\ldots,N - 1) \\
-1,\ \ &x \geq x_{\left( N \right)} \\
-\end{matrix} \right.\</script><p>关于其优良性，前文所说的“频率估计概率”的严谨叙述其实就是强大数律：</p>
-<script type="math/tex; mode=display">
-p\left( \lim_{N}{F_{N}\left( x \right) - F\left( x \right) = 0} \right) = 1\ (\forall x)</script><p>亦即</p>
-<script type="math/tex; mode=display">
-F_{N}(x) \xrightarrow{a.s.} F(x)</script><p>同时还有一个更强的结论（Glivenko-Cantelli 定理）：</p>
-<script type="math/tex; mode=display">
-p\left( \lim_{N}{\sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right| = 0} \right) = 1</script><p>亦即</p>
-<script type="math/tex; mode=display">
-\left\| F_{N}\left( x \right) - F\left( x \right) \right\|_{\infty} \equiv \sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right|\xrightarrow{a.s.}0</script><p>其中，<script type="math/tex">\sup_{x}\left| F_{N}\left( x \right) - F\left( x \right) \right|</script>就是著名的柯尔莫诺夫-斯米尔诺夫检验（Kolmogorov-Smirnov Statistic）。值得一提的是，用其它范数来代替这里的无穷范数有时也是合理的。比如说用二范数来代替时、对应的就是 Cramér-von Mises Criterion</p>
-<p>此外，我们还可以利用中心极限定理等来研究经验分布函数（比如与正态分布扯上关系等等），这里就不详细展开了。总之，经验分布函数的优良性是相当有保证的，与其本质类似的 Bootstrap 的优良性也因而有了保证。当然、Bootstrap 自己是有一套成熟理论的，不过如果就这点展开来叙述的话、多多少少会偏离了本系列文章的主旨，所以这里就仅通过讨论经验分布函数来间接地感受 Bootstrap 的优良性</p>
-<h1 id="AdaBoost-与前向分步加法模型"><a href="#AdaBoost-与前向分步加法模型" class="headerlink" title="AdaBoost 与前向分步加法模型"></a>AdaBoost 与前向分步加法模型</h1><p>本节主要用于推导如下定理：AdaBoost 分类模型可以等价为损失函数为指数函数的前向分步加法模型</p>
-<p>假设经过<script type="math/tex">k</script>轮迭代后、前项分布算法已经得到了加法模型<script type="math/tex">f_{k}(x)</script>，亦即：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-f_{k}\left( x \right) &= f_{k - 1}\left( x \right) + \alpha_{k}g_{k}\left( x \right) = f_{k - 2}\left( x \right) + \alpha_{k - 1}g_{k - 1}\left( x \right) + \alpha_{k}g_{k}(x) \\
-
-&= \ldots = \sum_{i = 1}^{k}{\alpha_{i}g_{i}(x)}
-\end{align}</script><p>可知、第<script type="math/tex">k + 1</script>轮的模型<script type="math/tex">f_{k + 1}</script>能表示为：</p>
-<script type="math/tex; mode=display">
-f_{k + 1}\left( x \right) = f_{k}\left( x \right) + \alpha_{k + 1}g_{k + 1}(x)</script><p>我们关心的问题就是，如何在<script type="math/tex">f_{k}(x)</script>确定下来的情况下、训练出第<script type="math/tex">k + 1</script>轮的个体分类器<script type="math/tex">g_{k + 1}(x)</script>及其权重<script type="math/tex">\alpha_{k + 1}</script>。注意到我们的损失函数是指数函数，亦即：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-L &= \sum_{i = 1}^{N}{\exp\left\lbrack - y_{i}f_{k + 1}\left( x_{i} \right) \right\rbrack} \\
-
-&= \sum_{i = 1}^{N}w_{ki}\exp\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}(x_{i})\rbrack
-\end{align}</script><p>其中</p>
-<script type="math/tex; mode=display">
-w_{ki} = \exp\lbrack - y_{i}f_{k}(x_{i})\rbrack</script><p>在<script type="math/tex">f_{k}(x)</script>确定下来的情况下是常数。由于我们的最终目的是最小化损失函数、所以<script type="math/tex">\alpha_{k + 1}</script>和<script type="math/tex">g_{k + 1}(x)</script>就可以表示为：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-\left( \alpha_{k + 1},g_{k + 1}\left( x \right) \right) &= \arg{\min_{\alpha,g}{\sum_{i = 1}^{N}{w_{ki}\exp\left\lbrack - y_{i}\alpha g\left( x_{i} \right) \right\rbrack}}} \\
-
-&= \arg{\min_{\alpha,g}{\sum_{y_{i} = g\left( x_{i} \right)}^{}{w_{ki}e^{- \alpha}} + \sum_{y_{i} \neq g\left( x_{i} \right)}^{}{w_{ki}e^{\alpha}}}} \\
-
-&= \arg{\min_{\alpha,g}{\left( e^{\alpha} - e^{- \alpha} \right)\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)} + e^{- \alpha}\sum_{i = 1}^{N}w_{ki}}} \\
-
-&= \arg{\min_{\alpha,g}{\left( e^{\alpha} - e^{- \alpha} \right)\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)} + e^{- \alpha}}}
-\end{align}</script><p>上式可以分两步求解。先看当<script type="math/tex">\alpha</script>确定下来后应该如何定出<script type="math/tex">g_{k + 1}(x)</script>，易知：</p>
-<script type="math/tex; mode=display">
-g_{k + 1}\left( x \right) = \arg{\min_{g}{\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g\left( x_{i} \right) \right)}}}</script><p>亦即第<script type="math/tex">k + 1</script>步的个体分类器应该使训练集上的加权错误率最小。不妨设解出的<script type="math/tex">g_{k + 1}(x)</script>在训练集上的加权错误率为<script type="math/tex">e_{k + 1}</script>、亦即：</p>
-<script type="math/tex; mode=display">
-\sum_{i = 1}^{N}{w_{ki}I\left( y_{i} \neq g_{k + 1}\left( x_{i} \right) \right)} \triangleq e_{k + 1}</script><p>我们需要利用它来定出<script type="math/tex">\alpha_{k + 1}</script>。注意到对目标函数求偏导后易知：</p>
-<script type="math/tex; mode=display">
-\begin{align}
-\alpha_{k + 1} &= \arg{\min_{\alpha}{\left( e^{\alpha} - e^{- \alpha} \right)e_{k + 1} + e^{- \alpha}}} \\
-
-&\Leftrightarrow \left( e^{\alpha_{k + 1}} + e^{- \alpha_{k + 1}} \right)e_{k + 1} - e^{- \alpha_{k + 1}} = 0 \\
-
-&\Leftrightarrow \alpha_{k + 1} = \frac{1}{2}\ln\frac{1 - e_{k + 1}}{e_{k + 1}}
-\end{align}</script><p>这和 AdaBoost 中确定个体分类器权值的式子一模一样。接下来只需要证明样本权重更新的式子也彼此一致即可得证定理，而事实上、由于：</p>
-<script type="math/tex; mode=display">
-f_{k + 1}\left( x \right) = f_{k}\left( x \right) + \alpha_{k + 1}g_{k + 1}\left( x \right)</script><p>从而</p>
-<script type="math/tex; mode=display">
-\begin{align}
-w_{k + 1,i} &= \exp\left\lbrack - y_{i}f_{k + 1}\left( x_{i} \right) \right\rbrack \\
-
-&= \exp\left\lbrack - y_{i}f_{k}\left( x_{i} \right) \right\rbrack \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack \\
-
-&= w_{ki} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack
-\end{align}</script><p>注意到我们要将样本权重归一化，所以须有：</p>
-<script type="math/tex; mode=display">
-w_{k + 1,i} \leftarrow \frac{w_{k + 1,i}}{Z_{k}}</script><p>其中</p>
-<script type="math/tex; mode=display">
-Z_{k} = \sum_{i = 1}^{N}w_{k + 1,i} = \sum_{i = 1}^{N}{w_{ki} \cdot \exp\left\lbrack - \alpha_{k + 1}y_{i}g_{k + 1}\left( x_{i} \right) \right\rbrack}</script><p>是故</p>
-<script type="math/tex; mode=display">
-w_{k + 1,i} = \frac{w_{ki}}{Z_{k}} \cdot \exp\left\lbrack - y_{i}\alpha_{k + 1}g_{k + 1}\left( x_{i} \right) \right\rbrack</script><p>这和 AdaBoost 中更新样本权重的式子也一模一样。综上所述、定理得证</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;这篇文章会叙述之前没有解决的纯数学问题，同样会涉及到概率论的一些基础概念和思想，可能会有一定的难度&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="集成学习" scheme="http://www.carefree0910.com/categories/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/"/>
-    
-    
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   

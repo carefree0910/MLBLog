@@ -1,0 +1,1098 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="算法,Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文将会使用 Tensorflow 框架来重写我们上个系列中实现过的 NN、观众老爷们可能会需要知道 Tensorflow 的基本知识之后才能比较顺畅地阅读接下来的内容；如果对 Tensorflow 基本不了解的话、可以先参见我写的一篇 Tensorflow 的应用式入门教程">
+<meta name="keywords" content="算法,Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用 Tensorflow 重写 NN">
+<meta property="og:url" content="http://www.carefree0910.com/posts/24ed2586/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="本文将会使用 Tensorflow 框架来重写我们上个系列中实现过的 NN、观众老爷们可能会需要知道 Tensorflow 的基本知识之后才能比较顺畅地阅读接下来的内容；如果对 Tensorflow 基本不了解的话、可以先参见我写的一篇 Tensorflow 的应用式入门教程">
+<meta property="og:image" content="http://www.carefree0910.com/posts/24ed2586/p1.png">
+<meta property="og:image" content="http://www.carefree0910.com/posts/24ed2586/p2.png">
+<meta property="og:updated_time" content="2017-05-06T07:15:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用 Tensorflow 重写 NN">
+<meta name="twitter:description" content="本文将会使用 Tensorflow 框架来重写我们上个系列中实现过的 NN、观众老爷们可能会需要知道 Tensorflow 的基本知识之后才能比较顺畅地阅读接下来的内容；如果对 Tensorflow 基本不了解的话、可以先参见我写的一篇 Tensorflow 的应用式入门教程">
+<meta name="twitter:image" content="http://www.carefree0910.com/posts/24ed2586/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/24ed2586/"/>
+
+
+
+
+
+  <title> 利用 Tensorflow 重写 NN | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/24ed2586/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                利用 Tensorflow 重写 NN
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-06T14:24:58+08:00">
+                2017-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/卷积神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">卷积神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文将会使用 Tensorflow 框架来重写我们上个系列中实现过的 NN、观众老爷们可能会需要知道 Tensorflow 的基本知识之后才能比较顺畅地阅读接下来的内容；如果对 Tensorflow 基本不了解的话、可以先参见我写的一篇 <a href="https://zhuanlan.zhihu.com/p/26645181" target="_blank" rel="external">Tensorflow 的应用式入门教程</a></p>
+<a id="more"></a>
+<h1 id="重写-Layer-结构"><a href="#重写-Layer-结构" class="headerlink" title="重写 Layer 结构"></a>重写 Layer 结构</h1><p>使用 Tensorflow 来重写 NN 的流程和上个系列中我们介绍过的实现流程是差不多的，不过由于 Tensorflow 帮助我们处理了更新参数这一部分的细节，所以我们能增添许多功能、同时也能把接口写得更漂亮一些。</p>
+<p>首先还是要来实现 NN 的基本单元——Layer 结构。鉴于 Tensorflow 能够自动获取梯度、同时考虑到要扩展出 CNN 的功能，我们需要做出如下微调：</p>
+<ul>
+<li>对于激活函数，只用定义其原始形式、不必定义其导函数形式</li>
+<li>解决上一章遗留下来的、特殊层结构的实现问题</li>
+<li>要考虑当前层为 FC（全连接层）时的表现</li>
+<li>让用户可以选择是否给 Layer 加偏置量</li>
+</ul>
+<p>其中的第四点可能有些让人不明所以：上个系列不是刚说过、偏置量对破坏对称性是很重要的吗？为什么要让用户选择是否使用偏置量呢？这主要是因为特殊层结构中 Normalize 的特殊性会使偏置量显得冗余。具体细节会在后文讨论特殊层结构处进行说明，这里就暂时按下不表</p>
+<p>以下是 Layer 结构基类的具体代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</div><div class="line"><span class="keyword">from</span> math <span class="keyword">import</span> ceil</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Layer</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.shape：记录该Layer和上个Layer所含神经元的个数，具体而言：</div><div class="line">            self.shape[0] = 上个Layer所含神经元的个数</div><div class="line">            self.shape[1] = 该Layer所含神经元的个数</div><div class="line">        self.is_fc、self.is_sub_layer：记录该Layer是否为FC、特殊层结构的属性</div><div class="line">        self.apply_bias：记录是否对该Layer加偏置量的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, shape, **kwargs)</span>:</span></div><div class="line">        self.shape = shape</div><div class="line">        self.is_fc = self.is_sub_layer = <span class="keyword">False</span></div><div class="line">        self.apply_bias = kwargs.get(<span class="string">"apply_bias"</span>, <span class="keyword">True</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> self.__class__.__name__</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> str(self)</div><div class="line"></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">name</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> str(self)</div><div class="line"></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">root</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> self</div><div class="line"></div><div class="line">    <span class="comment"># 定义兼容特殊层结构和CNN的、前向传导算法的封装</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias=None, predict=False)</span>:</span></div><div class="line">        <span class="comment"># 如果当前层是FC、就需要先将输入“铺平”</span></div><div class="line">        <span class="keyword">if</span> self.is_fc:</div><div class="line">            x = tf.reshape(x, [<span class="number">-1</span>, int(np.prod(x.get_shape()[<span class="number">1</span>:]))])</div><div class="line">        <span class="comment"># 如果是特殊的层结构、就调用相应的方法获得结果</span></div><div class="line">        <span class="keyword">if</span> self.is_sub_layer:</div><div class="line">            <span class="keyword">return</span> self._activate(x, predict)</div><div class="line">        <span class="comment"># 如果不加偏置量的话、就只进行矩阵相乘和激活函数的作用</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.apply_bias:</div><div class="line">            <span class="keyword">return</span> self._activate(tf.matmul(x, w), predict)</div><div class="line">        <span class="comment"># 否则就进行“最正常的”前向传导算法</span></div><div class="line">        <span class="keyword">return</span> self._activate(tf.matmul(x, w) + bias, predict)</div><div class="line"></div><div class="line">    <span class="comment"># 前向传导算法的核心、留待子类定义</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<p>注意到我们前向传导算法中有一项“predict”参数，这主要是因为特殊层结构的训练过程和预测过程表现通常都会不一样、所以要加一个标注。该标注的具体意义会在后文进行特殊层结构 SubLayer 的相关说明时体现出来、这里暂时按下不表</p>
+<p>在实现好基类后、就可以实现具体要用在神经网络中的 Layer 了。以 Sigmoid 激活函数对应的 Layer 为例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sigmoid</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.nn.sigmoid(x)</div></pre></td></tr></table></figure>
+<p>得益于 Tensorflow 框架的强大（你除了这句话就没别的话说了吗……）、我们甚至连激活函数的形式都无需手写，因为它已经帮我们封装好了（事实上、绝大多数常用的激活函数在 Tensorflow 里面都有封装）</p>
+<h1 id="实现特殊层"><a href="#实现特殊层" class="headerlink" title="实现特殊层"></a>实现特殊层</h1><p>这一节我们将介绍如何利用 Tensorflow 框架实现上个系列没有实现的特殊层结构——SubLayer，同时也会对十分常用的两种 SubLayer（Dropout、Normalize）做比上个系列深入一些的介绍</p>
+<p>先来看看应该如何定义 SubLayer 的基类：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 让SubLayer继承Layer以合理复用代码</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SubLayer</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.shape：和Layer相应属性意义一致</div><div class="line">        self.parent：记录该Layer的父层的属性</div><div class="line">        self.description：用于可视化的属性，记录着对该SubLayer的“描述”</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent, shape)</span>:</span></div><div class="line">        Layer.__init__(self, shape)</div><div class="line">        self.parent = parent</div><div class="line">        self.description = <span class="string">""</span></div><div class="line"></div><div class="line">    <span class="comment"># 辅助获取Root Layer的property</span></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">root</span><span class="params">(self)</span>:</span></div><div class="line">        _root = self.parent</div><div class="line">        <span class="keyword">while</span> _root.parent:</div><div class="line">            _root = _root.parent</div><div class="line">        <span class="keyword">return</span> _root</div></pre></td></tr></table></figure>
+<p>可以看到，得益于 Tensorflow 框架（Tensorflow 就是很厉害嘛……），本来难以处理的SubLayer 的实现变得非常简洁清晰。在实现好基类后、就可以实现具体要用在神经网络中的 SubLayer 了，先来看 Dropout：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dropout</span><span class="params">(SubLayer)</span>:</span></div><div class="line">    <span class="comment"># self._prob：训练过程中每个神经元被“留下”的概率</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent, shape, drop_prob=<span class="number">0.5</span>)</span>:</span></div><div class="line">        <span class="comment"># 神经元被Drop的概率必须大于等于0和小于1</span></div><div class="line">        <span class="keyword">if</span> drop_prob &lt; <span class="number">0</span> <span class="keyword">or</span> drop_prob &gt;= <span class="number">1</span>:</div><div class="line">            <span class="keyword">raise</span> ValueError(</div><div class="line">                <span class="string">"(Dropout) Probability of Dropout should be a positive float smaller than 1"</span>)</div><div class="line">        SubLayer.__init__(self, parent, shape)</div><div class="line">        <span class="comment"># 被“留下”的概率自然是1-被Drop的概率</span></div><div class="line">        self._prob = tf.constant(<span class="number">1</span> - drop_prob, dtype=tf.float32)</div><div class="line">        self.description = <span class="string">"(Drop prob: &#123;&#125;)"</span>.format(drop_prob)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="comment"># 如果是在训练过程，那么就按照设定的、被“留下”的概率进行Dropout</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> predict:</div><div class="line">            <span class="keyword">return</span> tf.nn.dropout(x, self._prob)</div><div class="line">        <span class="comment"># 如果是在预测过程，那么直接返回输入值即可</span></div><div class="line">        <span class="keyword">return</span> x</div></pre></td></tr></table></figure>
+<p>Dropout 的详细说明自然是看<a href="https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf" target="_blank" rel="external">原 paper </a>最好，这里我就大概翻译、总结一下主要内容。Dropout 的核心思想在于提高模型的泛化能力：它会在每次迭代中依概率去掉对应 Layer 的某些神经元，从而每次迭代中训练的都是一个小的神经网络。这个过程可以通过下图进行说明：</p>
+<img src="/posts/24ed2586/p1.png" alt="p1.png" title="">
+<p>上图所示的即为当<code>drop_prob</code>为 50%（我们所设的默认值）时、Dropout 的一种可能的表现。左图所示为原网络、右图所示的为 Dropout 后的网络，可以看到神经元 a、b、e、g、j 都被 Drop 了</p>
+<p>Dropout 过程的合理性需要概率论上一些理论的支撑，不过鉴于 Tensorflow 框架有封装好的相应函数、我们就不深入介绍其具体的数学原理而仅仅说明其直观（以<code>drop_prob</code>为 50%为例，其余<code>drop_prob</code>的情况是同理的）：</p>
+<ul>
+<li>在训练过程中，由于 Dropout 后留下来的神经元可以理解为“在 50%死亡概率下幸存”的神经元，所以给将它们对应的输出进行“增幅”是合理的。具体而言，假设一个神经元<script type="math/tex">n_{i}</script>的输出本来是<script type="math/tex">o_{i}</script>，那么如果 Dropout 后它被留下来了的话、其输出就应该变成<script type="math/tex">o_{i} \times \frac{1}{50\%} = 2o_{i}</script>（换句话说、应该让带 Dropout 的期望输出和原输出一致：对于任一个神经元<script type="math/tex">n_{i}</script>，设<code>drop_prob</code>为<script type="math/tex">p</script>而其原输出为<script type="math/tex">o_{i}</script>，那么当带 Dropout 的输出为<script type="math/tex">o_{i} \times \frac{1}{p}</script>时、<script type="math/tex">n_{i}</script>的期望输出即为<script type="math/tex">p \times o_{i} \times \frac{1}{p} = o_{i}</script>）</li>
+<li>由于在训练时我们保证了神经网络的期望输出不变、所以在预测过程中我们还是应该让整个网络一起进行预测而不进行 Dropout（关于这一点，原论文似乎也表示这是一种“经试验证明行之有效”的办法而没有给出具体的、原理层面的说明）</li>
+</ul>
+<p>接下来介绍一下 Normalize。Normalize 这个特殊层结构的学名叫 Batch Normalization、常简称为 BN，顾名思义，它用于对每个 Batch 对应的数据进行规范化处理。这样做的意义是直观的：对于 NN、CNN 乃至任何机器学习分类器来说，其目的可以说都是从训练样本集中学出样本在样本空间中的分布、从而可以用这个分布来预测未知数据所属的类别。如果不对每个 Batch 的数据进行任何操作的话，不难想象它们彼此对应的“极大似然分布（极大似然估计意义下的分布）”是各不相同的（因为训练集只是样本空间中的一个小抽样、而 Batch 又只是训练集的一个小抽样）；这样的话，分类器在接受每个 Batch 时都要学习一个新的分布、然后最后还要尝试从这些分布中总结出样本空间的总分布，这无疑是相当困难的。如果存在一种规范化处理方法能够使每个 Batch 的分布都贴近真实分布的话、对分类器的训练来说无疑是至关重要的</p>
+<p>传统的做法是对输入<script type="math/tex">X</script>进行很久以前提到过的归一化处理、亦即：</p>
+<script type="math/tex; mode=display">
+X = \frac{X - \overset{\overline{}}{X}}{std(X)}</script><p>其中<script type="math/tex">\overset{\overline{}}{X}</script>表示<script type="math/tex">X</script>的均值、<script type="math/tex">std(X)</script>表示<script type="math/tex">X</script>的标准差（Standard Deviation）。这种做法虽然能保证输入数据的质量、但是却无法保证NN里面中间层输出数据的质量。试想NN中的第一个隐藏层<script type="math/tex">L_{2}</script>，它接收的输入<script type="math/tex">u^{\left( 2 \right)}</script>是输入层<script type="math/tex">L_{1}</script>的输出<script type="math/tex">v^{\left( 1 \right)} = \phi_{1}(u^{\left( 1 \right)})</script>和权值矩阵<script type="math/tex">w^{\left( 1 \right)}</script>相乘后、加上偏置量<script type="math/tex">b^{\left( 1 \right)}</script>后的结果；在训练过程中，虽然<script type="math/tex">v^{\left( 1 \right)}</script>的质量有保证，但由于<script type="math/tex">w^{\left( 1 \right)}</script>和<script type="math/tex">b^{\left( 1 \right)}</script>在训练过程中会不断地被更新、所以<script type="math/tex">u^{\left( 2 \right)} = v^{\left( 1 \right)} \times w^{\left( 1 \right)} + b^{\left( 1 \right)}</script>的分布其实仍然不断在变。换句话说、<script type="math/tex">u^{\left( 2 \right)}</script>的质量其实就已经没有保证了</p>
+<p>BN 打算解决的正是随着前向传导算法的推进、得到的数据的质量会不断变差的问题，它能通过对中间层数据进行某种规范化处理以达到类似对输入归一化处理的效果。事实上回忆上一章的内容、我们已经提到过 Normalize 的核心思想在于把父层的输出进行“归一化”了，下面我们就简单看看它具体是怎么做到这一点的</p>
+<p>首先需要指出的是，简单地将每层得到的数据进行上述归一化操作显然是不可行的、因为这样会破坏掉每层自身学到的数据特征。设想如果某一层<script type="math/tex">L_{i}</script>学到了“数据基本都分布在样本空间的边缘”这一特征，这时如果强行做归一化处理并把数据都中心化的话、无疑就摈弃了<script type="math/tex">L_{i}</script>所学到的、可能是非常有价值的知识</p>
+<p>为了使得中心化之后不破坏 Layer 本身学到的特征、BN 采取了一个简单却十分有效的方法：引入两个可以学习的“重构参数”以期望能够从中心化的数据重构出 Layer 本身学到的特征。具体而言：</p>
+<ol>
+<li><strong>输入</strong>：某一层<script type="math/tex">L_{i}</script>在当前 Batch 上的输出<script type="math/tex">v^{\left( i \right)}</script>、增强数值稳定性所用的小值<script type="math/tex">\epsilon</script></li>
+<li><strong>过程</strong>：<ol>
+<li>计算当前 Batch 的均值、方差：  <script type="math/tex; mode=display">
+\mu_{i} = \overset{\overline{}}{v^{\left( i \right)}}</script><script type="math/tex; mode=display">
+\sigma_{i}^{2} = \left\lbrack \text{std}\left( v^{\left( i \right)} \right) \right\rbrack^{2}</script></li>
+<li>归一化：  <script type="math/tex; mode=display">
+\hat{v^{\left( i \right)}} = \frac{v^{\left( i \right)} - \mu_{i}}{\sqrt{\sigma_{i}^{2} + \epsilon}}</script></li>
+<li>线性变换：  <script type="math/tex; mode=display">
+y^{\left( i \right)} = \gamma\hat{v^{\left( i \right)}} + \beta</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：规范化处理后的输出<script type="math/tex">y^{\left( i \right)}</script></li>
+</ol>
+<p>BN 的核心即在于<script type="math/tex">\gamma</script>、<script type="math/tex">\beta</script>这两个参数的应用上。关于如何利用反向传播算法来更新这两个参数的数学推导会稍显繁复、我们就不展开叙述了，取而代之、我们会直接利用 Tensorflow 来进行相关的实现</p>
+<p>需要指出的是、对于算法中均值和方差的计算其实还有一个被广泛使用的小技巧，该小技巧某种意义上可以说是用到了“动量”的思想：我们会分别维护两个储存“运行均值（Running<br>Mean）”和“运行方差（Running Variance）”的变量。具体而言：</p>
+<ol>
+<li><strong>输入</strong>：某一层<script type="math/tex">L_{i}</script>在当前 Batch 上的输出<script type="math/tex">v^{\left( i \right)}</script>、增强数值稳定性所用的小值<script type="math/tex">\epsilon</script>；动量值<script type="math/tex">m</script>（一般取<script type="math/tex">m = 0.9</script>）</li>
+<li><strong>过程</strong>：<br>首先要初始化 Running Mean、Running Variance 为 0 向量：  <script type="math/tex; mode=display">
+\mu_{run} = \sigma_{run}^{2} = 0</script>并初始化<script type="math/tex">\gamma</script>、<script type="math/tex">\beta</script>为 1、0 向量：  <script type="math/tex; mode=display">
+\gamma = 1,\ \ \beta = 0</script>然后进行如下操作：<ol>
+<li>计算当前 Batch  的均值、方差：  <script type="math/tex; mode=display">
+\mu_{i} = \overset{\overline{}}{v^{\left( i \right)}}</script><script type="math/tex; mode=display">
+\sigma_{i}^{2} = \left\lbrack \text{std}\left( v^{\left( i \right)} \right) \right\rbrack^{2}</script></li>
+<li>利用<script type="math/tex">\mu_{i}</script>、<script type="math/tex">\sigma_{i}^{2}</script>和动量值<script type="math/tex">m</script>更新<script type="math/tex">\mu_{run}</script>、<script type="math/tex">\sigma_{run}^{2}</script>：  <script type="math/tex; mode=display">
+\mu_{run} \leftarrow m \cdot \mu_{run} + \left( 1 - m \right) \cdot \mu_{i}</script><script type="math/tex; mode=display">
+\sigma_{run}^{2} \leftarrow m \cdot \sigma_{run}^{2} + \left( 1 - m \right) \cdot \sigma_{i}^{2}</script></li>
+<li>利用<script type="math/tex">\mu_{run}</script>、<script type="math/tex">\sigma_{run}^{2}</script>规范化处理输出：  <script type="math/tex; mode=display">
+\hat{v^{\left( i \right)}} = \frac{v^{\left( i \right)} - \mu_{run}}{\sqrt{\sigma_{run}^{2} + \epsilon}}</script></li>
+<li>线性变换：  <script type="math/tex; mode=display">
+y^{\left( i \right)} = \gamma\hat{v^{\left( i \right)}} + \beta</script></li>
+</ol>
+</li>
+<li><strong>输出</strong>：规范化处理后的输出<script type="math/tex">y^{\left( i \right)}</script></li>
+</ol>
+<p>最后提三点使用 Normalize 时需要注意的事项：</p>
+<ul>
+<li>无论是上述的哪种算法、BN 的训练过程和预测过程的表现都是不同的。具体而言，训练过程和算法中所叙述的一致、均值和方差都是根据当前 Batch 来计算的；但测试过程中的均值和方差不能根据当前 Batch 来计算、而应该根据训练样本集的某些特征来进行计算。对于第二个算法来说，<script type="math/tex">\mu_{\text{run}}</script>和<script type="math/tex">\sigma_{\text{run}}^{2}</script>天然就是很好的、可以用来当测试过程中的均值和方差的变量，对于第一个算法而言就需要额外的计算</li>
+<li>对于 Normalize 这个特殊层结构来说、偏置量是一个冗余的变量；这是因为规范化操作（去均值）本身会将偏置量的影响抹去、同时 BN 本身的<script type="math/tex">\beta</script>参数可以说正是破坏对称性的参数，它能比较好地完成原本偏置量所做的工作</li>
+<li>Normalize 这个层结构是可以加在许多不同地方的（如下图所示的 A、B 和 C 处），原论文将它加在了 A 处、但其实现在很多主流的深层 CNN 结构都将它加在了 C 处；相对而言、加在 B 处的做法则会少一些</li>
+</ul>
+<img src="/posts/24ed2586/p2.png" alt="p2.png" title="">
+<p>在基本了解了 Normalize 对应的 BN 算法之后、我们就可以着手进行实现了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Normalize</span><span class="params">(SubLayer)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self._eps：记录增强数值稳定性所用的小值的属性</div><div class="line">        self._activation：记录自身的激活函数的属性，主要是为了兼容图7.17 A的情况</div><div class="line">        self.tf_rm、self.tf_rv：记录μ_run、σ_run^2的属性</div><div class="line">        self.tf_gamma、self.tf_beta：记录γ、β的属性</div><div class="line">        self._momentum：记录动量值m的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent, shape, activation=<span class="string">"Identical"</span>, eps=<span class="number">1e-8</span>, momentum=<span class="number">0.9</span>)</span>:</span></div><div class="line">        SubLayer.__init__(self, parent, shape)</div><div class="line">        self._eps, self._activation = eps, activation</div><div class="line">        self.tf_rm = self.tf_rv = <span class="keyword">None</span></div><div class="line">        self.tf_gamma = tf.Variable(tf.ones(self.shape[<span class="number">1</span>]), name=<span class="string">"norm_scale"</span>)</div><div class="line">        self.tf_beta = tf.Variable(tf.zeros(self.shape[<span class="number">1</span>]), name=<span class="string">"norm_beta"</span>)</div><div class="line">        self._momentum = momentum</div><div class="line">        self.description = <span class="string">"(eps: &#123;&#125;, momentum: &#123;&#125;)"</span>.format(eps, momentum)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">        <span class="comment"># 若μ_run、σ_run^2还未初始化，则根据输入x进行相应的初始化</span></div><div class="line">        <span class="keyword">if</span> self.tf_rm <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">or</span> self.tf_rv <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            shape = x.get_shape()[<span class="number">-1</span>]</div><div class="line">            self.tf_rm = tf.Variable(tf.zeros(shape), trainable=<span class="keyword">False</span>, name=<span class="string">"norm_mean"</span>)</div><div class="line">            self.tf_rv = tf.Variable(tf.ones(shape), trainable=<span class="keyword">False</span>, name=<span class="string">"norm_var"</span>)</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> predict:</div><div class="line">            <span class="comment"># 利用Tensorflow相应函数计算当前Batch的举止、方差</span></div><div class="line">            _sm, _sv = tf.nn.moments(x, list(range(len(x.get_shape()) - <span class="number">1</span>)))</div><div class="line">            _rm = tf.assign(</div><div class="line">                self.tf_rm, self._momentum * self.tf_rm + (<span class="number">1</span> - self._momentum) * _sm)</div><div class="line">            _rv = tf.assign(</div><div class="line">                self.tf_rv, self._momentum * self.tf_rv + (<span class="number">1</span> - self._momentum) * _sv)</div><div class="line">            <span class="comment"># 利用Tensorflow相应函数直接得到Batch Normalization的结果</span></div><div class="line">            <span class="keyword">with</span> tf.control_dependencies([_rm, _rv]):</div><div class="line">                _norm = tf.nn.batch_normalization(</div><div class="line">                    x, _sm, _sv, self.tf_beta, self.tf_gamma, self._eps)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _norm = tf.nn.batch_normalization(</div><div class="line">                x, self.tf_rm, self.tf_rv, self.tf_beta, self.tf_gamma, self._eps)</div><div class="line">        <span class="comment"># 如果指定了激活函数、就再用相应激活函数作用在BN结果上以得到最终结果</span></div><div class="line">        <span class="comment"># 这里只定义了ReLU和Sigmoid两种，如有需要可以很方便地进行拓展</span></div><div class="line">        <span class="keyword">if</span> self._activation == <span class="string">"ReLU"</span>:</div><div class="line">            <span class="keyword">return</span> tf.nn.relu(_norm)</div><div class="line">        <span class="keyword">if</span> self._activation == <span class="string">"Sigmoid"</span>:</div><div class="line">            <span class="keyword">return</span> tf.nn.sigmoid(_norm)</div><div class="line">        <span class="keyword">return</span> _norm</div></pre></td></tr></table></figure>
+<h1 id="重写-CostLayer-结构"><a href="#重写-CostLayer-结构" class="headerlink" title="重写 CostLayer 结构"></a>重写 CostLayer 结构</h1><p>在上个系列中，为了整合特殊变换函数和损失函数以更高效地计算梯度、我们花了不少代码来做繁琐的封装；不过由于 Tensorflow 中已经有了这些封装好的、数值性质更优的函数、所以 CostLayer 的实现将会变得非常简单：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义一个简单的基类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CostLayer</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="comment"># 定义一个方法以获取损失值</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">calculate</span><span class="params">(self, y, y_pred)</span>:</span></div><div class="line">        <span class="keyword">return</span> self._activate(y_pred, y)</div><div class="line"></div><div class="line"><span class="comment"># 定义Cross Entropy对应的CostLayer（整合了Softmax变换）</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CrossEntropy</span><span class="params">(CostLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, y)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=x, labels=y))</div><div class="line"></div><div class="line"><span class="comment"># 定义MSE准则对应的CostLayer</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MSE</span><span class="params">(CostLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, y)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.reduce_mean(tf.square(x - y))</div></pre></td></tr></table></figure>
+<p>短短 15 行代码就实现了上个系列中用 113 行代码才实现的所有功能，由此可窥见 Tensorflow 框架的强大</p>
+<p>（话说我这么卖力地安利 Tensorflow，Google 是不是应该给我些广告费什么的）（喂</p>
+<h1 id="重写网络结构"><a href="#重写网络结构" class="headerlink" title="重写网络结构"></a>重写网络结构</h1><p>由于 Tensorflow 重写的是算法核心部分，作为封装的网络结构其实并不用进行太大的变动；具体而言、整个网络结构需要做比较大的改动的地方只有如下两个：</p>
+<ul>
+<li>初始化各个权值矩阵时，从初始化为 Numpy 数组改为初始化为 Tensorflow 数组、同时要注意兼容 CNN 的问题</li>
+<li>不用记录所有 Layer 的激活值而只用关心输出 Layer 的输出值和 CostLayer 的损失值（在上个系列中、我们是要记录所有中间结果以进行反向传播算法的）</li>
+</ul>
+<p>关于第一点我们会在后面介绍 CNN 的实现时进行说明，这里就仅看看第二点怎么做到：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义一个只获取输出Layer的输出值的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_rs</span><span class="params">(self, x, predict=True)</span>:</span></div><div class="line">    <span class="comment"># 先获取第一层的激活值并用一个 _cache变量进行存储</span></div><div class="line">    _cache = self._layers[<span class="number">0</span>].activate(x, self._tf_weights[<span class="number">0</span>], self._tf_bias[<span class="number">0</span>], predict)</div><div class="line">    <span class="comment"># 遍历剩余的Layer</span></div><div class="line">    <span class="keyword">for</span> i, layer <span class="keyword">in</span> enumerate(self._layers[<span class="number">1</span>:]):</div><div class="line">        <span class="comment"># 如果到了倒数第二层（输出层）、就进行相应的处理并输出结果</span></div><div class="line">        <span class="keyword">if</span> i == len(self._layers) - <span class="number">2</span>:</div><div class="line">            <span class="comment"># 如果输出层是卷积层、就要把结果铺平</span></div><div class="line">            <span class="keyword">if</span> isinstance(self._layers[<span class="number">-2</span>], ConvLayer):</div><div class="line">                _cache = tf.reshape(_cache, [<span class="number">-1</span>, int(np.prod(_cache.get_shape()[<span class="number">1</span>:]))])</div><div class="line">            <span class="keyword">if</span> self._tf_bias[<span class="number">-1</span>] <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">                <span class="keyword">return</span> tf.matmul(_cache, self._tf_weights[<span class="number">-1</span>]) + self._tf_bias[<span class="number">-1</span>]</div><div class="line">            <span class="keyword">return</span> tf.matmul(_cache, self._tf_weights[<span class="number">-1</span>])</div><div class="line">        <span class="comment"># 否则、进行相应的前向传导算法</span></div><div class="line">        _cache = layer.activate(_cache, self._tf_weights[i + <span class="number">1</span>], self._tf_bias[i + <span class="number">1</span>], predict)</div></pre></td></tr></table></figure>
+<p><strong><em>注意：不难看出、<code>get_rs</code>是兼容 CNN 的</em></strong></p>
+<p>有了<code>get_rs</code>这个方法后、Tensorflow 下的网络结构的核心训练步骤就非常简洁了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 获取输出值</span></div><div class="line">self._y_pred = self._get_rs(self._tfx, predict=<span class="keyword">False</span>)</div><div class="line"><span class="comment"># 利用输出值和CostLayer的calculate方法、计算出损失值</span></div><div class="line">self._cost = self._layers[<span class="number">-1</span>].calculate(self._tfy, self._y_pred)</div><div class="line"><span class="comment"># 利用Tensorflow帮我们封装的优化器、直接定义出参数的更新步骤</span></div><div class="line">self._train_step = self._optimizer.minimize(self._cost)</div></pre></td></tr></table></figure>
+<p>完整的、Tensorflow 版本的网络结构的代码可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/g_CNN/Networks.py" target="_blank" rel="external">这里</a>，对其深入一些的介绍则在下篇文章的最后一节中进行。此外、我对 Tensorflow 提供的诸多优化器做了一个简单的封装以兼容上个系列实现的优化器的一些接口，具体的代码可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/g_CNN/Optimizers.py" target="_blank" rel="external">这里</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/7990dadf/" rel="prev" title="从 NN 到 CNN">
+                <i class="fa fa-chevron-left"></i> 从 NN 到 CNN
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/433ed5d6/" rel="next" title="将 NN 扩展为 CNN">
+                将 NN 扩展为 CNN <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#重写-Layer-结构"><span class="nav-number">1.</span> <span class="nav-text">重写 Layer 结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现特殊层"><span class="nav-number">2.</span> <span class="nav-text">实现特殊层</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重写-CostLayer-结构"><span class="nav-number">3.</span> <span class="nav-text">重写 CostLayer 结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重写网络结构"><span class="nav-number">4.</span> <span class="nav-text">重写网络结构</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1041 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Python 与机器学习" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="往简单里说、CNN 只是多了卷积层、池化层和 FC 的 NN 而已，虽然卷积、池化对应的前向传导算法和反向传播算法的高效实现都很不平凡，但得益于 Tensorflow 的强大、我们可以在仅仅知道它们思想的前提下进行相应的实现，因为 Tensorflow 能够帮我们处理所有数学与技术上的细节">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="将 NN 扩展为 CNN">
+<meta property="og:url" content="http://www.carefree0910.com/posts/433ed5d6/index.html">
+<meta property="og:site_name" content="Python 与机器学习">
+<meta property="og:description" content="往简单里说、CNN 只是多了卷积层、池化层和 FC 的 NN 而已，虽然卷积、池化对应的前向传导算法和反向传播算法的高效实现都很不平凡，但得益于 Tensorflow 的强大、我们可以在仅仅知道它们思想的前提下进行相应的实现，因为 Tensorflow 能够帮我们处理所有数学与技术上的细节">
+<meta property="og:updated_time" content="2017-05-06T07:15:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="将 NN 扩展为 CNN">
+<meta name="twitter:description" content="往简单里说、CNN 只是多了卷积层、池化层和 FC 的 NN 而已，虽然卷积、池化对应的前向传导算法和反向传播算法的高效实现都很不平凡，但得益于 Tensorflow 的强大、我们可以在仅仅知道它们思想的前提下进行相应的实现，因为 Tensorflow 能够帮我们处理所有数学与技术上的细节">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.carefree0910.com/posts/433ed5d6/"/>
+
+
+
+
+
+  <title> 将 NN 扩展为 CNN | Python 与机器学习 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4c67aa97d53197be627444a8367334aa";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Python 与机器学习</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Python & Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.carefree0910.com/posts/433ed5d6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="射命丸咲">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Python 与机器学习">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                将 NN 扩展为 CNN
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-06T14:54:43+08:00">
+                2017-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/卷积神经网络/" itemprop="url" rel="index">
+                    <span itemprop="name">卷积神经网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>往简单里说、CNN 只是多了卷积层、池化层和 FC 的 NN 而已，虽然卷积、池化对应的前向传导算法和反向传播算法的高效实现都很不平凡，但得益于 Tensorflow 的强大、我们可以在仅仅知道它们思想的前提下进行相应的实现，因为 Tensorflow 能够帮我们处理所有数学与技术上的细节</p>
+<a id="more"></a>
+<h1 id="实现卷积层"><a href="#实现卷积层" class="headerlink" title="实现卷积层"></a>实现卷积层</h1><p>回忆我们说过的卷积层和普通层的性质、不难发现它们的表现极其相似，区别大体上来说只在于如下三点：</p>
+<ul>
+<li>普通层自身对数据的处理只有“激活”（<script type="math/tex">v^{\left( i \right)} = \phi_{i}\left( u^{\left( i \right)} \right)</script>）这一个步骤，层与层（<script type="math/tex">L_{i}</script>、<script type="math/tex">L_{i + 1}</script>）之间的数据传递则是通过权值矩阵、偏置量（<script type="math/tex">w^{\left( i \right)}</script>、<script type="math/tex">b^{\left( i \right)}</script>）和线性变换（<script type="math/tex">u^{\left( i + 1 \right)} = v^{\left( i \right)} \times w^{\left( i \right)} + b^{\left( i \right)}</script>）来完成的；卷积层自身对数据的处理则多了“卷积”这个步骤（通常来说是先卷积再激活：<script type="math/tex">v^{\left( i \right)} = \phi_{i}\left( \text{conv}\left( u^{\left( i \right)} \right) \right)</script>）、同时层与层之间的数据传递是直接传递的（<script type="math/tex">u^{\left( i + 1 \right)} = v^{\left( i \right)}</script>）</li>
+<li>卷积层自身多了 Kernel 这个属性并因此带来了诸如 Stride、Padding 等属性，不过与此同时、卷积层之间没有权值矩阵</li>
+<li>卷积层和普通层的<code>shape</code>属性记录的东西不同，具体而言：<ul>
+<li>普通层的<code>shape</code>记录着上个 Layer 和该 Layer 所含神经元的个数</li>
+<li>卷积层的<code>shape</code>记录着上个卷积层的输出和该卷积层的 Kernel 的信息（注意卷积层的上一层必定还是卷积层）</li>
+</ul>
+</li>
+</ul>
+<p>接下来就看看具体实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvLayer</span><span class="params">(Layer)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">        初始化结构</div><div class="line">        self.shape：记录着上个卷积层的输出和该Layer的Kernel的信息，具体而言：</div><div class="line">            self.shape[0] = 上个卷积层的输出的形状（频道数×高×宽）</div><div class="line">                常简记为self.shape[0] =(c,h_old,w_old)</div><div class="line">            self.shape[1] = 该卷积层Kernel的信息（Kernel数×高×宽）</div><div class="line">                常简记为self.shape[1] =(f,h_new,w_new)</div><div class="line">        self.stride、self.padding：记录Stride、Padding的属性</div><div class="line">        self.parent：记录父层的属性</div><div class="line">    """</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, shape, stride=<span class="number">1</span>, padding=<span class="string">"SAME"</span>, parent=None)</span>:</span></div><div class="line">        <span class="keyword">if</span> parent <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">            _parent = parent.root <span class="keyword">if</span> parent.is_sub_layer <span class="keyword">else</span> parent</div><div class="line">            shape = _parent.shape</div><div class="line">        Layer.__init__(self, shape)</div><div class="line">        self.stride = stride</div><div class="line">        <span class="comment"># 利用Tensorflow里面对Padding功能的封装、定义self.padding属性</span></div><div class="line">        <span class="keyword">if</span> isinstance(padding, str):</div><div class="line">            <span class="comment"># "VALID"意味着输出的高、宽会受Kernel的高、宽影响，具体公式后面会说</span></div><div class="line">            <span class="keyword">if</span> padding.upper() == <span class="string">"VALID"</span>:</div><div class="line">                self.padding = <span class="number">0</span></div><div class="line">                self.pad_flag = <span class="string">"VALID"</span></div><div class="line">            <span class="comment"># "SAME"意味着输出的高、宽与Kernel的高、宽无关、只受Stride的影响</span></div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                self.padding = self.pad_flag = <span class="string">"SAME"</span></div><div class="line">        <span class="comment"># 如果输入了一个整数、那么就按照VALID情形设置Padding相关的属性</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self.padding = int(padding)</div><div class="line">            self.pad_flag = <span class="string">"VALID"</span></div><div class="line">        self.parent = parent</div><div class="line">        <span class="keyword">if</span> len(shape) == <span class="number">1</span>:</div><div class="line">            self.n_channels = self.n_filters = self.out_h = self.out_w = <span class="keyword">None</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self.feed_shape(shape)</div><div class="line"></div><div class="line">    <span class="comment"># 定义一个处理shape属性的方法</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">feed_shape</span><span class="params">(self, shape)</span>:</span></div><div class="line">        self.shape = shape</div><div class="line">        self.n_channels, height, width = shape[<span class="number">0</span>]</div><div class="line">        self.n_filters, filter_height, filter_width = shape[<span class="number">1</span>]</div><div class="line">        <span class="comment"># 根据Padding的相关信息、计算输出的高、宽</span></div><div class="line">        <span class="keyword">if</span> self.pad_flag == <span class="string">"VALID"</span>:</div><div class="line">            self.out_h = ceil((height - filter_height + <span class="number">1</span>) / self.stride)</div><div class="line">            self.out_w = ceil((width - filter_width + <span class="number">1</span>) / self.stride)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            self.out_h = ceil(height / self.stride)</div><div class="line">            self.out_w = ceil(width / self.stride)</div></pre></td></tr></table></figure>
+<p>上述代码的最后几行对应着下述两个公式、这两个公式在 Tensorflow 里面有着直接对应的实现：</p>
+<ul>
+<li>当 Padding 设置为 VALID 时，输出的高、宽分别为：  <script type="math/tex; mode=display">
+h^{\text{out}} = \left\lceil \frac{h^{\text{old}} - h^{\text{new}} + 1}{\text{stride}} \right\rceil,\ \ w^{\text{out}} = \left\lceil \frac{w^{\text{old}} - w^{\text{new}} + 1}{\text{stride}} \right\rceil</script>其中，符号“<script type="math/tex">\lceil\ \rceil</script>”代表着“向上取整”，stride 代表着步长</li>
+<li>当 Padding 设置为 SAME 时，输出的高、宽分别为：  <script type="math/tex; mode=display">
+h^{\text{out}} = \left\lceil \frac{h^{\text{old}}}{\text{stride}} \right\rceil,\ \ w^{\text{out}} = \left\lceil \frac{w^{\text{old}}}{\text{stride}} \right\rceil</script></li>
+</ul>
+<p>同时不难看出、上述代码其实没有把 CNN 的前向传导算法囊括进去，这是因为考虑到卷积层会利用到普通层的激活函数、所以期望能够合理复用代码。所以期望能够把上述代码定义的 ConvLayer 和前文重写的 Layer 整合在一起以成为具体用在 CNN 中的卷积层，为此我们需要利用到 Python 中一项比较高级的技术——元类（元类的介绍可以参见<a href="https://zhuanlan.zhihu.com/p/24633374" target="_blank" rel="external">这里</a>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvLayerMeta</span><span class="params">(type)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(mcs, *args, **kwargs)</span>:</span></div><div class="line">        name, bases, attr = args[:<span class="number">3</span>]</div><div class="line">        <span class="comment"># 规定继承的顺序为ConvLayer→Layer</span></div><div class="line">        conv_layer, layer = bases</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, shape, stride=<span class="number">1</span>, padding=<span class="string">"SAME"</span>)</span>:</span></div><div class="line">            conv_layer.__init__(self, shape, stride, padding)</div><div class="line"></div><div class="line">        <span class="comment"># 利用Tensorflow的相应函数定义计算卷积的方法</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_conv</span><span class="params">(self, x, w)</span>:</span></div><div class="line">            <span class="keyword">return</span> tf.nn.conv2d(x, w, strides=[self.stride] * <span class="number">4</span>, padding=self.pad_flag)</div><div class="line"></div><div class="line">        <span class="comment"># 依次进行卷积、激活的步骤</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, w, bias, predict)</span>:</span></div><div class="line">            res = self._conv(x, w) + bias</div><div class="line">            <span class="keyword">return</span> layer._activate(self, res, predict)</div><div class="line"></div><div class="line">        <span class="comment"># 在正式进行前向传导算法之前、先要利用Tensorflow相应函数进行Padding</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias=None, predict=False)</span>:</span></div><div class="line">            <span class="keyword">if</span> self.pad_flag == <span class="string">"VALID"</span> <span class="keyword">and</span> self.padding &gt; <span class="number">0</span>:</div><div class="line">                _pad = [self.padding] * <span class="number">2</span></div><div class="line">                x = tf.pad(x, [[<span class="number">0</span>, <span class="number">0</span>], _pad, _pad, [<span class="number">0</span>, <span class="number">0</span>]], <span class="string">"CONSTANT"</span>)</div><div class="line">            <span class="keyword">return</span> _activate(self, x, w, bias, predict)</div><div class="line">        <span class="comment"># 将打包好的类返回</span></div><div class="line">        <span class="keyword">for</span> key, value <span class="keyword">in</span> locals().items():</div><div class="line">            <span class="keyword">if</span> str(value).find(<span class="string">"function"</span>) &gt;= <span class="number">0</span>:</div><div class="line">                attr[key] = value</div><div class="line">        <span class="keyword">return</span> type(name, bases, attr)</div></pre></td></tr></table></figure>
+<p>在定义好基类和元类后、定义实际应用在 CNN 中的卷积层就非常简洁了。以在深度学习中应用最广泛的 ReLU 卷积层为例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvReLU</span><span class="params">(ConvLayer, ReLU, metaclass=ConvLayerMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<h1 id="实现池化层"><a href="#实现池化层" class="headerlink" title="实现池化层"></a>实现池化层</h1><p>池化层比起卷积层而言要更简单一点：对于最常见的两种池化——极大池化和平均池化而言，它们所做的只是取输入的极大值和均值而已、本身并没有可以更新的参数。是故对池化层而言，我们无需维护其 Kernel、而只用定义相应的池化方法（极大、平均）即可，因此我们要求用户在调用池化层时、只提供“高”和“宽”而不提供“Kernel 个数”</p>
+<p><strong><em>注意：Kernel 个数从数值上来说与输出频道个数一致，所以对于池化层的实现而言、我们应该直接用输入频道数来赋值 Kernel 数，因为池化不会改变数据的频道数</em></strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvPoolLayer</span><span class="params">(ConvLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">feed_shape</span><span class="params">(self, shape)</span>:</span></div><div class="line">        shape = (shape[<span class="number">0</span>], (shape[<span class="number">0</span>][<span class="number">0</span>], *shape[<span class="number">1</span>]))</div><div class="line">        ConvLayer.feed_shape(self, shape)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias=None, predict=False)</span>:</span></div><div class="line">        pool_height, pool_width = self.shape[<span class="number">1</span>][<span class="number">1</span>:]</div><div class="line">        <span class="comment"># 处理Padding</span></div><div class="line">        <span class="keyword">if</span> self.pad_flag == <span class="string">"VALID"</span> <span class="keyword">and</span> self.padding &gt; <span class="number">0</span>:</div><div class="line">            _pad = [self.padding] * <span class="number">2</span></div><div class="line">            x = tf.pad(x, [[<span class="number">0</span>, <span class="number">0</span>], _pad, _pad, [<span class="number">0</span>, <span class="number">0</span>]], <span class="string">"CONSTANT"</span>)</div><div class="line">        <span class="comment"># 利用self._activate方法进行池化</span></div><div class="line">        <span class="keyword">return</span> self._activate(<span class="keyword">None</span>)(</div><div class="line">            x, ksize=[<span class="number">1</span>, pool_height, pool_width, <span class="number">1</span>],</div><div class="line">            strides=[<span class="number">1</span>, self.stride, self.stride, <span class="number">1</span>], padding=self.pad_flag)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, *args)</span>:</span></div><div class="line">        <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<p>同样的，由于 Tensorflow 已经帮助我们做好了封装、我们可以直接调用相应的函数来完成极大池化和平均池化的实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 实现极大池化</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MaxPool</span><span class="params">(ConvPoolLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, *args)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.nn.max_pool</div><div class="line"></div><div class="line"><span class="comment"># 实现平均池化</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">AvgPool</span><span class="params">(ConvPoolLayer)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, *args)</span>:</span></div><div class="line">        <span class="keyword">return</span> tf.nn.avg_pool</div></pre></td></tr></table></figure>
+<h1 id="实现-CNN-中的特殊层结构"><a href="#实现-CNN-中的特殊层结构" class="headerlink" title="实现 CNN 中的特殊层结构"></a>实现 CNN 中的特殊层结构</h1><p>在 CNN 中同样有着 Dropout 和 Normalize 这两种特殊层结构。它们的表现和 NN 中相应特殊层结构的表现是完全一致的，区别只在于作用的对象不同</p>
+<p>我们知道，CNN 每一层数据的维度要比 NN 中每一层数据的维度多一维：一个典型的 NN 中每一层的数据通常是<script type="math/tex">N \times p \times q</script>的，而 CNN 则通常是<script type="math/tex">N \times p \times q \times r</script>的、其中<script type="math/tex">r</script>是当前数据的频道数。为了让适用于 NN 的特殊层结构适配于 CNN，一个自然而合理的做法就是将<script type="math/tex">r</script>个频道的数据当做一个整体来处理、或说将 CNN 中<script type="math/tex">r</script>个频道的数据放在一起并视为 NN 中的一个神经元，这样做的话就能通过简易的封装来直接利用上我们对 NN 定义的特殊层结构。封装的过程则仍要用到元类：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义作为封装的元类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvSubLayerMeta</span><span class="params">(type)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(mcs, *args, **kwargs)</span>:</span></div><div class="line">        name, bases, attr = args[:<span class="number">3</span>]</div><div class="line">        conv_layer, sub_layer = bases</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, parent, shape, *_args, **_kwargs)</span>:</span></div><div class="line">            conv_layer.__init__(self, <span class="keyword">None</span>, parent=parent)</div><div class="line">            <span class="comment"># 与池化层类似、特殊层输出数据的形状应保持与输入数据的形状一致</span></div><div class="line">            self.out_h, self.out_w = parent.out_h, parent.out_w</div><div class="line">            sub_layer.__init__(self, parent, shape, *_args, **_kwargs)</div><div class="line">            self.shape = ((shape[<span class="number">0</span>][<span class="number">0</span>], self.out_h, self.out_w), shape[<span class="number">0</span>])</div><div class="line">            <span class="comment"># 如果是CNN中的Normalize、则要提前初始化好γ、β</span></div><div class="line">            <span class="keyword">if</span> name == <span class="string">"ConvNorm"</span>:</div><div class="line">                self.tf_gamma = tf.Variable(tf.ones(self.n_filters), name=<span class="string">"norm_scale"</span>)</div><div class="line">                self.tf_beta = tf.Variable(tf.zeros(self.n_filters), name=<span class="string">"norm_beta"</span>)</div><div class="line"></div><div class="line">        <span class="comment"># 利用NN中的特殊层结构的相应方法获得结果</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_activate</span><span class="params">(self, x, predict)</span>:</span></div><div class="line">            <span class="keyword">return</span> sub_layer._activate(self, x, predict)</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">activate</span><span class="params">(self, x, w, bias=None, predict=False)</span>:</span></div><div class="line">            <span class="keyword">return</span> _activate(self, x, predict)</div><div class="line">        <span class="comment"># 将打包好的类返回</span></div><div class="line">        <span class="keyword">for</span> key, value <span class="keyword">in</span> locals().items():</div><div class="line">            <span class="keyword">if</span> str(value).find(<span class="string">"function"</span>) &gt;= <span class="number">0</span> <span class="keyword">or</span> str(value).find(<span class="string">"property"</span>):</div><div class="line">                attr[key] = value</div><div class="line">        <span class="keyword">return</span> type(name, bases, attr)</div><div class="line"></div><div class="line"><span class="comment"># 定义CNN中的Dropout，注意继承顺序</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvDrop</span><span class="params">(ConvLayer, Dropout, metaclass=ConvSubLayerMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div><div class="line"></div><div class="line"><span class="comment"># 定义CNN中的Normalize，注意继承顺序</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConvNorm</span><span class="params">(ConvLayer, Normalize, metaclass=ConvSubLayerMeta)</span>:</span></div><div class="line">    <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<h1 id="实现-LayerFactory"><a href="#实现-LayerFactory" class="headerlink" title="实现 LayerFactory"></a>实现 LayerFactory</h1><p>我们在前三节讲述了 CNN 中卷积层、池化层和特殊层的实现，这一节我们将介绍如何定义一个简单的工厂来“生产”NN 中的层和前文介绍的这些层以方便进行应用（与上个系列中生产优化器的工厂差不多）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LayerFactory</span>:</span></div><div class="line">    <span class="comment"># 使用一个字典记录下所有的Root Layer</span></div><div class="line">    available_root_layers = &#123;</div><div class="line">        <span class="string">"Tanh"</span>: Tanh, <span class="string">"Sigmoid"</span>: Sigmoid,</div><div class="line">        <span class="string">"ELU"</span>: ELU, <span class="string">"ReLU"</span>: ReLU, <span class="string">"Softplus"</span>: Softplus,</div><div class="line">        <span class="string">"Identical"</span>: Identical,</div><div class="line">        <span class="string">"CrossEntropy"</span>: CrossEntropy, <span class="string">"MSE"</span>: MSE,</div><div class="line">        <span class="string">"ConvTanh"</span>: ConvTanh, <span class="string">"ConvSigmoid"</span>: ConvSigmoid,</div><div class="line">        <span class="string">"ConvELU"</span>: ConvELU, <span class="string">"ConvReLU"</span>: ConvReLU, <span class="string">"ConvSoftplus"</span>: ConvSoftplus,</div><div class="line">        <span class="string">"ConvIdentical"</span>: ConvIdentical,</div><div class="line">        <span class="string">"MaxPool"</span>: MaxPool, <span class="string">"AvgPool"</span>: AvgPool</div><div class="line">    &#125;</div><div class="line">    <span class="comment"># 使用一个字典记录下所有特殊层</span></div><div class="line">    available_special_layers = &#123;</div><div class="line">        <span class="string">"Dropout"</span>: Dropout,</div><div class="line">        <span class="string">"Normalize"</span>: Normalize,</div><div class="line">        <span class="string">"ConvDrop"</span>: ConvDrop,</div><div class="line">        <span class="string">"ConvNorm"</span>: ConvNorm</div><div class="line">    &#125;</div><div class="line">    <span class="comment"># 使用一个字典记录下所有特殊层的默认参数</span></div><div class="line">    special_layer_default_params = &#123;</div><div class="line">        <span class="string">"Dropout"</span>: (<span class="number">0.5</span>,),</div><div class="line">        <span class="string">"Normalize"</span>: (<span class="string">"Identical"</span>, <span class="number">1e-8</span>, <span class="number">0.9</span>),</div><div class="line">        <span class="string">"ConvDrop"</span>: (<span class="number">0.5</span>,),</div><div class="line">        <span class="string">"ConvNorm"</span>: (<span class="string">"Identical"</span>, <span class="number">1e-8</span>, <span class="number">0.9</span>)</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>以上是一些准备工作，如果由于特殊需求（比如想实验某种激活函数是否好用）实现了新的 Layer 的话、就需要更新上面对应的字典。<br>接下来看看核心的方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 定义根据“名字”获取（Root）Layer的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_root_layer_by_name</span><span class="params">(self, name, *args, **kwargs)</span>:</span></div><div class="line">    <span class="comment"># 根据字典判断输入的名字是否是Root Layer的名字</span></div><div class="line">    <span class="keyword">if</span> name <span class="keyword">in</span> self.available_root_layers:</div><div class="line">        <span class="comment"># 若是、则返回相应的Root Layer</span></div><div class="line">        layer = self.available_root_layers[name]</div><div class="line">        <span class="keyword">return</span> layer(*args, **kwargs)</div><div class="line">    <span class="comment"># 否则返回None</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line"></div><div class="line"><span class="comment"># 定义根据“名字”获取（任何）Layer的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_layer_by_name</span><span class="params">(self, name, parent, current_dimension, *args, **kwargs)</span>:</span></div><div class="line">    <span class="comment"># 先看输入的是否是Root Layer</span></div><div class="line">    _layer = self.get_root_layer_by_name(name, *args, **kwargs)</div><div class="line">    <span class="comment"># 若是、直接返回相应的Root Layer</span></div><div class="line">    <span class="keyword">if</span> _layer:</div><div class="line">        <span class="keyword">return</span> _layer, <span class="keyword">None</span></div><div class="line">    <span class="comment"># 否则就根据父层和相应字典进行初始化后、返回相应的特殊层</span></div><div class="line">    _current, _next = parent.shape[<span class="number">1</span>], current_dimension</div><div class="line">    layer_param = self.special_layer_default_params[name]</div><div class="line">    _layer = self.available_special_layers[name]</div><div class="line">    <span class="keyword">if</span> args <span class="keyword">or</span> kwargs:</div><div class="line">        _layer = _layer(parent, (_current, _next), *args, **kwargs)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        _layer = _layer(parent, (_current, _next), *layer_param)</div><div class="line">    <span class="keyword">return</span> _layer, (_current, _next)</div></pre></td></tr></table></figure>
+<p>至此，所有 CNN 会用到的、和层结构相关的东西就已经全部实现完毕了，接下来只需在网络结构上做一些简单的更新后、CNN 的实现便能大功告成</p>
+<h1 id="扩展网络结构"><a href="#扩展网络结构" class="headerlink" title="扩展网络结构"></a>扩展网络结构</h1><p>将网络结构迁移到 Tensorflow 框架中并扩展出 CNN 的功能这个过程、虽然不算困难却也相当繁琐。本节将会节选出其中比较重要的部分进行说明，对于其余和上个系列实现的网络结构几乎一致的地方则不再进行注释或叙述</p>
+<p>首先是初始化，由于我们使用的是 Tensorflow 框架、所以相应变量名的前面会一概加上“tf”两个字母：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NN</span><span class="params">(ClassifierBase)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(NN, self).__init__()</div><div class="line">        self._layers = []</div><div class="line">        self._optimizer = <span class="keyword">None</span></div><div class="line">        self._current_dimension = <span class="number">0</span></div><div class="line">        self._available_metrics = &#123;</div><div class="line">            key: value <span class="keyword">for</span> key, value <span class="keyword">in</span> zip([<span class="string">"acc"</span>, <span class="string">"f1-score"</span>], [NN.acc, NN.f1_score])</div><div class="line">        &#125;</div><div class="line">        self.verbose = <span class="number">0</span></div><div class="line">        self._metrics, self._metric_names, self._logs = [], [], &#123;&#125;</div><div class="line">        self._layer_factory = LayerFactory()</div><div class="line">        <span class="comment"># 定义Tensorflow中的相应变量</span></div><div class="line">        self._tfx = self._tfy = <span class="keyword">None</span>  <span class="comment"># 记录每个Batch的样本、标签的属性</span></div><div class="line">        self._tf_weights, self._tf_bias = [], []  <span class="comment"># 记录w、b的属性</span></div><div class="line">        self._cost = self._y_pred = <span class="keyword">None</span>  <span class="comment"># 记录损失值、输出值的属性</span></div><div class="line">        self._train_step = <span class="keyword">None</span>  <span class="comment"># 记录“参数更新步骤”的属性</span></div><div class="line">        self._sess = tf.Session()  <span class="comment"># 记录Tensorflow Session的属性</span></div></pre></td></tr></table></figure>
+<p>然后我们要解决的就是上篇文章最后遗留下来的、在初始化各个权值矩阵时要把从初始化为 Numpy 数组改为初始化为 Tensorflow 数组、同时要注意兼容 CNN 的问题：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 利用Tensorflow相应函数初始化参数</span></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_w</span><span class="params">(shape)</span>:</span></div><div class="line">    initial = tf.truncated_normal(shape, stddev=<span class="number">0.1</span>)</div><div class="line">    <span class="keyword">return</span> tf.Variable(initial, name=<span class="string">"w"</span>)</div><div class="line"></div><div class="line"><span class="meta">@staticmethod</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_b</span><span class="params">(shape)</span>:</span></div><div class="line">    <span class="keyword">return</span> tf.Variable(np.zeros(shape, dtype=np.float32) + <span class="number">0.1</span>, name=<span class="string">"b"</span>)</div><div class="line"></div><div class="line"><span class="comment"># 做一个初始化参数的封装，要注意兼容CNN</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_add_params</span><span class="params">(self, shape, conv_channel=None, fc_shape=None, apply_bias=True)</span>:</span></div><div class="line">    <span class="comment"># 如果是FC的话、就要根据铺平后数据的形状来初始化数据</span></div><div class="line">    <span class="keyword">if</span> fc_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        w_shape = (fc_shape, shape[<span class="number">1</span>])</div><div class="line">        b_shape = shape[<span class="number">1</span>],</div><div class="line">    <span class="comment"># 如果是卷积层的话、就要定义Kernel而非权值矩阵</span></div><div class="line">    <span class="keyword">elif</span> conv_channel <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">        <span class="keyword">if</span> len(shape[<span class="number">1</span>]) &lt;= <span class="number">2</span>:</div><div class="line">            w_shape = shape[<span class="number">1</span>][<span class="number">0</span>], shape[<span class="number">1</span>][<span class="number">1</span>], conv_channel, conv_channel</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            w_shape = (shape[<span class="number">1</span>][<span class="number">1</span>], shape[<span class="number">1</span>][<span class="number">2</span>], conv_channel, shape[<span class="number">1</span>][<span class="number">0</span>])</div><div class="line">        b_shape = shape[<span class="number">1</span>][<span class="number">0</span>],</div><div class="line">    <span class="comment"># 其余情况和普通NN无异</span></div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        w_shape = shape</div><div class="line">        b_shape = shape[<span class="number">1</span>],</div><div class="line">    self._tf_weights.append(self._get_w(w_shape))</div><div class="line">    <span class="keyword">if</span> apply_bias:</div><div class="line">        self._tf_bias.append(self._get_b(b_shape))</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        self._tf_bias.append(<span class="keyword">None</span>)</div><div class="line"></div><div class="line"><span class="comment"># 由于特殊层不会用到w和b、所以要定义一个生成占位符的方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_add_param_placeholder</span><span class="params">(self)</span>:</span></div><div class="line">    self._tf_weights.append(tf.constant([<span class="number">.0</span>]))</div><div class="line">    self._tf_bias.append(tf.constant([<span class="number">.0</span>]))</div></pre></td></tr></table></figure>
+<p>以上就是和 NN 中网络结构相比有比较大改动的地方、其余的部分则都是一些琐碎的细节。完整的代码可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/g_CNN/Networks.py" target="_blank" rel="external">这里</a>，功能更为齐全、在许多细节上都进行了优化的版本则可以参见<a href="https://github.com/carefree0910/MachineLearning/blob/master/NN/TF/Networks.py" target="_blank" rel="external">这里</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>观众老爷们能赏个脸么 ( σ'ω')σ</div>
+    <br>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://i1.piimg.com/4851/d9125415b6f8f0db.png" alt="射命丸咲 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://i1.piimg.com/4851/2b59a8258884e616.png" alt="射命丸咲 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/24ed2586/" rel="prev" title="利用 Tensorflow 重写 NN">
+                <i class="fa fa-chevron-left"></i> 利用 Tensorflow 重写 NN
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/18671318/" rel="next" title="“卷积神经网络”小结">
+                “卷积神经网络”小结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODI5Ni80ODY4"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="射命丸咲" />
+          <p class="site-author-name" itemprop="name">射命丸咲</p>
+           
+              <p class="site-description motion-element" itemprop="description">一个啥都想学的浮莲子</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/carefree0910" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/carefree0910" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实现卷积层"><span class="nav-number">1.</span> <span class="nav-text">实现卷积层</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现池化层"><span class="nav-number">2.</span> <span class="nav-text">实现池化层</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现-CNN-中的特殊层结构"><span class="nav-number">3.</span> <span class="nav-text">实现 CNN 中的特殊层结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现-LayerFactory"><span class="nav-number">4.</span> <span class="nav-text">实现 LayerFactory</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#扩展网络结构"><span class="nav-number">5.</span> <span class="nav-text">扩展网络结构</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">射命丸咲</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
