@@ -104,7 +104,7 @@
 <meta property="og:image" content="http://www.carefree0910.com/posts/65c8a24f/p3.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/65c8a24f/p4.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/65c8a24f/p5.png">
-<meta property="og:updated_time" content="2017-05-06T02:36:40.000Z">
+<meta property="og:updated_time" content="2017-05-20T01:34:39.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="“大数据”下的网络结构">
 <meta name="twitter:description" content="本文标题处的“大数据”打上了引号，是因为我们所要讨论的不是当今十分火热的、真正的大数据问题、而是讨论当问题规模“相当大”时应该如何处理。我们虽然在上篇文章中实现了一个切实可用的神经网络、但它确实显得过于朴实。本文会说明如何在这个朴实模型的基础上进行拓展，这些拓展的手法不单适用于神经网络、还适用于诸多旨在解决现实生活中规模相对较大的任务的模型">
@@ -430,7 +430,7 @@
 <p>仅仅简单地把数据集分开并没有意义，如果想要进行评估的话、就必须切实利用到那分出来的测试集。一种常见的做法是实时记录模型在测试集上的表现并在最后以图表的形式画出，这正是我们之前展示过的各种训练曲线的由来；要想实现这种实时记录的功能、我们需要额外地定义一些属性和方法。思路大致如下：</p>
 <ul>
 <li>定义一个属性<code>self._logs</code>以存储我们的记录。该属性是一个字典、结构大致为：  <script type="math/tex; mode=display">
-\text{self._logs} = "\text{\{"train": train_log, "test":test_log\}}</script>其中<script type="math/tex">\text{train_log}</script>和<script type="math/tex">\text{test_log}</script>为训练集和测试集的实时表现</li>
+\text{self._logs} = \text{\{"train": train_log, "test":test_log\}}</script>其中<script type="math/tex">\text{train_log}</script>和<script type="math/tex">\text{test_log}</script>为训练集和测试集的实时表现</li>
 <li>常见的对模型实时表现的评估有三种：损失（cost）、准确率（acc）和 F1-score，其中前两种是通用的评估、F1-score 则针对二类分类问题（F1-score 的相关数学定义可以参见<a href="https://en.wikipedia.org/wiki/F1_score" target="_blank" rel="external">这里</a>）</li>
 <li>定义三个方法，一个拿来实时记录这些评估、一个拿来输出最新的评估、一个拿来可视化评估</li>
 </ul>
