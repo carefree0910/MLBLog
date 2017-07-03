@@ -1227,7 +1227,7 @@ w = \left( w_{1},\ldots,w_{n} \right)^{T},\ \ x = \left( x_{1},\ldots,x_{n} \rig
     
     <entry>
       <title><![CDATA[相关数学理论]]></title>
-      <url>/posts/613bbb2f/</url>
+      <url>/posts/613bbb2e/</url>
       <content type="html"><![CDATA[<p>这篇文章会叙述之前没有解决的纯数学问题，会涉及到相当庞杂的数学概念与思想，其中一些推导的难度相对而言可能会比较大</p>
 <a id="more"></a>
 <h1 id="梯度下降法"><a href="#梯度下降法" class="headerlink" title="梯度下降法"></a>梯度下降法</h1><p>前文已经相当充分地说明了梯度下降的直观，本节则打算用较严谨的数学语言来重新叙述一遍这个方法</p>
