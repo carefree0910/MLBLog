@@ -102,7 +102,7 @@
 <meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p1.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p2.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p3.png">
-<meta property="og:updated_time" content="2017-04-28T12:11:15.000Z">
+<meta property="og:updated_time" content="2017-07-03T00:33:27.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从感知机到支持向量机">
 <meta name="twitter:description" content="感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：  可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容">
@@ -554,8 +554,6 @@ x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下
 0 < \alpha_{i} < C &\Leftrightarrow y_{i}g\left( x_{i} \right) = 1 \\
 \alpha_{i} = C &\Leftrightarrow y_{i}g\left( x_{i} \right) \leq 1
 \end{align}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
-<script type="math/tex; mode=display">
-c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
 <ul>
 <li>计算“损失向量”<script type="math/tex">c = \left( c_{1},\ldots,c_{N} \right)^{T}</script>、其中：  <script type="math/tex; mode=display">
 c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script></li>

@@ -1785,8 +1785,6 @@ x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下
 0 < \alpha_{i} < C &\Leftrightarrow y_{i}g\left( x_{i} \right) = 1 \\
 \alpha_{i} = C &\Leftrightarrow y_{i}g\left( x_{i} \right) \leq 1
 \end{align}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
-<script type="math/tex; mode=display">
-c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script><p>所谓违反 KKT 条件最严重的样本点的定义也有许多种、其中一种简单有效的定义为：</p>
 <ul>
 <li>计算“损失向量”<script type="math/tex">c = \left( c_{1},\ldots,c_{N} \right)^{T}</script>、其中：  <script type="math/tex; mode=display">
 c_{i} = \left\lbrack y_{i}g\left( x_{i} \right) - 1 \right\rbrack^{2}</script></li>
