@@ -1720,7 +1720,7 @@ b &\leftarrow b + \eta Cy_{i}
 <p>可以通过二维线性可分数据集来简单直观地感受一下感知机和线性 SVM 的区别、结果如下图所示：</p>
 <img src="/posts/d455305a/p2.png" alt="p2.png" title="">
 <p>其中左、右图分别为感知机和线性 SVM 的表现，可以看出线性 SVM 要更合理</p>
-<h1 id="SVM-算法的对偶形式"><a href="#SVM-算法的对偶形式" class="headerlink" title="SVM 算法的对偶形式"></a>SVM 算法的对偶形式</h1><p>与感知机类似、SVM 算法也是存在着对偶形式，不过这个转化的过程会比感知机那里的转化过程复杂不少。具体的推导步骤会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中、这里我们就直接看结果：</p>
+<h1 id="SVM-算法的对偶形式"><a href="#SVM-算法的对偶形式" class="headerlink" title="SVM 算法的对偶形式"></a>SVM 算法的对偶形式</h1><p>与感知机类似、SVM 算法也是存在着对偶形式，不过这个转化的过程会比感知机那里的转化过程复杂不少。具体的推导步骤会放在<a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a>中、这里我们就直接看结果：</p>
 <ul>
 <li>硬间隔最大化的对偶形式  <script type="math/tex; mode=display">
 \max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：  <script type="math/tex; mode=display">
@@ -1749,7 +1749,7 @@ x_{i} \in SV \Leftrightarrow 0 < \alpha_{i}^{*} \leq C</script></li>
 x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下图来直观认知何谓支持向量：</p>
 <img src="/posts/d455305a/p3.png" alt="p3.png" title="">
 <p>图中的线段即为决策边界、被一个黑色圆圈给圈住的样本点即为支持向量，左图为线性可分数据集上的情况、右图为线性不可分数据集上的情况</p>
-<p>此外，说明<script type="math/tex">\alpha_{i}^{*}</script>和<script type="math/tex">\xi_{i}^{*}</script>是如何定出各个样本点和间隔边界、分离超平面之间的位置关系是有必要的，它能加深我们对对偶形式求解过程中涉及到的 KKT 条件的理解与记忆（KKT 条件的相关定义会在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中讲到）。具体而言：</p>
+<p>此外，说明<script type="math/tex">\alpha_{i}^{*}</script>和<script type="math/tex">\xi_{i}^{*}</script>是如何定出各个样本点和间隔边界、分离超平面之间的位置关系是有必要的，它能加深我们对对偶形式求解过程中涉及到的 KKT 条件的理解与记忆（KKT 条件的相关定义会在<a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a>中讲到）。具体而言：</p>
 <ul>
 <li>若<script type="math/tex">\alpha_{i}^{*} = 0</script>，那么<script type="math/tex">x_{i}</script>被正确分类且不在间隔边界上、又或被正确分类且在间隔边界上但不是支持向量</li>
 <li>若<script type="math/tex">0 < \alpha_{i}^{*} < C</script>，那么就有<script type="math/tex">\xi_{i} = 0</script>、亦即<script type="math/tex">x_{i}</script>落在间隔边界上且为支持向量</li>
@@ -1778,7 +1778,7 @@ x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下
 </li>
 <li>将上述步骤选出的变量以外的变量固定、仅针对这两个变量进行最优化。易知此时问题转化为了求二次函数的极大值、从而能简单地得到解析解</li>
 </ul>
-<p>这里仅简要说明一下 SVM 对偶算法中的 KKT 条件，详细的陈列则会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中。具体而言、<script type="math/tex">\alpha_{i}</script>及其对应样本<script type="math/tex">(x_{i},y_{i})</script>的 KKT 条件为：</p>
+<p>这里仅简要说明一下 SVM 对偶算法中的 KKT 条件，详细的陈列则会放在<a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a>中。具体而言、<script type="math/tex">\alpha_{i}</script>及其对应样本<script type="math/tex">(x_{i},y_{i})</script>的 KKT 条件为：</p>
 <script type="math/tex; mode=display">
 \begin{align}
 \alpha_{i} = 0 &\Leftrightarrow y_{i}g\left( x_{i} \right) \geq 1 \\
@@ -1857,8 +1857,8 @@ w \cdot x_{i} + b &\leq 0\ \left( if\ y_{i} = + 1 \right)
 <script type="math/tex; mode=display">
 L\left( w,b,x,y \right) = \sum_{x_{i} \in E}^{}\left| w \cdot x_{i} + b \right|</script><p>注意到对于样本点<script type="math/tex">(x_{i},y_{i})</script>而言、<script type="math/tex">\left| w \cdot x_{i} + b \right|</script>能够相对地表示向量<script type="math/tex">x_{i}</script>到分离超平面<script type="math/tex">w \cdot x + b = 0</script>的距离，所以损失函数的几何解释即为：损失函数值<script type="math/tex">=</script>所有被误分类的样本点到当前分离超平面的相对距离的总和。如果感知机能将所有样本点正确分类的话、<script type="math/tex">E</script>就是空集、此时损失函数<script type="math/tex">L\left( w,b \right) = 0</script>；同时，若误分类的样本点越少或误分类的样本点离当前分离超平面越近、损失函数<script type="math/tex">L\left( w,b \right)</script>的值就越小。是故寻找最终正确的分离超平面<script type="math/tex">\Pi</script>的过程、确实可以转化为最小化损失函数<script type="math/tex">L\left( w,b \right)</script>的过程，而这也正是感知机所采用的训练策略</p>
 <p><strong><em>注意：需要强调的是，<script type="math/tex">\left| w \cdot x_{i} + b \right|</script>所描述的“相对距离”和我们直观上的“欧氏距离”或说“几何距离”是不一样的（事实上它们之间相差了一个<script type="math/tex">\left\| w \right\|</script>）；相对严谨的叙述会放在<a href="/posts/d455305a/" title="从感知机到支持向量机">从感知机到支持向量机</a>中、这里就先按下不表</em></strong></p>
-<h1 id="感知机算法"><a href="#感知机算法" class="headerlink" title="感知机算法"></a>感知机算法</h1><p>最小化损失函数这个过程在决策树的训练中也出现过，彼时我们采用的是一种启发式的算法——选取当前能使损失（信息的不确定性）减少最多的特征作为划分标准来划分数据。感知机算法采用的则是一种应用场景更广的方法——梯度下降法。梯度下降法的一般性定义和相关说明会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中、这里我们只说一个直观：在许多情况下，损失函数是足够好的函数、从而它在每个点都能进行“求导”。求导之后我们就能得到一个损失函数增长最快的“方向”，此时我们沿反方向前进的话、就能期望损失函数以“最快的速度”减少（这也正是为何梯度下降法又叫最速下降法）</p>
-<p>注意到在求得“方向”后、沿方向“走多远”也是需要考虑的参数。一般我们称该参数为“学习速率”或“步长”，通过调整和优化该参数的表现、常常能导出原理一致但表现迥异的算法。不过即使如此，梯度下降法的关键还是在于损失函数的“求导”。需要指出的是，梯度下降法本身还可以大致分为三种具体的算法——随机梯度下降法（Stochastic Gradient Descent，常简称为 SGD）、小批量梯度下降法（Mini-batch Gradient Descent，常简称为 MBGD）和批量梯度下降法（Batch Gradient Descent，常简称为 BGD）。这三种梯度下降法的说明、对比同样会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中进行，这里只需要知道它们行为上的差别：随机梯度下降法在每个迭代中只使用一个样本来进行参数的更新、小批量梯度下降法则会同时选用多个样本来更新参数、批量梯度下降法则更是会同时选用所有样本来更新参数</p>
+<h1 id="感知机算法"><a href="#感知机算法" class="headerlink" title="感知机算法"></a>感知机算法</h1><p>最小化损失函数这个过程在决策树的训练中也出现过，彼时我们采用的是一种启发式的算法——选取当前能使损失（信息的不确定性）减少最多的特征作为划分标准来划分数据。感知机算法采用的则是一种应用场景更广的方法——梯度下降法。梯度下降法的一般性定义和相关说明会放在<a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a>中、这里我们只说一个直观：在许多情况下，损失函数是足够好的函数、从而它在每个点都能进行“求导”。求导之后我们就能得到一个损失函数增长最快的“方向”，此时我们沿反方向前进的话、就能期望损失函数以“最快的速度”减少（这也正是为何梯度下降法又叫最速下降法）</p>
+<p>注意到在求得“方向”后、沿方向“走多远”也是需要考虑的参数。一般我们称该参数为“学习速率”或“步长”，通过调整和优化该参数的表现、常常能导出原理一致但表现迥异的算法。不过即使如此，梯度下降法的关键还是在于损失函数的“求导”。需要指出的是，梯度下降法本身还可以大致分为三种具体的算法——随机梯度下降法（Stochastic Gradient Descent，常简称为 SGD）、小批量梯度下降法（Mini-batch Gradient Descent，常简称为 MBGD）和批量梯度下降法（Batch Gradient Descent，常简称为 BGD）。这三种梯度下降法的说明、对比同样会放在<a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a>中进行，这里只需要知道它们行为上的差别：随机梯度下降法在每个迭代中只使用一个样本来进行参数的更新、小批量梯度下降法则会同时选用多个样本来更新参数、批量梯度下降法则更是会同时选用所有样本来更新参数</p>
 <p><strong><em>注意：也有认为 SGD 即为 MBGD 的说法、所以具体的含义需要结合具体情况分析</em></strong></p>
 <p>简单起见、我们采用随机梯度下降来进行训练，此时我们需要求出损失函数在单一样本上对<script type="math/tex">w</script>和<script type="math/tex">b</script>的偏导数：</p>
 <script type="math/tex; mode=display">
@@ -1972,7 +1972,7 @@ G = \left( x_{i} \cdot x_{j} \right)_{N \times N}</script><p>这样的话，在�
 <li><a href="/posts/924abfe1/" title="从线性到非线性">从线性到非线性</a></li>
 <li><a href="/posts/917ccef9/" title="核模型的实现与评估">核模型的实现与评估</a></li>
 <li><a href="/posts/1dc4445a/" title="多分类与支持向量回归">多分类与支持向量回归</a></li>
-<li><a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a></li>
+<li><a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a></li>
 <li><a href="/posts/5b3e9c59/" title="“支持向量机”小结">“支持向量机”小结</a>
 </li>
 </ul>

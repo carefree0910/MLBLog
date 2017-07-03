@@ -102,7 +102,7 @@
 <meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p1.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p2.png">
 <meta property="og:image" content="http://www.carefree0910.com/posts/d455305a/p3.png">
-<meta property="og:updated_time" content="2017-07-03T00:33:27.000Z">
+<meta property="og:updated_time" content="2017-07-03T15:52:31.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从感知机到支持向量机">
 <meta name="twitter:description" content="感知机确实能够解决线性可分数据集的分类问题，但从它的解法容易看出、感知机的解是有无穷多个的。这主要是因为它对自己的要求太低：只需对训练集中所有样本点都能正确分类即可。换句话说、感知机基本没有考虑模型的泛化能力，这就导致感知机有时会训练出如下图所示的结果：  可以看出它们是不尽合理的。支持向量机（SVM）针对这一点提出了一种改进方法，本篇文章主要叙述的就是该改进的思想和具体内容">
@@ -489,7 +489,7 @@ b &\leftarrow b + \eta Cy_{i}
 <p>可以通过二维线性可分数据集来简单直观地感受一下感知机和线性 SVM 的区别、结果如下图所示：</p>
 <img src="/posts/d455305a/p2.png" alt="p2.png" title="">
 <p>其中左、右图分别为感知机和线性 SVM 的表现，可以看出线性 SVM 要更合理</p>
-<h1 id="SVM-算法的对偶形式"><a href="#SVM-算法的对偶形式" class="headerlink" title="SVM 算法的对偶形式"></a>SVM 算法的对偶形式</h1><p>与感知机类似、SVM 算法也是存在着对偶形式，不过这个转化的过程会比感知机那里的转化过程复杂不少。具体的推导步骤会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中、这里我们就直接看结果：</p>
+<h1 id="SVM-算法的对偶形式"><a href="#SVM-算法的对偶形式" class="headerlink" title="SVM 算法的对偶形式"></a>SVM 算法的对偶形式</h1><p>与感知机类似、SVM 算法也是存在着对偶形式，不过这个转化的过程会比感知机那里的转化过程复杂不少。具体的推导步骤会放在<a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a>中、这里我们就直接看结果：</p>
 <ul>
 <li>硬间隔最大化的对偶形式  <script type="math/tex; mode=display">
 \max_{\alpha}{- \frac{1}{2}\sum_{i = 1}^{N}{\sum_{j = 1}^{N}{\alpha_{i}\alpha_{j}y_{i}y_{j}\left( x_{i} \cdot x_{j} \right)}} + \sum_{i = 1}^{N}\alpha_{i}}</script>使得对<script type="math/tex">i = 1,\ldots,N</script>、都有：  <script type="math/tex; mode=display">
@@ -518,7 +518,7 @@ x_{i} \in SV \Leftrightarrow 0 < \alpha_{i}^{*} \leq C</script></li>
 x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下图来直观认知何谓支持向量：</p>
 <img src="/posts/d455305a/p3.png" alt="p3.png" title="">
 <p>图中的线段即为决策边界、被一个黑色圆圈给圈住的样本点即为支持向量，左图为线性可分数据集上的情况、右图为线性不可分数据集上的情况</p>
-<p>此外，说明<script type="math/tex">\alpha_{i}^{*}</script>和<script type="math/tex">\xi_{i}^{*}</script>是如何定出各个样本点和间隔边界、分离超平面之间的位置关系是有必要的，它能加深我们对对偶形式求解过程中涉及到的 KKT 条件的理解与记忆（KKT 条件的相关定义会在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中讲到）。具体而言：</p>
+<p>此外，说明<script type="math/tex">\alpha_{i}^{*}</script>和<script type="math/tex">\xi_{i}^{*}</script>是如何定出各个样本点和间隔边界、分离超平面之间的位置关系是有必要的，它能加深我们对对偶形式求解过程中涉及到的 KKT 条件的理解与记忆（KKT 条件的相关定义会在<a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a>中讲到）。具体而言：</p>
 <ul>
 <li>若<script type="math/tex">\alpha_{i}^{*} = 0</script>，那么<script type="math/tex">x_{i}</script>被正确分类且不在间隔边界上、又或被正确分类且在间隔边界上但不是支持向量</li>
 <li>若<script type="math/tex">0 < \alpha_{i}^{*} < C</script>，那么就有<script type="math/tex">\xi_{i} = 0</script>、亦即<script type="math/tex">x_{i}</script>落在间隔边界上且为支持向量</li>
@@ -547,7 +547,7 @@ x_{i} \in SV \Leftrightarrow \alpha_{i}^{*} > 0</script><p>我们可以通过下
 </li>
 <li>将上述步骤选出的变量以外的变量固定、仅针对这两个变量进行最优化。易知此时问题转化为了求二次函数的极大值、从而能简单地得到解析解</li>
 </ul>
-<p>这里仅简要说明一下 SVM 对偶算法中的 KKT 条件，详细的陈列则会放在<a href="/posts/613bbb2f/" title="相关数学理论">相关数学理论</a>中。具体而言、<script type="math/tex">\alpha_{i}</script>及其对应样本<script type="math/tex">(x_{i},y_{i})</script>的 KKT 条件为：</p>
+<p>这里仅简要说明一下 SVM 对偶算法中的 KKT 条件，详细的陈列则会放在<a href="/posts/18dd8b30/" title="相关数学理论">相关数学理论</a>中。具体而言、<script type="math/tex">\alpha_{i}</script>及其对应样本<script type="math/tex">(x_{i},y_{i})</script>的 KKT 条件为：</p>
 <script type="math/tex; mode=display">
 \begin{align}
 \alpha_{i} = 0 &\Leftrightarrow y_{i}g\left( x_{i} \right) \geq 1 \\
