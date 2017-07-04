@@ -1537,7 +1537,7 @@ u &= (u_{1},\ldots,u_{N}) \\
 <script type="math/tex; mode=display">
 \sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
 0 \leq \alpha_{i} \leq C</script><p>不妨设<script type="math/tex">i=1</script>、<script type="math/tex">j=2</script>，那么在针对<script type="math/tex">\alpha_1</script>、<script type="math/tex">\alpha_2</script>的情况下，<script type="math/tex">\alpha_3,...,\alpha_N</script>是固定的、且上述最优化问题可以转化为：</p>
-<script type="math/tex; mode=display">\max_{\alpha_1,\alpha_2}{- \frac{1}{2}\left( K_{11}\alpha_{1}^{2} + y_{1}y_{2}K_{12}\alpha_{1}\alpha_{2} + K_{22}\alpha_{2}^{2} \right) - \left( y_{1}\alpha_{1}\sum_{i = 3}^{N}{y_{i}\alpha_{i}K_{i1}} + y_{2}\alpha_{2}\sum_{i = 3}^{N}K_{i2} \right) + {(\alpha}_{1} + \alpha_{2})}</script><p>使得对<script type="math/tex">i = 1</script>和<script type="math/tex">i = 2</script>、有</p>
+<script type="math/tex; mode=display">\max_{\alpha_1,\alpha_2}{- \frac{1}{2}\left( K_{11}\alpha_{1}^{2} + 2y_{1}y_{2}K_{12}\alpha_{1}\alpha_{2} + K_{22}\alpha_{2}^{2} \right) - \left( y_{1}\alpha_{1}\sum_{i = 3}^{N}{y_{i}\alpha_{i}K_{i1}} + y_{2}\alpha_{2}\sum_{i = 3}^{N}y_i\alpha_iK_{i2} \right) + {(\alpha}_{1} + \alpha_{2})}</script><p>使得对<script type="math/tex">i = 1</script>和<script type="math/tex">i = 2</script>、有</p>
 <script type="math/tex; mode=display">
 y_{1}\alpha_{1} + y_{2}\alpha_{2} = - \sum_{i = 3}^{N}{y_{i}\alpha_{i} = const}</script><script type="math/tex; mode=display">
 0 \leq \alpha_{i} \leq C</script><p>其中<script type="math/tex">const</script>为常数。可以看出此时问题确实转化为了一个带约束的二次函数求极值问题、从而能够比较简单地求出其解析解。推导过程从略、以下就直接在算法中写出结果：</p>

@@ -1507,7 +1507,7 @@ l_{\epsilon}(w,b,x_{i},y_{i}) = \left\{ \begin{matrix}
     <link href="http://www.carefree0910.com/posts/924abfe1/"/>
     <id>http://www.carefree0910.com/posts/924abfe1/</id>
     <published>2017-04-28T03:18:01.000Z</published>
-    <updated>2017-04-28T12:18:18.000Z</updated>
+    <updated>2017-07-04T00:28:54.000Z</updated>
     
     <content type="html"><![CDATA[<p>前文已经提过，由于对偶形式中的样本点仅以内积的形式出现、所以利用核技巧能将线性算法“升级”为非线性算法。有一个与核技巧（Kernel Trick）类似的概念叫核方法（Kernel Method），这两者的区别可以简单地从字面意思去认知：当我们提及核方法（Method）时、我们比较注重它背后的原理；当我们提及核技巧（Trick）时、我们更注重它实际的应用。考虑到本书的主旨、我们还是选择了核技巧这一说法</p>
 <p><strong><em>注意：以上关于核技巧和核方法这两个名词的区分不是一种共识、而是我个人为了简化问题而作的一种形象的说明，所以切忌将其作为严谨的叙述</em></strong></p>
@@ -1612,7 +1612,7 @@ u &= (u_{1},\ldots,u_{N}) \\
 <script type="math/tex; mode=display">
 \sum_{i = 1}^{N}{\alpha_{i}y_{i}} = 0</script><script type="math/tex; mode=display">
 0 \leq \alpha_{i} \leq C</script><p>不妨设<script type="math/tex">i=1</script>、<script type="math/tex">j=2</script>，那么在针对<script type="math/tex">\alpha_1</script>、<script type="math/tex">\alpha_2</script>的情况下，<script type="math/tex">\alpha_3,...,\alpha_N</script>是固定的、且上述最优化问题可以转化为：</p>
-<script type="math/tex; mode=display">\max_{\alpha_1,\alpha_2}{- \frac{1}{2}\left( K_{11}\alpha_{1}^{2} + y_{1}y_{2}K_{12}\alpha_{1}\alpha_{2} + K_{22}\alpha_{2}^{2} \right) - \left( y_{1}\alpha_{1}\sum_{i = 3}^{N}{y_{i}\alpha_{i}K_{i1}} + y_{2}\alpha_{2}\sum_{i = 3}^{N}K_{i2} \right) + {(\alpha}_{1} + \alpha_{2})}</script><p>使得对<script type="math/tex">i = 1</script>和<script type="math/tex">i = 2</script>、有</p>
+<script type="math/tex; mode=display">\max_{\alpha_1,\alpha_2}{- \frac{1}{2}\left( K_{11}\alpha_{1}^{2} + 2y_{1}y_{2}K_{12}\alpha_{1}\alpha_{2} + K_{22}\alpha_{2}^{2} \right) - \left( y_{1}\alpha_{1}\sum_{i = 3}^{N}{y_{i}\alpha_{i}K_{i1}} + y_{2}\alpha_{2}\sum_{i = 3}^{N}y_i\alpha_iK_{i2} \right) + {(\alpha}_{1} + \alpha_{2})}</script><p>使得对<script type="math/tex">i = 1</script>和<script type="math/tex">i = 2</script>、有</p>
 <script type="math/tex; mode=display">
 y_{1}\alpha_{1} + y_{2}\alpha_{2} = - \sum_{i = 3}^{N}{y_{i}\alpha_{i} = const}</script><script type="math/tex; mode=display">
 0 \leq \alpha_{i} \leq C</script><p>其中<script type="math/tex">const</script>为常数。可以看出此时问题确实转化为了一个带约束的二次函数求极值问题、从而能够比较简单地求出其解析解。推导过程从略、以下就直接在算法中写出结果：</p>
