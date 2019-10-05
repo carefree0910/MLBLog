@@ -4,9 +4,9 @@
   <subtitle>Python &amp; Machine Learning</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://www.carefree0910.com/"/>
+  <link href="http://mlblog.carefree0910.me/"/>
   <updated>2017-05-06T07:17:13.000Z</updated>
-  <id>http://www.carefree0910.com/</id>
+  <id>http://mlblog.carefree0910.me/</id>
   
   <author>
     <name>射命丸咲</name>
@@ -17,8 +17,8 @@
   
   <entry>
     <title>“卷积神经网络”小结</title>
-    <link href="http://www.carefree0910.com/posts/18671318/"/>
-    <id>http://www.carefree0910.com/posts/18671318/</id>
+    <link href="http://mlblog.carefree0910.me/posts/18671318/"/>
+    <id>http://mlblog.carefree0910.me/posts/18671318/</id>
     <published>2017-05-06T07:15:38.000Z</published>
     <updated>2017-05-06T07:17:13.000Z</updated>
     
@@ -40,17 +40,17 @@
     
     </summary>
     
-      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="卷积神经网络" scheme="http://mlblog.carefree0910.me/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
+      <category term="小结" scheme="http://mlblog.carefree0910.me/tags/%E5%B0%8F%E7%BB%93/"/>
     
   </entry>
   
   <entry>
     <title>将 NN 扩展为 CNN</title>
-    <link href="http://www.carefree0910.com/posts/433ed5d6/"/>
-    <id>http://www.carefree0910.com/posts/433ed5d6/</id>
+    <link href="http://mlblog.carefree0910.me/posts/433ed5d6/"/>
+    <id>http://mlblog.carefree0910.me/posts/433ed5d6/</id>
     <published>2017-05-06T06:54:43.000Z</published>
     <updated>2017-05-06T07:15:12.000Z</updated>
     
@@ -106,17 +106,17 @@ h^{\text{out}} = \left\lceil \frac{h^{\text{old}}}{\text{stride}} \right\rceil,\
     
     </summary>
     
-      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="卷积神经网络" scheme="http://mlblog.carefree0910.me/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>利用 Tensorflow 重写 NN</title>
-    <link href="http://www.carefree0910.com/posts/24ed2586/"/>
-    <id>http://www.carefree0910.com/posts/24ed2586/</id>
+    <link href="http://mlblog.carefree0910.me/posts/24ed2586/"/>
+    <id>http://mlblog.carefree0910.me/posts/24ed2586/</id>
     <published>2017-05-06T06:24:58.000Z</published>
     <updated>2017-05-20T01:45:52.000Z</updated>
     
@@ -224,19 +224,19 @@ y^{\left( i \right)} = \gamma\hat{v^{\left( i \right)}} + \beta</script></li>
     
     </summary>
     
-      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="卷积神经网络" scheme="http://mlblog.carefree0910.me/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+      <category term="算法" scheme="http://mlblog.carefree0910.me/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
   <entry>
     <title>从 NN 到 CNN</title>
-    <link href="http://www.carefree0910.com/posts/7990dadf/"/>
-    <id>http://www.carefree0910.com/posts/7990dadf/</id>
+    <link href="http://mlblog.carefree0910.me/posts/7990dadf/"/>
+    <id>http://mlblog.carefree0910.me/posts/7990dadf/</id>
     <published>2017-05-06T05:59:36.000Z</published>
     <updated>2017-05-06T07:15:08.000Z</updated>
     
@@ -328,17 +328,17 @@ X = \left( x_{1},\ldots,x_{N} \right)^{T}</script><p>其中<script type="math/te
     
     </summary>
     
-      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="卷积神经网络" scheme="http://mlblog.carefree0910.me/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://mlblog.carefree0910.me/tags/%E7%BB%BC%E8%BF%B0/"/>
     
   </entry>
   
   <entry>
     <title>卷积神经网络综述</title>
-    <link href="http://www.carefree0910.com/posts/78be0d7d/"/>
-    <id>http://www.carefree0910.com/posts/78be0d7d/</id>
+    <link href="http://mlblog.carefree0910.me/posts/78be0d7d/"/>
+    <id>http://mlblog.carefree0910.me/posts/78be0d7d/</id>
     <published>2017-05-06T02:41:50.000Z</published>
     <updated>2017-05-06T07:15:05.000Z</updated>
     
@@ -361,19 +361,19 @@ X = \left( x_{1},\ldots,x_{N} \right)^{T}</script><p>其中<script type="math/te
     
     </summary>
     
-      <category term="卷积神经网络" scheme="http://www.carefree0910.com/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="卷积神经网络" scheme="http://mlblog.carefree0910.me/categories/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://mlblog.carefree0910.me/tags/%E7%BB%BC%E8%BF%B0/"/>
     
-      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
+      <category term="目录" scheme="http://mlblog.carefree0910.me/tags/%E7%9B%AE%E5%BD%95/"/>
     
   </entry>
   
   <entry>
     <title>“神经网络”小结</title>
-    <link href="http://www.carefree0910.com/posts/66bacb27/"/>
-    <id>http://www.carefree0910.com/posts/66bacb27/</id>
+    <link href="http://mlblog.carefree0910.me/posts/66bacb27/"/>
+    <id>http://mlblog.carefree0910.me/posts/66bacb27/</id>
     <published>2017-05-06T01:59:09.000Z</published>
     <updated>2017-05-06T02:00:52.000Z</updated>
     
@@ -395,17 +395,17 @@ X = \left( x_{1},\ldots,x_{N} \right)^{T}</script><p>其中<script type="math/te
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
+      <category term="小结" scheme="http://mlblog.carefree0910.me/tags/%E5%B0%8F%E7%BB%93/"/>
     
   </entry>
   
   <entry>
     <title>相关数学理论</title>
-    <link href="http://www.carefree0910.com/posts/613bbb2f/"/>
-    <id>http://www.carefree0910.com/posts/613bbb2f/</id>
+    <link href="http://mlblog.carefree0910.me/posts/613bbb2f/"/>
+    <id>http://mlblog.carefree0910.me/posts/613bbb2f/</id>
     <published>2017-05-06T01:38:59.000Z</published>
     <updated>2017-05-19T16:57:01.000Z</updated>
     
@@ -506,17 +506,17 @@ L^{*}\left( x \right) = \left\{ \begin{matrix}
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>“大数据”下的网络结构</title>
-    <link href="http://www.carefree0910.com/posts/65c8a24f/"/>
-    <id>http://www.carefree0910.com/posts/65c8a24f/</id>
+    <link href="http://mlblog.carefree0910.me/posts/65c8a24f/"/>
+    <id>http://mlblog.carefree0910.me/posts/65c8a24f/</id>
     <published>2017-05-06T01:14:58.000Z</published>
     <updated>2017-05-20T01:34:39.000Z</updated>
     
@@ -585,17 +585,17 @@ L^{*}\left( x \right) = \left\{ \begin{matrix}
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>朴素的网络结构</title>
-    <link href="http://www.carefree0910.com/posts/3bb962a6/"/>
-    <id>http://www.carefree0910.com/posts/3bb962a6/</id>
+    <link href="http://mlblog.carefree0910.me/posts/3bb962a6/"/>
+    <id>http://mlblog.carefree0910.me/posts/3bb962a6/</id>
     <published>2017-05-05T15:51:38.000Z</published>
     <updated>2017-05-06T02:08:37.000Z</updated>
     
@@ -652,17 +652,17 @@ L^{*}\left( x \right) = \left\{ \begin{matrix}
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>参数的更新</title>
-    <link href="http://www.carefree0910.com/posts/55a23cf0/"/>
-    <id>http://www.carefree0910.com/posts/55a23cf0/</id>
+    <link href="http://mlblog.carefree0910.me/posts/55a23cf0/"/>
+    <id>http://mlblog.carefree0910.me/posts/55a23cf0/</id>
     <published>2017-05-05T15:06:13.000Z</published>
     <updated>2017-05-06T02:32:29.000Z</updated>
     
@@ -792,21 +792,21 @@ v_{t} &= \rho v_{t - 1} - \eta\Delta{\hat{w}}_{t} \\
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+      <category term="算法" scheme="http://mlblog.carefree0910.me/tags/%E7%AE%97%E6%B3%95/"/>
     
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://mlblog.carefree0910.me/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
   <entry>
     <title>特殊的层结构</title>
-    <link href="http://www.carefree0910.com/posts/a33ff165/"/>
-    <id>http://www.carefree0910.com/posts/a33ff165/</id>
+    <link href="http://mlblog.carefree0910.me/posts/a33ff165/"/>
+    <id>http://mlblog.carefree0910.me/posts/a33ff165/</id>
     <published>2017-05-05T14:47:43.000Z</published>
     <updated>2017-05-06T02:25:34.000Z</updated>
     
@@ -857,17 +857,17 @@ v_{t} &= \rho v_{t - 1} - \eta\Delta{\hat{w}}_{t} \\
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://mlblog.carefree0910.me/tags/%E7%BB%BC%E8%BF%B0/"/>
     
   </entry>
   
   <entry>
     <title>反向传播算法</title>
-    <link href="http://www.carefree0910.com/posts/437097cd/"/>
-    <id>http://www.carefree0910.com/posts/437097cd/</id>
+    <link href="http://mlblog.carefree0910.me/posts/437097cd/"/>
+    <id>http://mlblog.carefree0910.me/posts/437097cd/</id>
     <published>2017-05-05T13:27:21.000Z</published>
     <updated>2017-05-06T02:24:18.000Z</updated>
     
@@ -1022,21 +1022,21 @@ c = \max{\{ v_{1}^{\left( m \right)},\ldots,v_{K}^{\left( m \right)}\}}</script>
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+      <category term="算法" scheme="http://mlblog.carefree0910.me/tags/%E7%AE%97%E6%B3%95/"/>
     
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://mlblog.carefree0910.me/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
   <entry>
     <title>前向传导算法</title>
-    <link href="http://www.carefree0910.com/posts/2a8cdd6/"/>
-    <id>http://www.carefree0910.com/posts/2a8cdd6/</id>
+    <link href="http://mlblog.carefree0910.me/posts/2a8cdd6/"/>
+    <id>http://mlblog.carefree0910.me/posts/2a8cdd6/</id>
     <published>2017-05-05T12:51:11.000Z</published>
     <updated>2017-05-06T02:15:04.000Z</updated>
     
@@ -1149,19 +1149,19 @@ L\left( y,G\left( x \right) \right) = - \ln v_{k}</script>换句话说，log-lik
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+      <category term="算法" scheme="http://mlblog.carefree0910.me/tags/%E7%AE%97%E6%B3%95/"/>
     
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://mlblog.carefree0910.me/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
   <entry>
     <title>从感知机到多层感知机</title>
-    <link href="http://www.carefree0910.com/posts/3fa9a563/"/>
-    <id>http://www.carefree0910.com/posts/3fa9a563/</id>
+    <link href="http://mlblog.carefree0910.me/posts/3fa9a563/"/>
+    <id>http://mlblog.carefree0910.me/posts/3fa9a563/</id>
     <published>2017-05-05T12:25:50.000Z</published>
     <updated>2017-05-19T16:47:10.000Z</updated>
     
@@ -1214,17 +1214,17 @@ w = \left( w_{1},\ldots,w_{n} \right)^{T},\ \ x = \left( x_{1},\ldots,x_{n} \rig
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://mlblog.carefree0910.me/tags/%E7%BB%BC%E8%BF%B0/"/>
     
   </entry>
   
   <entry>
     <title>神经网络综述</title>
-    <link href="http://www.carefree0910.com/posts/d94622d/"/>
-    <id>http://www.carefree0910.com/posts/d94622d/</id>
+    <link href="http://mlblog.carefree0910.me/posts/d94622d/"/>
+    <id>http://mlblog.carefree0910.me/posts/d94622d/</id>
     <published>2017-05-05T02:20:11.000Z</published>
     <updated>2017-05-06T01:52:41.000Z</updated>
     
@@ -1249,19 +1249,19 @@ w = \left( w_{1},\ldots,w_{n} \right)^{T},\ \ x = \left( x_{1},\ldots,x_{n} \rig
     
     </summary>
     
-      <category term="神经网络" scheme="http://www.carefree0910.com/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+      <category term="神经网络" scheme="http://mlblog.carefree0910.me/categories/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     
     
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://mlblog.carefree0910.me/tags/%E7%BB%BC%E8%BF%B0/"/>
     
-      <category term="目录" scheme="http://www.carefree0910.com/tags/%E7%9B%AE%E5%BD%95/"/>
+      <category term="目录" scheme="http://mlblog.carefree0910.me/tags/%E7%9B%AE%E5%BD%95/"/>
     
   </entry>
   
   <entry>
     <title>“支持向量机”小结</title>
-    <link href="http://www.carefree0910.com/posts/5b3e9c59/"/>
-    <id>http://www.carefree0910.com/posts/5b3e9c59/</id>
+    <link href="http://mlblog.carefree0910.me/posts/5b3e9c59/"/>
+    <id>http://mlblog.carefree0910.me/posts/5b3e9c59/</id>
     <published>2017-04-28T11:25:48.000Z</published>
     <updated>2017-04-28T11:26:50.000Z</updated>
     
@@ -1283,17 +1283,17 @@ w = \left( w_{1},\ldots,w_{n} \right)^{T},\ \ x = \left( x_{1},\ldots,x_{n} \rig
     
     </summary>
     
-      <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
+      <category term="支持向量机" scheme="http://mlblog.carefree0910.me/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
     
     
-      <category term="小结" scheme="http://www.carefree0910.com/tags/%E5%B0%8F%E7%BB%93/"/>
+      <category term="小结" scheme="http://mlblog.carefree0910.me/tags/%E5%B0%8F%E7%BB%93/"/>
     
   </entry>
   
   <entry>
     <title>相关数学理论</title>
-    <link href="http://www.carefree0910.com/posts/18dd8b30/"/>
-    <id>http://www.carefree0910.com/posts/18dd8b30/</id>
+    <link href="http://mlblog.carefree0910.me/posts/18dd8b30/"/>
+    <id>http://mlblog.carefree0910.me/posts/18dd8b30/</id>
     <published>2017-04-28T11:01:43.000Z</published>
     <updated>2017-07-03T15:42:21.000Z</updated>
     
@@ -1391,21 +1391,21 @@ y_{i}\left( w^{*} \cdot x_{i} + b^{*} \right) - 1 + \xi^{*} \geq 0</script><scri
     
     </summary>
     
-      <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
+      <category term="支持向量机" scheme="http://mlblog.carefree0910.me/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
     
     
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://mlblog.carefree0910.me/tags/%E7%BB%BC%E8%BF%B0/"/>
     
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+      <category term="算法" scheme="http://mlblog.carefree0910.me/tags/%E7%AE%97%E6%B3%95/"/>
     
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://mlblog.carefree0910.me/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
   <entry>
     <title>多分类与支持向量回归</title>
-    <link href="http://www.carefree0910.com/posts/1dc4445a/"/>
-    <id>http://www.carefree0910.com/posts/1dc4445a/</id>
+    <link href="http://mlblog.carefree0910.me/posts/1dc4445a/"/>
+    <id>http://mlblog.carefree0910.me/posts/1dc4445a/</id>
     <published>2017-04-28T10:43:38.000Z</published>
     <updated>2017-04-28T12:19:38.000Z</updated>
     
@@ -1445,19 +1445,19 @@ l_{\epsilon}(w,b,x_{i},y_{i}) = \left\{ \begin{matrix}
     
     </summary>
     
-      <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
+      <category term="支持向量机" scheme="http://mlblog.carefree0910.me/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
     
     
-      <category term="综述" scheme="http://www.carefree0910.com/tags/%E7%BB%BC%E8%BF%B0/"/>
+      <category term="综述" scheme="http://mlblog.carefree0910.me/tags/%E7%BB%BC%E8%BF%B0/"/>
     
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+      <category term="算法" scheme="http://mlblog.carefree0910.me/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
   <entry>
     <title>核模型的实现与评估</title>
-    <link href="http://www.carefree0910.com/posts/917ccef9/"/>
-    <id>http://www.carefree0910.com/posts/917ccef9/</id>
+    <link href="http://mlblog.carefree0910.me/posts/917ccef9/"/>
+    <id>http://mlblog.carefree0910.me/posts/917ccef9/</id>
     <published>2017-04-28T04:10:51.000Z</published>
     <updated>2017-04-28T10:48:28.000Z</updated>
     
@@ -1495,17 +1495,17 @@ l_{\epsilon}(w,b,x_{i},y_{i}) = \left\{ \begin{matrix}
     
     </summary>
     
-      <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
+      <category term="支持向量机" scheme="http://mlblog.carefree0910.me/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>从线性到非线性</title>
-    <link href="http://www.carefree0910.com/posts/924abfe1/"/>
-    <id>http://www.carefree0910.com/posts/924abfe1/</id>
+    <link href="http://mlblog.carefree0910.me/posts/924abfe1/"/>
+    <id>http://mlblog.carefree0910.me/posts/924abfe1/</id>
     <published>2017-04-28T03:18:01.000Z</published>
     <updated>2017-07-04T00:28:54.000Z</updated>
     
@@ -1698,14 +1698,14 @@ b = y_{k} - \sum_{i = 1}^{N}{y_{i}\alpha_{i}K_{ik}}</script><p>这里的下标 k
     
     </summary>
     
-      <category term="支持向量机" scheme="http://www.carefree0910.com/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
+      <category term="支持向量机" scheme="http://mlblog.carefree0910.me/categories/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
     
     
-      <category term="Python" scheme="http://www.carefree0910.com/tags/Python/"/>
+      <category term="Python" scheme="http://mlblog.carefree0910.me/tags/Python/"/>
     
-      <category term="算法" scheme="http://www.carefree0910.com/tags/%E7%AE%97%E6%B3%95/"/>
+      <category term="算法" scheme="http://mlblog.carefree0910.me/tags/%E7%AE%97%E6%B3%95/"/>
     
-      <category term="数学" scheme="http://www.carefree0910.com/tags/%E6%95%B0%E5%AD%A6/"/>
+      <category term="数学" scheme="http://mlblog.carefree0910.me/tags/%E6%95%B0%E5%AD%A6/"/>
     
   </entry>
   
